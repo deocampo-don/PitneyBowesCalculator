@@ -91,6 +91,19 @@
     <Compile Include="Add PB\CreatePBJobDialog.Designer.cs">
       <DependentUpon>CreatePBJobDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\pickListModel.cs" />
+    <Compile Include="Picked Up\PickedUpRowControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Picked Up\PickedUpRowControl.Designer.cs">
+      <DependentUpon>PickedUpRowControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Picked Up\PickedUpListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Picked Up\PickedUpListView.Designer.cs">
+      <DependentUpon>PickedUpListView.cs</DependentUpon>
+    </Compile>
     <Compile Include="SettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -133,6 +146,12 @@
     </Compile>
     <EmbeddedResource Include="Add PB\CreatePBJobDialog.resx">
       <DependentUpon>CreatePBJobDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Picked Up\PickedUpListView.resx">
+      <DependentUpon>PickedUpListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Picked Up\PickedUpRowControl.resx">
+      <DependentUpon>PickedUpRowControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SettingsDialog.resx">
       <DependentUpon>SettingsDialog.cs</DependentUpon>

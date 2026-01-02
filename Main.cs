@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp1.Picked_Up;
 
 namespace WindowsFormsApp1
 {
@@ -15,6 +16,7 @@ namespace WindowsFormsApp1
     {
 
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
+        private readonly List<PickListModel> _pickLists = new List<PickListModel>();
 
 
         public Main()
@@ -39,10 +41,16 @@ namespace WindowsFormsApp1
             kryptonCheckSet1.CheckedButton = kcbBuildPallets;
 
             var list = lvBuild; // the one on your page (select it in designer to see its name)
-
+            var list2 = pickedUpListView;
+            var pickedRow = new PickedUpRowControl();
             var row1 = new PalletRowControl();
+            var test = new PickListModel { JobName = "CAPONE", JobNumber = 23413, EnvelopeQty = 10000, Trays = 10, Pallets = 3, ShipDateTime = DateTime.Parse("2025-11-23") };
+
             // row1.Bind(...) later
+            _pickLists.Add(test);                 // ← DATA updated here
+            pickedUpListView.SetItems(_pickLists);
             list.AddRow(row1);
+            //list2.AddRow(pickedRow);
 
             MakeTitleBarButton(btnMaximize);
             MakeTitleBarButton(btnMinimize);
@@ -233,15 +241,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void tableLayoutPanel1_Paint_1(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void kryptonTableLayoutPanel2_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
+ 
     }
 }
 

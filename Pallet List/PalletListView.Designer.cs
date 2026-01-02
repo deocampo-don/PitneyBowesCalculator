@@ -82,6 +82,5 @@ namespace WindowsFormsApp1
 
         private Krypton.Toolkit.KryptonPanel scrollHost;
         private System.Windows.Forms.FlowLayoutPanel flowRows;
-
     }
 }

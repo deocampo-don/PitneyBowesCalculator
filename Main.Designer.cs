@@ -51,6 +51,7 @@ namespace WindowsFormsApp1
             this.pgPacked = new Krypton.Navigator.KryptonPage();
             this.pgPicked = new Krypton.Navigator.KryptonPage();
             this.kryptonPanel2 = new Krypton.Toolkit.KryptonPanel();
+            this.pickedUpListView = new WindowsFormsApp1.Picked_Up.PickedUpListView();
             this.kryptonPanel6 = new Krypton.Toolkit.KryptonPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.kryptonLabel6 = new Krypton.Toolkit.KryptonLabel();
@@ -376,6 +377,7 @@ namespace WindowsFormsApp1
             // 
             // kryptonPanel2
             // 
+            this.kryptonPanel2.Controls.Add(this.pickedUpListView);
             this.kryptonPanel2.Controls.Add(this.kryptonPanel6);
             this.kryptonPanel2.Controls.Add(this.tableLayoutPanel1);
             this.kryptonPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -385,6 +387,14 @@ namespace WindowsFormsApp1
             this.kryptonPanel2.Size = new System.Drawing.Size(1371, 493);
             this.kryptonPanel2.StateCommon.Color1 = System.Drawing.Color.White;
             this.kryptonPanel2.TabIndex = 1;
+            // 
+            // pickedUpListView
+            // 
+            this.pickedUpListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pickedUpListView.Location = new System.Drawing.Point(0, 100);
+            this.pickedUpListView.Name = "pickedUpListView";
+            this.pickedUpListView.Size = new System.Drawing.Size(1371, 393);
+            this.pickedUpListView.TabIndex = 2;
             // 
             // kryptonPanel6
             // 
@@ -414,6 +424,7 @@ namespace WindowsFormsApp1
             this.tableLayoutPanel2.Controls.Add(this.kryptonLabel7, 5, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -504,7 +515,6 @@ namespace WindowsFormsApp1
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1371, 68);
             this.tableLayoutPanel1.TabIndex = 0;
-            this.tableLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint_1);
             // 
             // kryptonButton2
             // 
@@ -594,7 +604,6 @@ namespace WindowsFormsApp1
             this.kryptonTableLayoutPanel2.Size = new System.Drawing.Size(782, 62);
             this.kryptonTableLayoutPanel2.StateCommon.Color1 = System.Drawing.Color.White;
             this.kryptonTableLayoutPanel2.TabIndex = 0;
-            this.kryptonTableLayoutPanel2.Paint += new System.Windows.Forms.PaintEventHandler(this.kryptonTableLayoutPanel2_Paint);
             // 
             // kryptonPanel5
             // 
@@ -874,6 +883,7 @@ namespace WindowsFormsApp1
         private Krypton.Toolkit.KryptonLabel kryptonLabel4;
         private Krypton.Toolkit.KryptonLabel kryptonLabel5;
         private Krypton.Toolkit.KryptonLabel kryptonLabel7;
+        private Picked_Up.PickedUpListView pickedUpListView;
     }
 }
 

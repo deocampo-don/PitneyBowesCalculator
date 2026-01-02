@@ -16,20 +16,6 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
 
-
-            if (DesignMode)
-            {
-                var placeholder = new Label
-                {
-                    Text = "Pallet list (design-time placeholder)",
-                    AutoSize = true,
-                    ForeColor = Color.Gray,
-                    Margin = new Padding(12)
-                };
-
-                flowRows.Controls.Add(placeholder);
-            }
-
         }
 
         public void SetItems(IEnumerable<PbJobModel> items)
