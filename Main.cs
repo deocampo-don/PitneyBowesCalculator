@@ -245,6 +245,11 @@ namespace WindowsFormsApp1
         {
             //test
         }
+
+        private void pnlHeader_Paint(object sender, PaintEventArgs e)
+        {
+            //test
+        }
     }
 }
 
