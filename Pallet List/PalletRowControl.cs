@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using WindowsFormsApp1.Models;
+using WindowsFormsApp1.DIalogs;
 
 namespace WindowsFormsApp1
 {
@@ -30,7 +31,7 @@ namespace WindowsFormsApp1
 
         private void btnAddPallet_Click(object sender, EventArgs e)
         {
-            using (var dlg = new CreatePBJobDialog())
+            using (var dlg = new AddToPalletDialog())
             {
                 dlg.ShowDialog(this); // modal, centered to parent
             }
@@ -73,9 +74,14 @@ namespace WindowsFormsApp1
             lblScannedWOs.Text = model.ScannedWorkOrders.ToString("N0");
         }
 
-        private void tlButtons_Paint(object sender, PaintEventArgs e)
-        {
+     
 
+        private void btnPackPallet_Click(object sender, EventArgs e)
+        {
+            using (var dlg = new PackPalletDIalog())
+            {
+                dlg.ShowDialog(this); // modal, centered to parent
+            }
         }
     }
 }

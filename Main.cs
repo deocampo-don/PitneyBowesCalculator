@@ -200,6 +200,24 @@ namespace WindowsFormsApp1
           
         }
 
+   
+        private void pnlButtonHeaders_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+    
+
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+            using (var dlg = new SettingsDialog())
+            {
+                if (dlg.ShowDialog(this) == DialogResult.OK)
+                {
+                  
+                }
+            }
+        }
         private void btnAddPBJob_Click(object sender, EventArgs e)
         {
             using (var dlg = new CreatePBJobDialog())
@@ -218,37 +236,6 @@ namespace WindowsFormsApp1
                     lvBuild.SetItems(_pbJobs); // ← UI refreshed here
                 }
             }
-        }
-
-        private void pnlButtonHeaders_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void btnAddPBJob_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnSettings_Click(object sender, EventArgs e)
-        {
-            using (var dlg = new SettingsDialog())
-            {
-                if (dlg.ShowDialog(this) == DialogResult.OK)
-                {
-                  
-                }
-            }
-        }
-
-        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
-        {
-            //test
-        }
-
-        private void pnlHeader_Paint(object sender, PaintEventArgs e)
-        {
-            //test
         }
     }
 }

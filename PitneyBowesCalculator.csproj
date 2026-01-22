@@ -85,11 +85,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplyRoundedCorners.cs" />
-    <Compile Include="Add PB\CreatePBJobDialog.cs">
+    <Compile Include="Dialogs\AddToPalletDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Add PB\CreatePBJobDialog.Designer.cs">
+    <Compile Include="Dialogs\AddToPalletDialog.Designer.cs">
+      <DependentUpon>AddToPalletDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\CreatePBJobDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\CreatePBJobDialog.Designer.cs">
       <DependentUpon>CreatePBJobDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\PackPalletDIalog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\PackPalletDIalog.Designer.cs">
+      <DependentUpon>PackPalletDIalog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\SettingsDialog.Designer.cs">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\pickListModel.cs" />
     <Compile Include="Packed And Ready\PackedRowControl.cs">
@@ -121,12 +139,6 @@
     </Compile>
     <Compile Include="Picked Up\PickedUpListView.Designer.cs">
       <DependentUpon>PickedUpListView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SettingsDialog.Designer.cs">
-      <DependentUpon>SettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
@@ -162,8 +174,17 @@
     <Compile Include="View\WorkOrderRowControl.Designer.cs">
       <DependentUpon>WorkOrderRowControl.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Add PB\CreatePBJobDialog.resx">
+    <EmbeddedResource Include="Dialogs\AddToPalletDialog.resx">
+      <DependentUpon>AddToPalletDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\CreatePBJobDialog.resx">
       <DependentUpon>CreatePBJobDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\PackPalletDIalog.resx">
+      <DependentUpon>PackPalletDIalog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SettingsDialog.resx">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Packed And Ready\PackedRowControl.resx">
       <DependentUpon>PackedRowControl.cs</DependentUpon>
@@ -176,9 +197,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Picked Up\PickedUpRowControl.resx">
       <DependentUpon>PickedUpRowControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SettingsDialog.resx">
-      <DependentUpon>SettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
@@ -265,6 +283,5 @@
   <ItemGroup>
     <None Include="Resources\search_img_32.png" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -133,7 +133,7 @@ namespace WindowsFormsApp1
             this.pnlHeader.StateCommon.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(83)))), ((int)(((byte)(239)))));
             this.pnlHeader.StateCommon.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(83)))), ((int)(((byte)(239)))));
             this.pnlHeader.TabIndex = 0;
-            this.pnlHeader.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlHeader_Paint);
+            
             // 
             // flowLayoutPanel1
             // 
@@ -298,7 +298,7 @@ namespace WindowsFormsApp1
             this.btnAddPBJob.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnAddPBJob.Values.Image = global::WindowsFormsApp1.Properties.Resources.add_img_22;
             this.btnAddPBJob.Values.Text = "Add New PB Job";
-            this.btnAddPBJob.Click += new System.EventHandler(this.btnAddPBJob_Click_1);
+            this.btnAddPBJob.Click += new System.EventHandler(this.btnAddPBJob_Click);
             // 
             // pnlNavigator
             // 
@@ -696,7 +696,7 @@ namespace WindowsFormsApp1
             this.dateTimePicker1.Name = "dateTimePicker1";
             this.dateTimePicker1.Size = new System.Drawing.Size(307, 43);
             this.dateTimePicker1.TabIndex = 0;
-            this.dateTimePicker1.ValueChanged += new System.EventHandler(this.dateTimePicker1_ValueChanged);
+       
             // 
             // pnlButtonHeaders
             // 

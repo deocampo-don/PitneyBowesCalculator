@@ -42,8 +42,8 @@
             this.rightPanel = new Krypton.Toolkit.KryptonPanel();
             this.tlButtons = new System.Windows.Forms.TableLayoutPanel();
             this.btnAddPallet = new Krypton.Toolkit.KryptonButton();
+            this.btnPackPallet = new Krypton.Toolkit.KryptonButton();
             this.kryptonButton3 = new Krypton.Toolkit.KryptonButton();
-            this.kryptonButton2 = new Krypton.Toolkit.KryptonButton();
             ((System.ComponentModel.ISupportInitialize)(this.PalletMainPanel)).BeginInit();
             this.PalletMainPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.RoundedGroupBox)).BeginInit();
@@ -224,7 +224,7 @@
             this.tlButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 16F));
             this.tlButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 23.76211F));
             this.tlButtons.Controls.Add(this.btnAddPallet, 0, 0);
-            this.tlButtons.Controls.Add(this.kryptonButton2, 2, 0);
+            this.tlButtons.Controls.Add(this.btnPackPallet, 2, 0);
             this.tlButtons.Controls.Add(this.kryptonButton3, 4, 0);
             this.tlButtons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlButtons.Location = new System.Drawing.Point(0, 0);
@@ -234,7 +234,7 @@
             this.tlButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlButtons.Size = new System.Drawing.Size(452, 63);
             this.tlButtons.TabIndex = 0;
-            this.tlButtons.Paint += new System.Windows.Forms.PaintEventHandler(this.tlButtons_Paint);
+          
             // 
             // btnAddPallet
             // 
@@ -260,6 +260,29 @@
             this.btnAddPallet.Values.Text = "Add To Pallet";
             this.btnAddPallet.Click += new System.EventHandler(this.btnAddPallet_Click);
             // 
+            // btnPackPallet
+            // 
+            this.btnPackPallet.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            this.btnPackPallet.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnPackPallet.Location = new System.Drawing.Point(176, 5);
+            this.btnPackPallet.Margin = new System.Windows.Forms.Padding(0);
+            this.btnPackPallet.Name = "btnPackPallet";
+            this.btnPackPallet.Size = new System.Drawing.Size(152, 53);
+            this.btnPackPallet.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(136)))), ((int)(((byte)(255)))));
+            this.btnPackPallet.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(136)))), ((int)(((byte)(255)))));
+            this.btnPackPallet.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnPackPallet.StateCommon.Border.Rounding = 5F;
+            this.btnPackPallet.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.btnPackPallet.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnPackPallet.StateCommon.Content.ShortText.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnPackPallet.StateCommon.Content.ShortText.TextV = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnPackPallet.TabIndex = 1;
+            this.btnPackPallet.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.btnPackPallet.Values.Text = "Pack Pallet";
+            this.btnPackPallet.Click += new System.EventHandler(this.btnPackPallet_Click);
+            // 
             // kryptonButton3
             // 
             this.kryptonButton3.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
@@ -280,28 +303,6 @@
             this.kryptonButton3.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.kryptonButton3.Values.Text = "View";
             this.kryptonButton3.Click += new System.EventHandler(this.kryptonButton3_Click);
-            // 
-            // kryptonButton2
-            // 
-            this.kryptonButton2.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.kryptonButton2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonButton2.Location = new System.Drawing.Point(176, 5);
-            this.kryptonButton2.Margin = new System.Windows.Forms.Padding(0);
-            this.kryptonButton2.Name = "kryptonButton2";
-            this.kryptonButton2.Size = new System.Drawing.Size(152, 53);
-            this.kryptonButton2.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(136)))), ((int)(((byte)(255)))));
-            this.kryptonButton2.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(136)))), ((int)(((byte)(255)))));
-            this.kryptonButton2.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonButton2.StateCommon.Border.Rounding = 5F;
-            this.kryptonButton2.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
-            this.kryptonButton2.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kryptonButton2.StateCommon.Content.ShortText.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
-            this.kryptonButton2.StateCommon.Content.ShortText.TextV = Krypton.Toolkit.PaletteRelativeAlign.Center;
-            this.kryptonButton2.TabIndex = 1;
-            this.kryptonButton2.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.kryptonButton2.Values.Text = "Pack Pallet";
             // 
             // PalletRowControl
             // 
@@ -350,6 +351,6 @@
         private System.Windows.Forms.TableLayoutPanel tlButtons;
         private Krypton.Toolkit.KryptonButton btnAddPallet;
         private Krypton.Toolkit.KryptonButton kryptonButton3;
-        private Krypton.Toolkit.KryptonButton kryptonButton2;
+        private Krypton.Toolkit.KryptonButton btnPackPallet;
     }
 }
