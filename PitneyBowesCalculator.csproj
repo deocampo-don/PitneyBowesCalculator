@@ -92,6 +92,24 @@
       <DependentUpon>CreatePBJobDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\pickListModel.cs" />
+    <Compile Include="Packed And Ready\PackedRowControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Packed And Ready\PackedRowControl.Designer.cs">
+      <DependentUpon>PackedRowControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Packed And Ready\PackedViewList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Packed And Ready\PackedViewList.Designer.cs">
+      <DependentUpon>PackedViewList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Packed And Ready\View Button\ViewButtonDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Packed And Ready\View Button\ViewButtonDialog.Designer.cs">
+      <DependentUpon>ViewButtonDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Picked Up\PickedUpRowControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -146,6 +164,12 @@
     </Compile>
     <EmbeddedResource Include="Add PB\CreatePBJobDialog.resx">
       <DependentUpon>CreatePBJobDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Packed And Ready\PackedRowControl.resx">
+      <DependentUpon>PackedRowControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Packed And Ready\View Button\ViewButtonDialog.resx">
+      <DependentUpon>ViewButtonDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Picked Up\PickedUpListView.resx">
       <DependentUpon>PickedUpListView.cs</DependentUpon>
@@ -241,5 +265,6 @@
   <ItemGroup>
     <None Include="Resources\search_img_32.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

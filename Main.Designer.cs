@@ -211,9 +211,9 @@ namespace WindowsFormsApp1
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(448, 6);
+            this.label1.Location = new System.Drawing.Point(459, 7);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(543, 39);
+            this.label1.Size = new System.Drawing.Size(521, 38);
             this.label1.TabIndex = 0;
             this.label1.Text = "PITNEY BOWES CALCULATOR";
             // 
@@ -241,7 +241,7 @@ namespace WindowsFormsApp1
             this.gbRoundedParent.Panel.Controls.Add(this.pnlBottom);
             this.gbRoundedParent.Panel.Controls.Add(this.pnlNavigator);
             this.gbRoundedParent.Panel.Controls.Add(this.pnlSettings);
-            this.gbRoundedParent.Panel.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
+            this.gbRoundedParent.Panel.Margin = new System.Windows.Forms.Padding(7);
             this.gbRoundedParent.Size = new System.Drawing.Size(1417, 633);
             this.gbRoundedParent.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
             this.gbRoundedParent.StateCommon.Back.Color2 = System.Drawing.Color.Transparent;
@@ -284,9 +284,9 @@ namespace WindowsFormsApp1
             this.btnAddPBJob.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
             this.btnAddPBJob.Dock = System.Windows.Forms.DockStyle.Left;
             this.btnAddPBJob.Location = new System.Drawing.Point(12, 12);
-            this.btnAddPBJob.Margin = new System.Windows.Forms.Padding(12, 12, 12, 12);
+            this.btnAddPBJob.Margin = new System.Windows.Forms.Padding(12);
             this.btnAddPBJob.Name = "btnAddPBJob";
-            this.btnAddPBJob.Size = new System.Drawing.Size(164, 51);
+            this.btnAddPBJob.Size = new System.Drawing.Size(159, 51);
             this.btnAddPBJob.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
             this.btnAddPBJob.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
             this.btnAddPBJob.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
@@ -353,7 +353,7 @@ namespace WindowsFormsApp1
             this.lvBuild.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.lvBuild.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lvBuild.Location = new System.Drawing.Point(0, 0);
-            this.lvBuild.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.lvBuild.Margin = new System.Windows.Forms.Padding(5);
             this.lvBuild.Name = "lvBuild";
             this.lvBuild.Size = new System.Drawing.Size(1371, 494);
             this.lvBuild.TabIndex = 0;
@@ -380,7 +380,7 @@ namespace WindowsFormsApp1
             this.pgPicked.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pgPicked.MinimumSize = new System.Drawing.Size(149, 50);
             this.pgPicked.Name = "pgPicked";
-            this.pgPicked.Size = new System.Drawing.Size(1367, 493);
+            this.pgPicked.Size = new System.Drawing.Size(1367, 494);
             this.pgPicked.Text = "kryptonPage5";
             this.pgPicked.ToolTipTitle = "Page ToolTip";
             this.pgPicked.UniqueName = "fb4ae588bdaf4856b26cdaab046883f1";
@@ -392,9 +392,9 @@ namespace WindowsFormsApp1
             this.kryptonPanel2.Controls.Add(this.tableLayoutPanel1);
             this.kryptonPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.kryptonPanel2.Location = new System.Drawing.Point(0, 0);
-            this.kryptonPanel2.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.kryptonPanel2.Margin = new System.Windows.Forms.Padding(5);
             this.kryptonPanel2.Name = "kryptonPanel2";
-            this.kryptonPanel2.Size = new System.Drawing.Size(1367, 493);
+            this.kryptonPanel2.Size = new System.Drawing.Size(1367, 494);
             this.kryptonPanel2.StateCommon.Color1 = System.Drawing.Color.White;
             this.kryptonPanel2.TabIndex = 1;
             // 
@@ -404,7 +404,7 @@ namespace WindowsFormsApp1
             this.pickedUpListView.Location = new System.Drawing.Point(0, 100);
             this.pickedUpListView.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pickedUpListView.Name = "pickedUpListView";
-            this.pickedUpListView.Size = new System.Drawing.Size(1367, 393);
+            this.pickedUpListView.Size = new System.Drawing.Size(1367, 394);
             this.pickedUpListView.TabIndex = 2;
             // 
             // kryptonPanel6
@@ -449,7 +449,7 @@ namespace WindowsFormsApp1
             this.kryptonLabel6.Location = new System.Drawing.Point(718, 2);
             this.kryptonLabel6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.kryptonLabel6.Name = "kryptonLabel6";
-            this.kryptonLabel6.Size = new System.Drawing.Size(77, 28);
+            this.kryptonLabel6.Size = new System.Drawing.Size(74, 28);
             this.kryptonLabel6.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
             this.kryptonLabel6.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.kryptonLabel6.TabIndex = 4;
@@ -461,7 +461,7 @@ namespace WindowsFormsApp1
             this.kryptonLabel4.Location = new System.Drawing.Point(338, 2);
             this.kryptonLabel4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.kryptonLabel4.Name = "kryptonLabel4";
-            this.kryptonLabel4.Size = new System.Drawing.Size(143, 28);
+            this.kryptonLabel4.Size = new System.Drawing.Size(137, 28);
             this.kryptonLabel4.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
             this.kryptonLabel4.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.kryptonLabel4.TabIndex = 2;
@@ -483,7 +483,7 @@ namespace WindowsFormsApp1
             this.kryptonLabel3.Location = new System.Drawing.Point(102, 2);
             this.kryptonLabel3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.kryptonLabel3.Name = "kryptonLabel3";
-            this.kryptonLabel3.Size = new System.Drawing.Size(79, 28);
+            this.kryptonLabel3.Size = new System.Drawing.Size(76, 28);
             this.kryptonLabel3.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
             this.kryptonLabel3.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.kryptonLabel3.TabIndex = 1;
@@ -495,7 +495,7 @@ namespace WindowsFormsApp1
             this.kryptonLabel5.Location = new System.Drawing.Point(541, 2);
             this.kryptonLabel5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.kryptonLabel5.Name = "kryptonLabel5";
-            this.kryptonLabel5.Size = new System.Drawing.Size(65, 28);
+            this.kryptonLabel5.Size = new System.Drawing.Size(62, 28);
             this.kryptonLabel5.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
             this.kryptonLabel5.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.kryptonLabel5.TabIndex = 3;
@@ -507,7 +507,7 @@ namespace WindowsFormsApp1
             this.kryptonLabel7.Location = new System.Drawing.Point(909, 2);
             this.kryptonLabel7.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.kryptonLabel7.Name = "kryptonLabel7";
-            this.kryptonLabel7.Size = new System.Drawing.Size(183, 28);
+            this.kryptonLabel7.Size = new System.Drawing.Size(176, 28);
             this.kryptonLabel7.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
             this.kryptonLabel7.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.kryptonLabel7.TabIndex = 5;
@@ -636,7 +636,7 @@ namespace WindowsFormsApp1
             this.kryptonPanel5.Location = new System.Drawing.Point(3, 2);
             this.kryptonPanel5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.kryptonPanel5.Name = "kryptonPanel5";
-            this.kryptonPanel5.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.kryptonPanel5.Padding = new System.Windows.Forms.Padding(5);
             this.kryptonPanel5.Size = new System.Drawing.Size(316, 57);
             this.kryptonPanel5.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.kryptonPanel5.TabIndex = 1;
@@ -646,7 +646,7 @@ namespace WindowsFormsApp1
             this.kryptonLabel2.Location = new System.Drawing.Point(17, 0);
             this.kryptonLabel2.Margin = new System.Windows.Forms.Padding(0, 0, 5, 0);
             this.kryptonLabel2.Name = "kryptonLabel2";
-            this.kryptonLabel2.Size = new System.Drawing.Size(102, 20);
+            this.kryptonLabel2.Size = new System.Drawing.Size(98, 19);
             this.kryptonLabel2.StateCommon.Padding = new System.Windows.Forms.Padding(0);
             this.kryptonLabel2.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.kryptonLabel2.TabIndex = 1;
@@ -660,7 +660,7 @@ namespace WindowsFormsApp1
             this.dateTimePicker2.Location = new System.Drawing.Point(5, 5);
             this.dateTimePicker2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dateTimePicker2.Name = "dateTimePicker2";
-            this.dateTimePicker2.Size = new System.Drawing.Size(306, 45);
+            this.dateTimePicker2.Size = new System.Drawing.Size(306, 43);
             this.dateTimePicker2.TabIndex = 0;
             // 
             // kryptonPanel4
@@ -670,7 +670,7 @@ namespace WindowsFormsApp1
             this.kryptonPanel4.Location = new System.Drawing.Point(395, 2);
             this.kryptonPanel4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.kryptonPanel4.Name = "kryptonPanel4";
-            this.kryptonPanel4.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.kryptonPanel4.Padding = new System.Windows.Forms.Padding(5);
             this.kryptonPanel4.Size = new System.Drawing.Size(317, 57);
             this.kryptonPanel4.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.kryptonPanel4.TabIndex = 0;
@@ -680,7 +680,7 @@ namespace WindowsFormsApp1
             this.kryptonLabel1.Location = new System.Drawing.Point(17, 0);
             this.kryptonLabel1.Margin = new System.Windows.Forms.Padding(0);
             this.kryptonLabel1.Name = "kryptonLabel1";
-            this.kryptonLabel1.Size = new System.Drawing.Size(86, 20);
+            this.kryptonLabel1.Size = new System.Drawing.Size(83, 19);
             this.kryptonLabel1.StateCommon.Padding = new System.Windows.Forms.Padding(0);
             this.kryptonLabel1.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.kryptonLabel1.TabIndex = 1;
@@ -694,7 +694,7 @@ namespace WindowsFormsApp1
             this.dateTimePicker1.Location = new System.Drawing.Point(5, 5);
             this.dateTimePicker1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(307, 45);
+            this.dateTimePicker1.Size = new System.Drawing.Size(307, 43);
             this.dateTimePicker1.TabIndex = 0;
             this.dateTimePicker1.ValueChanged += new System.EventHandler(this.dateTimePicker1_ValueChanged);
             // 
