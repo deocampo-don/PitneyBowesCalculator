@@ -133,7 +133,6 @@ namespace WindowsFormsApp1
             this.pnlHeader.StateCommon.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(83)))), ((int)(((byte)(239)))));
             this.pnlHeader.StateCommon.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(83)))), ((int)(((byte)(239)))));
             this.pnlHeader.TabIndex = 0;
-            
             // 
             // flowLayoutPanel1
             // 
@@ -327,7 +326,7 @@ namespace WindowsFormsApp1
             this.pgBuild,
             this.pgPacked,
             this.pgPicked});
-            this.nvNavigator.SelectedIndex = 2;
+            this.nvNavigator.SelectedIndex = 0;
             this.nvNavigator.Size = new System.Drawing.Size(1369, 525);
             this.nvNavigator.StateCommon.Page.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.nvNavigator.StateCommon.Page.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
@@ -343,7 +342,7 @@ namespace WindowsFormsApp1
             this.pgBuild.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pgBuild.MinimumSize = new System.Drawing.Size(149, 50);
             this.pgBuild.Name = "pgBuild";
-            this.pgBuild.Size = new System.Drawing.Size(1371, 494);
+            this.pgBuild.Size = new System.Drawing.Size(1367, 494);
             this.pgBuild.Text = "kryptonPage1";
             this.pgBuild.ToolTipTitle = "Page ToolTip";
             this.pgBuild.UniqueName = "58f450f4e63246c49cf670228f30d882";
@@ -355,7 +354,7 @@ namespace WindowsFormsApp1
             this.lvBuild.Location = new System.Drawing.Point(0, 0);
             this.lvBuild.Margin = new System.Windows.Forms.Padding(5);
             this.lvBuild.Name = "lvBuild";
-            this.lvBuild.Size = new System.Drawing.Size(1371, 494);
+            this.lvBuild.Size = new System.Drawing.Size(1367, 494);
             this.lvBuild.TabIndex = 0;
             // 
             // pgPacked
@@ -366,7 +365,7 @@ namespace WindowsFormsApp1
             this.pgPacked.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pgPacked.MinimumSize = new System.Drawing.Size(149, 50);
             this.pgPacked.Name = "pgPacked";
-            this.pgPacked.Size = new System.Drawing.Size(1371, 494);
+            this.pgPacked.Size = new System.Drawing.Size(1367, 494);
             this.pgPacked.Text = "kryptonPage2";
             this.pgPacked.ToolTipTitle = "Page ToolTip";
             this.pgPacked.UniqueName = "78120dba424747da8ffc132c067ceb97";
@@ -696,7 +695,6 @@ namespace WindowsFormsApp1
             this.dateTimePicker1.Name = "dateTimePicker1";
             this.dateTimePicker1.Size = new System.Drawing.Size(307, 43);
             this.dateTimePicker1.TabIndex = 0;
-       
             // 
             // pnlButtonHeaders
             // 

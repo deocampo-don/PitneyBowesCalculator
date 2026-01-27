@@ -1,13 +1,10 @@
 ﻿using Krypton.Toolkit;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp1.Packed_And_Ready;
+using WindowsFormsApp1.Packed_And_Ready.View_Button;
 using WindowsFormsApp1.Picked_Up;
 
 namespace WindowsFormsApp1
@@ -22,6 +19,8 @@ namespace WindowsFormsApp1
         public Main()
         {
             InitializeComponent();
+
+            LoadPackedReady();
 
             //Apply styles to tabs
             ApplyTabColors(kcbPickedUp);
@@ -60,25 +59,16 @@ namespace WindowsFormsApp1
 
 
         }
-
-        private void kryptonTableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        private void LoadPackedReady()
         {
+            pgPacked.Controls.Clear(); // remove anything already there
 
-        }
+            PackedRowControl PackedReady = new PackedRowControl
+            {
 
-        private void kryptonTableLayoutPanel1_Paint_1(object sender, PaintEventArgs e)
-        {
+            };
 
-        }
-
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void kryptonPanel2_Paint(object sender, PaintEventArgs e)
-        {
-
+            pgPacked.Controls.Add(PackedReady);
         }
 
         private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
@@ -86,14 +76,12 @@ namespace WindowsFormsApp1
 
         }
 
- 
 
-  
 
         private void ApplyTabColors(KryptonCheckButton b)
         {
             Color purple = Color.FromArgb(110, 74, 191);
-            var tabFont= new Font("Segoe UI Semibold", 17f, FontStyle.Regular);
+            var tabFont = new Font("Segoe UI Semibold", 17f, FontStyle.Regular);
             var pad = new Padding(0, 6, 0, 6);
 
             b.StateCommon.Content.Padding = pad;
@@ -109,7 +97,7 @@ namespace WindowsFormsApp1
             b.StateCheckedNormal.Border.Color2 = purple;
             b.StateCheckedNormal.Border.Rounding = 7;
             b.StateCheckedNormal.Content.ShortText.Color1 = Color.White;
-    
+
 
             // Checked hover (keep purple)
             b.StateCheckedTracking.Back.Draw = InheritBool.True;
@@ -121,7 +109,7 @@ namespace WindowsFormsApp1
             b.StateCheckedTracking.Border.Color2 = purple;
             b.StateCheckedTracking.Border.Rounding = 7;
             b.StateCheckedTracking.Content.ShortText.Color1 = Color.White;
-        
+
 
             //Pressed on checked
             b.StateCheckedPressed.Back.Draw = InheritBool.True;
@@ -139,24 +127,24 @@ namespace WindowsFormsApp1
             b.StateNormal.Back.Draw = InheritBool.False;
             b.StateNormal.Border.Draw = InheritBool.False;
             b.StateNormal.Content.ShortText.Color1 = Color.Black;
-        
+
 
             //Hover state
             b.StateTracking.Back.Draw = InheritBool.False;
             b.StateTracking.Border.Draw = InheritBool.False;
             b.StateTracking.Content.ShortText.Color1 = Color.Black;
-           
+
 
             b.StatePressed.Back.Draw = InheritBool.False;
             b.StatePressed.Border.Draw = InheritBool.False;
             b.StatePressed.Content.ShortText.Color1 = Color.Black;
-           
+
         }
 
 
         private void Form1_Load(object sender, EventArgs e)
         {
-           
+
         }
         private void btnClose_Click(object sender, EventArgs e)
         {
@@ -197,16 +185,16 @@ namespace WindowsFormsApp1
             b.TabStop = false;
 
             // Optional: transparent background inheritance
-          
+
         }
 
-   
+
         private void pnlButtonHeaders_Paint(object sender, PaintEventArgs e)
         {
 
         }
 
-    
+
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
@@ -214,7 +202,7 @@ namespace WindowsFormsApp1
             {
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-                  
+
                 }
             }
         }

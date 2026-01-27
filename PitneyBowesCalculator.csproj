@@ -122,6 +122,18 @@
     <Compile Include="Packed And Ready\PackedViewList.Designer.cs">
       <DependentUpon>PackedViewList.cs</DependentUpon>
     </Compile>
+    <Compile Include="Packed And Ready\View Button\PalletNumList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Packed And Ready\View Button\PalletNumList.Designer.cs">
+      <DependentUpon>PalletNumList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Packed And Ready\View Button\RemovePallets.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Packed And Ready\View Button\RemovePallets.Designer.cs">
+      <DependentUpon>RemovePallets.cs</DependentUpon>
+    </Compile>
     <Compile Include="Packed And Ready\View Button\ViewButtonDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -162,6 +174,12 @@
     <Compile Include="Pallet List\PalletRowControl.Designer.cs">
       <DependentUpon>PalletRowControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="TestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForm.Designer.cs">
+      <DependentUpon>TestForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\ViewWOListDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -189,6 +207,12 @@
     <EmbeddedResource Include="Packed And Ready\PackedRowControl.resx">
       <DependentUpon>PackedRowControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Packed And Ready\View Button\PalletNumList.resx">
+      <DependentUpon>PalletNumList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Packed And Ready\View Button\RemovePallets.resx">
+      <DependentUpon>RemovePallets.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Packed And Ready\View Button\ViewButtonDialog.resx">
       <DependentUpon>ViewButtonDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -211,6 +235,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForm.resx">
+      <DependentUpon>TestForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\ViewWOListDialog.resx">
       <DependentUpon>ViewWOListDialog.cs</DependentUpon>
