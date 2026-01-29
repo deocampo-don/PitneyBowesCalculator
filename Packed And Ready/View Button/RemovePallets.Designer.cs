@@ -29,38 +29,47 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.btnNo = new System.Windows.Forms.Button();
+            this.btnExit = new Krypton.Toolkit.KryptonButton();
             this.btnYes = new System.Windows.Forms.Button();
             this.lblHeader = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.btnClose = new Krypton.Toolkit.KryptonButton();
+            this.btnNo = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.btnClose);
+            this.panel1.BackColor = System.Drawing.Color.Transparent;
+            this.panel1.Controls.Add(this.btnExit);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(352, 32);
             this.panel1.TabIndex = 0;
             // 
-            // btnNo
+            // btnExit
             // 
-            this.btnNo.Location = new System.Drawing.Point(233, 143);
-            this.btnNo.Name = "btnNo";
-            this.btnNo.Size = new System.Drawing.Size(40, 40);
-            this.btnNo.TabIndex = 1;
-            this.btnNo.Text = "No";
-            this.btnNo.UseVisualStyleBackColor = true;
+            this.btnExit.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            this.btnExit.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnExit.Location = new System.Drawing.Point(312, 4);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(28, 25);
+            this.btnExit.StateCommon.Back.Color1 = System.Drawing.Color.White;
+            this.btnExit.StateCommon.Back.Color2 = System.Drawing.Color.White;
+            this.btnExit.StateTracking.Back.Color1 = System.Drawing.Color.DarkGray;
+            this.btnExit.StateTracking.Back.Color2 = System.Drawing.Color.DarkGray;
+            this.btnExit.TabIndex = 0;
+            this.btnExit.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.btnExit.Values.Image = global::WindowsFormsApp1.Properties.Resources.close_img;
+            this.btnExit.Values.Text = "";
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
             // btnYes
             // 
-            this.btnYes.Location = new System.Drawing.Point(289, 143);
+            this.btnYes.Location = new System.Drawing.Point(279, 143);
             this.btnYes.Name = "btnYes";
-            this.btnYes.Size = new System.Drawing.Size(40, 40);
+            this.btnYes.Size = new System.Drawing.Size(50, 40);
             this.btnYes.TabIndex = 2;
             this.btnYes.Text = "Yes";
             this.btnYes.UseVisualStyleBackColor = true;
@@ -95,19 +104,15 @@
             this.label2.TabIndex = 5;
             this.label2.Text = "status. Would you like to proceed?";
             // 
-            // btnClose
+            // btnNo
             // 
-            this.btnClose.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnClose.Location = new System.Drawing.Point(316, 5);
-            this.btnClose.Margin = new System.Windows.Forms.Padding(11, 5, 11, 5);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(25, 25);
-            this.btnClose.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
-            this.btnClose.TabIndex = 61;
-            this.btnClose.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.btnClose.Values.Image = global::WindowsFormsApp1.Properties.Resources.close_img;
-            this.btnClose.Values.Text = "";
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            this.btnNo.Location = new System.Drawing.Point(204, 143);
+            this.btnNo.Name = "btnNo";
+            this.btnNo.Size = new System.Drawing.Size(50, 40);
+            this.btnNo.TabIndex = 6;
+            this.btnNo.Text = "No";
+            this.btnNo.UseVisualStyleBackColor = true;
+            this.btnNo.Click += new System.EventHandler(this.btnNo_Click_1);
             // 
             // RemovePallets
             // 
@@ -115,11 +120,11 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(352, 197);
+            this.Controls.Add(this.btnNo);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblHeader);
             this.Controls.Add(this.btnYes);
-            this.Controls.Add(this.btnNo);
             this.Controls.Add(this.panel1);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -134,11 +139,11 @@
         #endregion
 
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button btnNo;
         private System.Windows.Forms.Button btnYes;
         private System.Windows.Forms.Label lblHeader;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private Krypton.Toolkit.KryptonButton btnClose;
+        private Krypton.Toolkit.KryptonButton btnExit;
+        private System.Windows.Forms.Button btnNo;
     }
 }

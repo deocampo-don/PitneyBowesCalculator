@@ -1,124 +1,154 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿
+using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp1.Models;
 using WindowsFormsApp1.Packed_And_Ready.View_Button;
 
 namespace WindowsFormsApp1.Packed_And_Ready
 {
     public partial class PackedRowControl : UserControl
     {
+        private PackedReady _model;
+
+        // Expose an event so parent can react to View button
+        public event EventHandler ViewClicked;
+
         public PackedRowControl()
         {
             InitializeComponent();
 
-            MakeRounded(btnView, 10); // 20 = roundness
+            CSSDesign.MakeRounded(btnView, 10);
+            CSSDesign.MakePanelRounded(pnlDashboard, 12, Color.Gray, 2);
 
-        //    AddPanelBorder(pnlDashboard, Color.Silver, 1);
-            MakePanelRounded(pnlDashboard, 12, Color.Gray, 2);
+            // sensible defaults
+            JobName = "Job Name";
+            JobNumber = 0;
+            EnvelopeQty = 0;
+            Trays = 0;
+            Pallets = 0;
+            PackDate = DateTime.Today;
+            IsReady= false;
+            
         }
 
-
-        private void MakeRounded(Button btn, int radius)
+        // Optional bind from a model if you have one
+        public void Bind(PackedReady model)
         {
-            GraphicsPath path = new GraphicsPath();
-            path.StartFigure();
-            path.AddArc(0, 0, radius, radius, 180, 90);
-            path.AddArc(btn.Width - radius, 0, radius, radius, 270, 90);
-            path.AddArc(btn.Width - radius, btn.Height - radius, radius, radius, 0, 90);
-            path.AddArc(0, btn.Height - radius, radius, radius, 90, 90);
-            path.CloseFigure();
+            _model = model ?? throw new ArgumentNullException(nameof(model));
 
-            btn.Region = new Region(path);
+            JobName = model.JobName;       // ensure your model has these properties
+            JobNumber = model.JobNumber;
+            EnvelopeQty = model.EnvelopeQty;
+            Trays = model.Trays;
+            Pallets = model.Pallets;
+            PackDate = model.ShipDateTime;
+            IsReady = model.IsReady;
         }
 
-        private void AddPanelBorder(Panel panel, Color borderColor, int borderWidth)
+        // ==== Public properties that keep the UI in sync ====
+
+        private string _jobName;
+        public string JobName
         {
-            panel.Paint += (s, e) =>
+            get => _jobName;
+            set
             {
-                ControlPaint.DrawBorder(
-                    e.Graphics,
-                    panel.ClientRectangle,
-                    borderColor, borderWidth, ButtonBorderStyle.Solid,
-                    borderColor, borderWidth, ButtonBorderStyle.Solid,
-                    borderColor, borderWidth, ButtonBorderStyle.Solid,
-                    borderColor, borderWidth, ButtonBorderStyle.Solid
-                );
-            };
-
-            // Force the panel to repaint so the border shows immediately
-            panel.Invalidate();
+                _jobName = value ?? string.Empty;
+                // Heading shows the job name
+                txtPBJobName.Text = _jobName;
+            }
         }
-        private GraphicsPath GetRoundedRectPath(Rectangle rect, int radius)
-        {
-            GraphicsPath path = new GraphicsPath();
-            int d = radius * 2;
 
-            path.AddArc(rect.X, rect.Y, d, d, 180, 90);
-            path.AddArc(rect.Right - d, rect.Y, d, d, 270, 90);
-            path.AddArc(rect.Right - d, rect.Bottom - d, d, d, 0, 90);
-            path.AddArc(rect.X, rect.Bottom - d, d, d, 90, 90);
-            path.CloseFigure();
-
-            return path;
-        }
-        private void MakePanelRounded(Panel panel, int radius, Color borderColor, int borderWidth)
+        private int _jobNumber;
+        public int JobNumber
         {
-            panel.Paint += (s, e) =>
+            get => _jobNumber;
+            set
             {
-                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
-                Rectangle rect = panel.ClientRectangle;
-                rect.Width -= 1;
-                rect.Height -= 1;
-
-                using (GraphicsPath path = GetRoundedRectPath(rect, radius))
-                {
-                    // Clip panel to rounded shape
-                    panel.Region = new Region(path);
-
-                    // Draw border
-                    using (Pen pen = new Pen(borderColor, borderWidth))
-                    {
-                        e.Graphics.DrawPath(pen, path);
-                    }
-                }
-            };
-
-            panel.Resize += (s, e) => panel.Invalidate();
+                _jobNumber = value;
+                // If you want zero‑padding: $"{_jobNumber:D4}"
+                txtPBJobNum.Text = _jobNumber.ToString();
+            }
         }
+
+        private int _envelopeQty;
+        public int EnvelopeQty
+        {
+            get => _envelopeQty;
+            set
+            {
+                _envelopeQty = value;
+                txtEnvelopeQty.Text = _envelopeQty.ToString();
+            }
+        }
+
+        private int _trays;
+        public int Trays
+        {
+            get => _trays;
+            set
+            {
+                _trays = value;
+                txtTrays.Text = _trays.ToString();
+            }
+        }
+
+        private int _pallets;
+        public int Pallets
+        {
+            get => _pallets;
+            set
+            {
+                _pallets = value;
+                txtPallets.Text = _pallets.ToString();
+            }
+        }
+
+        private DateTime _packDate = DateTime.Today;
+        public DateTime PackDate
+        {
+            get => _packDate;
+            set
+            {
+                _packDate = value;
+                txtPackDate.Text = _packDate.ToString("MM/dd/yyyy");
+            }
+        }
+
+        private bool _isReady;
+        public bool IsReady
+        {
+            get => _isReady;
+            set
+            {
+                _isReady = value;
+                chkbxStatus.Checked = _isReady;
+                txtStatus.Text = _isReady ? "Ready to Ship" : "Not Ready";
+                txtStatus.StateCommon.ShortText.Color1 =
+                    ColorTranslator.FromHtml(_isReady ? "#34C759" : "#FF383C");
+            }
+        }
+
+        // === UI events ===
 
         private void btnView_Click(object sender, EventArgs e)
         {
-            Form parentForm = this.FindForm(); // get the dashboard form
+            // Raise an event in case parent wants to intercept
+            ViewClicked?.Invoke(this, EventArgs.Empty);
 
+            // Keep your dialog behavior
+            Form parentForm = this.FindForm();
             using (ViewButtonDialog dlg = new ViewButtonDialog())
             {
-                dlg.ShowDialog(parentForm); // locks the dashboard correctly
+                dlg.ShowDialog(parentForm);
             }
         }
 
         private void chkbxStatus_CheckedChanged(object sender, EventArgs e)
         {
-            if (chkbxStatus.Checked)
-            {
-                txtStatus.Text = "Ready to Ship";
-                txtStatus.StateCommon.ShortText.Color1 =
-                            ColorTranslator.FromHtml("#34C759"); // green
-
-            }
-            else
-            {
-                txtStatus.Text = "Not Ready";
-                txtStatus.StateCommon.ShortText.Color1 =
-                            ColorTranslator.FromHtml("#FF383C"); // red
-            }
+            // Keep property as the source of truth
+            IsReady = chkbxStatus.Checked;
         }
     }
 }

@@ -189,6 +189,7 @@
             // 
             // pnlDashboard
             // 
+            this.pnlDashboard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.pnlDashboard.Controls.Add(this.txtStatus);
             this.pnlDashboard.Controls.Add(this.txtPallets);
             this.pnlDashboard.Location = new System.Drawing.Point(20, 15);
@@ -200,6 +201,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.Controls.Add(this.chkbxStatus);
             this.Controls.Add(this.btnView);
             this.Controls.Add(this.txtPackDate);

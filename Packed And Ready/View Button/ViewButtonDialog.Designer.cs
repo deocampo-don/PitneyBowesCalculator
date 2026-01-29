@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.pnlHeader = new Krypton.Toolkit.KryptonPanel();
-            this.kryptonButton1 = new Krypton.Toolkit.KryptonButton();
             this.btnExit = new Krypton.Toolkit.KryptonButton();
             this.pnlDashboard = new System.Windows.Forms.Panel();
             this.pnlDetails = new System.Windows.Forms.Panel();
@@ -44,6 +43,10 @@
             this.lblPackDate = new Krypton.Toolkit.KryptonLabel();
             this.txtPBJobName = new Krypton.Toolkit.KryptonLabel();
             this.pnlPalletNoList = new Krypton.Toolkit.KryptonPanel();
+            this.txtEnvelopeQty = new Krypton.Toolkit.KryptonLabel();
+            this.txtScannedWO = new Krypton.Toolkit.KryptonLabel();
+            this.txtTrayCount = new Krypton.Toolkit.KryptonLabel();
+            this.txtPackedTime = new Krypton.Toolkit.KryptonLabel();
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
             this.pnlDashboard.SuspendLayout();
@@ -52,30 +55,14 @@
             // 
             // pnlHeader
             // 
-            this.pnlHeader.Controls.Add(this.kryptonButton1);
             this.pnlHeader.Controls.Add(this.btnExit);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
             this.pnlHeader.Name = "pnlHeader";
             this.pnlHeader.Size = new System.Drawing.Size(974, 45);
-            this.pnlHeader.StateNormal.Color1 = System.Drawing.Color.White;
-            this.pnlHeader.StateNormal.Color2 = System.Drawing.Color.White;
+            this.pnlHeader.StateNormal.Color1 = System.Drawing.Color.Transparent;
+            this.pnlHeader.StateNormal.Color2 = System.Drawing.Color.Transparent;
             this.pnlHeader.TabIndex = 54;
-            // 
-            // kryptonButton1
-            // 
-            this.kryptonButton1.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.kryptonButton1.Location = new System.Drawing.Point(855, 12);
-            this.kryptonButton1.Name = "kryptonButton1";
-            this.kryptonButton1.Size = new System.Drawing.Size(28, 25);
-            this.kryptonButton1.StateCommon.Back.Color1 = System.Drawing.Color.White;
-            this.kryptonButton1.StateCommon.Back.Color2 = System.Drawing.Color.White;
-            this.kryptonButton1.StateTracking.Back.Color1 = System.Drawing.Color.DarkGray;
-            this.kryptonButton1.StateTracking.Back.Color2 = System.Drawing.Color.DarkGray;
-            this.kryptonButton1.TabIndex = 62;
-            this.kryptonButton1.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.kryptonButton1.Values.Image = global::WindowsFormsApp1.Properties.Resources.close_img;
-            this.kryptonButton1.Values.Text = "";
             // 
             // btnExit
             // 
@@ -83,11 +70,14 @@
             this.btnExit.Location = new System.Drawing.Point(904, 12);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(28, 25);
-            this.btnExit.StateCommon.Back.Color1 = System.Drawing.Color.White;
-            this.btnExit.StateCommon.Back.Color2 = System.Drawing.Color.White;
+            this.btnExit.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
+            this.btnExit.StateCommon.Back.Color2 = System.Drawing.Color.Transparent;
+            this.btnExit.StateNormal.Back.Color1 = System.Drawing.Color.Transparent;
+            this.btnExit.StateNormal.Back.Color2 = System.Drawing.Color.Transparent;
+            this.btnExit.StateNormal.Back.ColorStyle = Krypton.Toolkit.PaletteColorStyle.Solid;
             this.btnExit.StateTracking.Back.Color1 = System.Drawing.Color.DarkGray;
             this.btnExit.StateTracking.Back.Color2 = System.Drawing.Color.DarkGray;
-            this.btnExit.TabIndex = 61;
+            this.btnExit.TabIndex = 0;
             this.btnExit.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnExit.Values.Image = global::WindowsFormsApp1.Properties.Resources.close_img;
             this.btnExit.Values.Text = "";
@@ -95,6 +85,10 @@
             // 
             // pnlDashboard
             // 
+            this.pnlDashboard.Controls.Add(this.txtPackedTime);
+            this.pnlDashboard.Controls.Add(this.txtTrayCount);
+            this.pnlDashboard.Controls.Add(this.txtScannedWO);
+            this.pnlDashboard.Controls.Add(this.txtEnvelopeQty);
             this.pnlDashboard.Controls.Add(this.pnlDetails);
             this.pnlDashboard.Controls.Add(this.lblPackedTime);
             this.pnlDashboard.Controls.Add(this.lblEnvelopeQty);
@@ -115,7 +109,7 @@
             // 
             // lblPackedTime
             // 
-            this.lblPackedTime.Location = new System.Drawing.Point(486, 35);
+            this.lblPackedTime.Location = new System.Drawing.Point(489, 35);
             this.lblPackedTime.Name = "lblPackedTime";
             this.lblPackedTime.Size = new System.Drawing.Size(105, 24);
             this.lblPackedTime.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
@@ -231,6 +225,42 @@
             this.pnlPalletNoList.StateCommon.ColorStyle = Krypton.Toolkit.PaletteColorStyle.Solid;
             this.pnlPalletNoList.TabIndex = 55;
             // 
+            // txtEnvelopeQty
+            // 
+            this.txtEnvelopeQty.Location = new System.Drawing.Point(112, 5);
+            this.txtEnvelopeQty.Name = "txtEnvelopeQty";
+            this.txtEnvelopeQty.Size = new System.Drawing.Size(28, 24);
+            this.txtEnvelopeQty.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
+            this.txtEnvelopeQty.TabIndex = 6;
+            this.txtEnvelopeQty.Values.Text = "00";
+            // 
+            // txtScannedWO
+            // 
+            this.txtScannedWO.Location = new System.Drawing.Point(112, 35);
+            this.txtScannedWO.Name = "txtScannedWO";
+            this.txtScannedWO.Size = new System.Drawing.Size(28, 24);
+            this.txtScannedWO.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
+            this.txtScannedWO.TabIndex = 7;
+            this.txtScannedWO.Values.Text = "00";
+            // 
+            // txtTrayCount
+            // 
+            this.txtTrayCount.Location = new System.Drawing.Point(634, 5);
+            this.txtTrayCount.Name = "txtTrayCount";
+            this.txtTrayCount.Size = new System.Drawing.Size(28, 24);
+            this.txtTrayCount.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
+            this.txtTrayCount.TabIndex = 8;
+            this.txtTrayCount.Values.Text = "00";
+            // 
+            // txtPackedTime
+            // 
+            this.txtPackedTime.Location = new System.Drawing.Point(587, 35);
+            this.txtPackedTime.Name = "txtPackedTime";
+            this.txtPackedTime.Size = new System.Drawing.Size(76, 24);
+            this.txtPackedTime.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
+            this.txtPackedTime.TabIndex = 59;
+            this.txtPackedTime.Values.Text = "00:00 AM";
+            // 
             // ViewButtonDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -276,6 +306,9 @@
         private Krypton.Toolkit.KryptonLabel txtPBJobName;
         private Krypton.Toolkit.KryptonPanel pnlPalletNoList;
         private Krypton.Toolkit.KryptonButton btnExit;
-        private Krypton.Toolkit.KryptonButton kryptonButton1;
+        private Krypton.Toolkit.KryptonLabel txtPackedTime;
+        private Krypton.Toolkit.KryptonLabel txtTrayCount;
+        private Krypton.Toolkit.KryptonLabel txtScannedWO;
+        private Krypton.Toolkit.KryptonLabel txtEnvelopeQty;
     }
 }

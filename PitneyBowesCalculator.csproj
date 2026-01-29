@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplyRoundedCorners.cs" />
+    <Compile Include="CSS Style\CSSDesign.cs" />
     <Compile Include="Dialogs\AddToPalletDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -109,18 +110,13 @@
     <Compile Include="Dialogs\SettingsDialog.Designer.cs">
       <DependentUpon>SettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\PackedReady.cs" />
     <Compile Include="Models\pickListModel.cs" />
     <Compile Include="Packed And Ready\PackedRowControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Packed And Ready\PackedRowControl.Designer.cs">
       <DependentUpon>PackedRowControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Packed And Ready\PackedViewList.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Packed And Ready\PackedViewList.Designer.cs">
-      <DependentUpon>PackedViewList.cs</DependentUpon>
     </Compile>
     <Compile Include="Packed And Ready\View Button\PalletNumList.cs">
       <SubType>UserControl</SubType>
