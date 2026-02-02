@@ -22,6 +22,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         {
             InitializeComponent();
             LoadPalletNumList();
+            LoadPalletDetailsRowControl();
             // this.StartPosition = FormStartPosition.CenterScreen;
 
 
@@ -41,12 +42,23 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         {
             pnlPalletNoList.Controls.Clear(); // remove anything already there
 
-            PalletNumList palletList = new PalletNumList
+            PalletNumListRowControl palletList = new PalletNumListRowControl
             {
                 Dock = DockStyle.Fill
             };
 
             pnlPalletNoList.Controls.Add(palletList);
+        }
+        private void LoadPalletDetailsRowControl()
+        {
+            pnlDetails.Controls.Clear(); // remove anything already there
+
+            PalletDetailsRowControl palletDetails = new PalletDetailsRowControl
+            {
+                
+            };
+
+            pnlDetails.Controls.Add(palletDetails);
         }
 
         private void pnlHeader_MouseDown(object sender, MouseEventArgs e)

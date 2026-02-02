@@ -1,6 +1,6 @@
 ﻿namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 {
-    partial class PalletNumList
+    partial class PalletNumListRowControl
     {
         /// <summary> 
         /// Required designer variable.

@@ -98,11 +98,12 @@
             // 
             this.txtPBJobName.Location = new System.Drawing.Point(48, 65);
             this.txtPBJobName.Name = "txtPBJobName";
-            this.txtPBJobName.Size = new System.Drawing.Size(116, 31);
+            this.txtPBJobName.Size = new System.Drawing.Size(179, 31);
             this.txtPBJobName.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
             this.txtPBJobName.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPBJobName.TabIndex = 38;
-            this.txtPBJobName.Values.Text = "CAPONE";
+            this.txtPBJobName.TabStop = false;
+            this.txtPBJobName.Values.Text = "PB JOB NAME";
             // 
             // lblPackDate
             // 

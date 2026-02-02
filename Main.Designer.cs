@@ -47,11 +47,9 @@ namespace WindowsFormsApp1
             this.pnlNavigator = new Krypton.Toolkit.KryptonPanel();
             this.nvNavigator = new Krypton.Navigator.KryptonNavigator();
             this.pgBuild = new Krypton.Navigator.KryptonPage();
-            this.lvBuild = new WindowsFormsApp1.PalletListView();
             this.pgPacked = new Krypton.Navigator.KryptonPage();
             this.pgPicked = new Krypton.Navigator.KryptonPage();
             this.kryptonPanel2 = new Krypton.Toolkit.KryptonPanel();
-            this.pickedUpListView = new WindowsFormsApp1.Picked_Up.PickedUpListView();
             this.kryptonPanel6 = new Krypton.Toolkit.KryptonPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.kryptonLabel6 = new Krypton.Toolkit.KryptonLabel();
@@ -79,6 +77,9 @@ namespace WindowsFormsApp1
             this.kcbPackedReady = new Krypton.Toolkit.KryptonCheckButton();
             this.pnlSettings = new Krypton.Toolkit.KryptonPanel();
             this.btnSettings = new Krypton.Toolkit.KryptonButton();
+            this.lvBuild = new WindowsFormsApp1.PalletListView();
+            this.packedListView2 = new WindowsFormsApp1.Packed_And_Ready.PackedListView();
+            this.pickedUpListView = new WindowsFormsApp1.Picked_Up.PickedUpListView();
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -100,6 +101,7 @@ namespace WindowsFormsApp1
             ((System.ComponentModel.ISupportInitialize)(this.pgBuild)).BeginInit();
             this.pgBuild.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pgPacked)).BeginInit();
+            this.pgPacked.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pgPicked)).BeginInit();
             this.pgPicked.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel2)).BeginInit();
@@ -326,7 +328,7 @@ namespace WindowsFormsApp1
             this.pgBuild,
             this.pgPacked,
             this.pgPicked});
-            this.nvNavigator.SelectedIndex = 0;
+            this.nvNavigator.SelectedIndex = 1;
             this.nvNavigator.Size = new System.Drawing.Size(1369, 525);
             this.nvNavigator.StateCommon.Page.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.nvNavigator.StateCommon.Page.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
@@ -347,19 +349,10 @@ namespace WindowsFormsApp1
             this.pgBuild.ToolTipTitle = "Page ToolTip";
             this.pgBuild.UniqueName = "58f450f4e63246c49cf670228f30d882";
             // 
-            // lvBuild
-            // 
-            this.lvBuild.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.lvBuild.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvBuild.Location = new System.Drawing.Point(0, 0);
-            this.lvBuild.Margin = new System.Windows.Forms.Padding(5);
-            this.lvBuild.Name = "lvBuild";
-            this.lvBuild.Size = new System.Drawing.Size(1367, 494);
-            this.lvBuild.TabIndex = 0;
-            // 
             // pgPacked
             // 
             this.pgPacked.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
+            this.pgPacked.Controls.Add(this.packedListView2);
             this.pgPacked.Flags = 65534;
             this.pgPacked.LastVisibleSet = true;
             this.pgPacked.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -396,15 +389,6 @@ namespace WindowsFormsApp1
             this.kryptonPanel2.Size = new System.Drawing.Size(1367, 494);
             this.kryptonPanel2.StateCommon.Color1 = System.Drawing.Color.White;
             this.kryptonPanel2.TabIndex = 1;
-            // 
-            // pickedUpListView
-            // 
-            this.pickedUpListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pickedUpListView.Location = new System.Drawing.Point(0, 100);
-            this.pickedUpListView.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pickedUpListView.Name = "pickedUpListView";
-            this.pickedUpListView.Size = new System.Drawing.Size(1367, 394);
-            this.pickedUpListView.TabIndex = 2;
             // 
             // kryptonPanel6
             // 
@@ -801,6 +785,33 @@ namespace WindowsFormsApp1
             this.btnSettings.Values.Text = "";
             this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
             // 
+            // lvBuild
+            // 
+            this.lvBuild.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
+            this.lvBuild.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvBuild.Location = new System.Drawing.Point(0, 0);
+            this.lvBuild.Margin = new System.Windows.Forms.Padding(5);
+            this.lvBuild.Name = "lvBuild";
+            this.lvBuild.Size = new System.Drawing.Size(1367, 494);
+            this.lvBuild.TabIndex = 0;
+            // 
+            // packedListView2
+            // 
+            this.packedListView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.packedListView2.Location = new System.Drawing.Point(0, 0);
+            this.packedListView2.Name = "packedListView2";
+            this.packedListView2.Size = new System.Drawing.Size(1367, 494);
+            this.packedListView2.TabIndex = 1;
+            // 
+            // pickedUpListView
+            // 
+            this.pickedUpListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pickedUpListView.Location = new System.Drawing.Point(0, 100);
+            this.pickedUpListView.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pickedUpListView.Name = "pickedUpListView";
+            this.pickedUpListView.Size = new System.Drawing.Size(1367, 394);
+            this.pickedUpListView.TabIndex = 2;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -838,6 +849,7 @@ namespace WindowsFormsApp1
             ((System.ComponentModel.ISupportInitialize)(this.pgBuild)).EndInit();
             this.pgBuild.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pgPacked)).EndInit();
+            this.pgPacked.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pgPicked)).EndInit();
             this.pgPicked.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel2)).EndInit();
@@ -917,6 +929,7 @@ namespace WindowsFormsApp1
         private Krypton.Toolkit.KryptonLabel kryptonLabel5;
         private Krypton.Toolkit.KryptonLabel kryptonLabel7;
         private Picked_Up.PickedUpListView pickedUpListView;
+        private Packed_And_Ready.PackedListView packedListView2;
     }
 }
 

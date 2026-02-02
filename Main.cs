@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using WindowsFormsApp1.Packed_And_Ready;
-using WindowsFormsApp1.Packed_And_Ready.View_Button;
 using WindowsFormsApp1.Picked_Up;
 
 namespace WindowsFormsApp1
@@ -14,13 +13,14 @@ namespace WindowsFormsApp1
 
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
         private readonly List<PickListModel> _pickLists = new List<PickListModel>();
+      
 
 
         public Main()
         {
             InitializeComponent();
 
-            LoadPackedReady();
+
 
             //Apply styles to tabs
             ApplyTabColors(kcbPickedUp);
@@ -40,16 +40,31 @@ namespace WindowsFormsApp1
             kryptonCheckSet1.CheckedButton = kcbBuildPallets;
 
             var list = lvBuild; // the one on your page (select it in designer to see its name)
-            var list2 = pickedUpListView;
+            var list2 = packedListView2;
+            var list3 = pickedUpListView;
+           
+
+
+            var packedRow = new PackedRowControl();
             var pickedRow = new PickedUpRowControl();
             var row1 = new PalletRowControl();
             var test = new PickListModel { JobName = "CAPONE", JobNumber = 23413, EnvelopeQty = 10000, Trays = 10, Pallets = 3, ShipDateTime = DateTime.Parse("2025-11-23") };
 
             // row1.Bind(...) later
             _pickLists.Add(test);                 // ← DATA updated here
+
+            packedListView2.SetItems(_pickLists);
             pickedUpListView.SetItems(_pickLists);
+            
+            //load the pack & ready using the pickedUpListView data
+
+            //   LoadPackedReady();
+            // loadShipAll();
             list.AddRow(row1);
-            //list2.AddRow(pickedRow);
+            list2.AddRow(packedRow);
+            //list3.AddRow(pickedRow);
+
+
 
             MakeTitleBarButton(btnMaximize);
             MakeTitleBarButton(btnMinimize);
@@ -59,18 +74,27 @@ namespace WindowsFormsApp1
 
 
         }
-        private void LoadPackedReady()
+       /* private void LoadPackedReady()
         {
-            pgPacked.Controls.Clear(); // remove anything already there
+            pgPacked.Controls.Clear();
 
-            PackedRowControl PackedReady = new PackedRowControl
+            foreach (var pick in _pickLists)
             {
+                var PackedRow = new PackedRowControl();
 
-            };
+                PackedRow.Bind(pick);              // ← PASS DATA HERE
+                pgPacked.Controls.Add(PackedRow);
+            }
 
-            pgPacked.Controls.Add(PackedReady);
+        }*/
+        /* private void loadShipAll()
+        {
+
+            ShipPalletsRowControl shipPallets = new ShipPalletsRowControl();
+            pgPacked.Controls.Add(shipPallets);
+
         }
-
+        */
         private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
 
@@ -188,11 +212,6 @@ namespace WindowsFormsApp1
 
         }
 
-
-        private void pnlButtonHeaders_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
 
 
 
