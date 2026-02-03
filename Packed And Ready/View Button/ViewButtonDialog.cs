@@ -1,96 +1,125 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+
 namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 {
     public partial class ViewButtonDialog : Form
     {
+        /* -------------------------------------------------------------
+         * FIELDS & DATA STORAGE
+         * ------------------------------------------------------------- */
 
-        [DllImport("user32.dll")]
-        private static extern bool ReleaseCapture();
+        /// <summary>
+        /// Job data passed from PackedRowControl.
+        /// </summary>
+        private PbJobModel _job;
 
-        [DllImport("user32.dll")]
-        private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        /* -------------------------------------------------------------
+         * WIN32 IMPORTS (DRAGGABLE BORDERLESS FORM)
+         * ------------------------------------------------------------- */
 
+        [DllImport("user32.dll")] private static extern bool ReleaseCapture();
+        [DllImport("user32.dll")] private static extern int SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
 
         private const int WM_NCLBUTTONDOWN = 0xA1;
         private const int HTCAPTION = 0x2;
 
         private int _formRadius = 12;
-        public ViewButtonDialog()
+
+
+        /* -------------------------------------------------------------
+         * CONSTRUCTOR
+         * ------------------------------------------------------------- */
+        public ViewButtonDialog(PbJobModel job)
         {
             InitializeComponent();
-            LoadPalletNumList();
+
+            _job = job;
+
+            // Load header fields first
+            LoadHeaderInfo();
+
+            // Load pallet list number Buttons (left)
+            palletNumListViewList1.SetItems(_job);
+
+            // Load empty detail panel layout (right)
             LoadPalletDetailsRowControl();
-            // this.StartPosition = FormStartPosition.CenterScreen;
 
-
-
+            // Wire events
             pnlHeader.MouseDown += pnlHeader_MouseDown;
-
             this.Paint += ViewButtonDialog_Paint;
 
+            // Styling
             CSSDesign.MakeRounded(btnRemovePallets, 10);
             CSSDesign.MakeRounded(btnPrintPallets, 10);
             CSSDesign.AddPanelBorder(pnlDashboard, Color.Silver, 1);
             CSSDesign.AddPanelBorder(pnlDetails, Color.Silver, 1);
-
-
         }
-        private void LoadPalletNumList()
+
+
+        /* -------------------------------------------------------------
+         * HEADER INFO BINDING
+         * ------------------------------------------------------------- */
+        private void LoadHeaderInfo()
         {
-            pnlPalletNoList.Controls.Clear(); // remove anything already there
+            if (_job == null)
+                return;
 
-            PalletNumListRowControl palletList = new PalletNumListRowControl
-            {
-                Dock = DockStyle.Fill
-            };
-
-            pnlPalletNoList.Controls.Add(palletList);
+            txtPBJobName.Text = _job.JobName;
+            txtPBJobNumber.Text = _job.JobNumber.ToString();
+            txtPackDate.Text = _job.PackDate.ToString("MM/dd/yyyy");
         }
+
+
+        /* -------------------------------------------------------------
+         * PALLET DETAILS PANEL (RIGHT SIDE)
+         * ------------------------------------------------------------- */
         private void LoadPalletDetailsRowControl()
         {
-            pnlDetails.Controls.Clear(); // remove anything already there
-
-            PalletDetailsRowControl palletDetails = new PalletDetailsRowControl
-            {
-                
-            };
-
-            pnlDetails.Controls.Add(palletDetails);
+            // If you have a default layout for pallet details, load it here.
+            // Uncomment when ready:
+            // pnlDetails.Controls.Clear();
+            // pnlDetails.Controls.Add(new PalletDetailsRowControl());
         }
 
+
+        /* -------------------------------------------------------------
+         * FORM DRAGGING
+         * ------------------------------------------------------------- */
         private void pnlHeader_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                ReleaseCapture(); // release the mouse
-                SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0); // move the form
+                ReleaseCapture();
+                SendMessage(this.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
             }
         }
 
+
+        /* -------------------------------------------------------------
+         * FORM CUSTOM BORDER PAINTING
+         * ------------------------------------------------------------- */
         private void ViewButtonDialog_Paint(object sender, PaintEventArgs e)
         {
-            CSSDesign.PaintRoundedForm(
-               this,
-               e,
-               _formRadius,
-               Color.Gray
-
-           );
+            CSSDesign.PaintRoundedForm(this, e, _formRadius, Color.Gray);
         }
+
+
+        /* -------------------------------------------------------------
+         * EVENTS
+         * ------------------------------------------------------------- */
+        public event Action<int> PalletClicked;
 
         private void btnRemovePallets_Click(object sender, EventArgs e)
         {
-            Form parentForm = this.FindForm(); // get the dashboard form
-
-            using (RemovePallets removepallets = new RemovePallets())
+            using (var dlg = new RemovePallets())
             {
-                removepallets.ShowDialog(parentForm); // locks the dashboard correctly
+                dlg.ShowDialog(this);
             }
         }
-
 
         private void btnExit_Click_1(object sender, EventArgs e)
         {

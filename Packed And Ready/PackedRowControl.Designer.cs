@@ -1,6 +1,6 @@
 ﻿namespace WindowsFormsApp1.Packed_And_Ready
 {
-    partial class PackedRowControl
+    public partial class PackedRowControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -55,7 +55,7 @@
             this.btnView.FlatAppearance.BorderSize = 0;
             this.btnView.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnView.ForeColor = System.Drawing.Color.White;
-            this.btnView.Location = new System.Drawing.Point(331, 293);
+            this.btnView.Location = new System.Drawing.Point(263, 264);
             this.btnView.Name = "btnView";
             this.btnView.Size = new System.Drawing.Size(149, 37);
             this.btnView.TabIndex = 43;
@@ -66,7 +66,7 @@
             // txtStatus
             // 
             this.txtStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtStatus.Location = new System.Drawing.Point(377, 79);
+            this.txtStatus.Location = new System.Drawing.Point(326, 70);
             this.txtStatus.Name = "txtStatus";
             this.txtStatus.Size = new System.Drawing.Size(83, 24);
             this.txtStatus.StateCommon.ShortText.Color1 = System.Drawing.Color.Red;
@@ -76,7 +76,7 @@
             // 
             // txtPackDate
             // 
-            this.txtPackDate.Location = new System.Drawing.Point(371, 263);
+            this.txtPackDate.Location = new System.Drawing.Point(303, 234);
             this.txtPackDate.Name = "txtPackDate";
             this.txtPackDate.Size = new System.Drawing.Size(90, 24);
             this.txtPackDate.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
@@ -86,7 +86,7 @@
             // 
             // txtPBJobNum
             // 
-            this.txtPBJobNum.Location = new System.Drawing.Point(51, 94);
+            this.txtPBJobNum.Location = new System.Drawing.Point(29, 73);
             this.txtPBJobNum.Name = "txtPBJobNum";
             this.txtPBJobNum.Size = new System.Drawing.Size(45, 24);
             this.txtPBJobNum.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
@@ -96,7 +96,7 @@
             // 
             // txtPBJobName
             // 
-            this.txtPBJobName.Location = new System.Drawing.Point(48, 65);
+            this.txtPBJobName.Location = new System.Drawing.Point(26, 44);
             this.txtPBJobName.Name = "txtPBJobName";
             this.txtPBJobName.Size = new System.Drawing.Size(179, 31);
             this.txtPBJobName.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
@@ -107,7 +107,7 @@
             // 
             // lblPackDate
             // 
-            this.lblPackDate.Location = new System.Drawing.Point(382, 239);
+            this.lblPackDate.Location = new System.Drawing.Point(314, 210);
             this.lblPackDate.Name = "lblPackDate";
             this.lblPackDate.Size = new System.Drawing.Size(81, 24);
             this.lblPackDate.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
@@ -117,7 +117,7 @@
             // 
             // lblTrays
             // 
-            this.lblTrays.Location = new System.Drawing.Point(48, 221);
+            this.lblTrays.Location = new System.Drawing.Point(17, 192);
             this.lblTrays.Margin = new System.Windows.Forms.Padding(0);
             this.lblTrays.Name = "lblTrays";
             this.lblTrays.Size = new System.Drawing.Size(48, 24);
@@ -128,17 +128,17 @@
             // 
             // txtTrays
             // 
-            this.txtTrays.Location = new System.Drawing.Point(41, 239);
+            this.txtTrays.Location = new System.Drawing.Point(11, 210);
             this.txtTrays.Name = "txtTrays";
-            this.txtTrays.Size = new System.Drawing.Size(61, 48);
+            this.txtTrays.Size = new System.Drawing.Size(104, 48);
             this.txtTrays.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
             this.txtTrays.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtTrays.TabIndex = 36;
-            this.txtTrays.Values.Text = "00";
+            this.txtTrays.Values.Text = "0000";
             // 
             // lblEnvelopeQty
             // 
-            this.lblEnvelopeQty.Location = new System.Drawing.Point(47, 143);
+            this.lblEnvelopeQty.Location = new System.Drawing.Point(16, 118);
             this.lblEnvelopeQty.Margin = new System.Windows.Forms.Padding(0);
             this.lblEnvelopeQty.Name = "lblEnvelopeQty";
             this.lblEnvelopeQty.Size = new System.Drawing.Size(105, 24);
@@ -150,7 +150,7 @@
             // txtEnvelopeQty
             // 
             this.txtEnvelopeQty.LabelStyle = Krypton.Toolkit.LabelStyle.TitleControl;
-            this.txtEnvelopeQty.Location = new System.Drawing.Point(41, 162);
+            this.txtEnvelopeQty.Location = new System.Drawing.Point(11, 137);
             this.txtEnvelopeQty.Name = "txtEnvelopeQty";
             this.txtEnvelopeQty.Size = new System.Drawing.Size(104, 48);
             this.txtEnvelopeQty.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
@@ -160,7 +160,7 @@
             // 
             // lblPallets
             // 
-            this.lblPallets.Location = new System.Drawing.Point(406, 143);
+            this.lblPallets.Location = new System.Drawing.Point(338, 118);
             this.lblPallets.Name = "lblPallets";
             this.lblPallets.Size = new System.Drawing.Size(57, 24);
             this.lblPallets.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
@@ -171,7 +171,7 @@
             // txtPallets
             // 
             this.txtPallets.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPallets.Location = new System.Drawing.Point(370, 147);
+            this.txtPallets.Location = new System.Drawing.Point(308, 134);
             this.txtPallets.Name = "txtPallets";
             this.txtPallets.Size = new System.Drawing.Size(82, 48);
             this.txtPallets.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
@@ -181,28 +181,31 @@
             // 
             // chkbxStatus
             // 
-            this.chkbxStatus.Location = new System.Drawing.Point(458, 33);
+            this.chkbxStatus.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkbxStatus.AutoSize = false;
+            this.chkbxStatus.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.chkbxStatus.Location = new System.Drawing.Point(390, 14);
             this.chkbxStatus.Name = "chkbxStatus";
-            this.chkbxStatus.Size = new System.Drawing.Size(22, 16);
+            this.chkbxStatus.Size = new System.Drawing.Size(18, 22);
             this.chkbxStatus.TabIndex = 44;
             this.chkbxStatus.Values.Text = "";
             this.chkbxStatus.CheckedChanged += new System.EventHandler(this.chkbxStatus_CheckedChanged);
             // 
             // pnlDashboard
             // 
-            this.pnlDashboard.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
+            this.pnlDashboard.BackColor = System.Drawing.Color.Transparent;
             this.pnlDashboard.Controls.Add(this.txtStatus);
             this.pnlDashboard.Controls.Add(this.txtPallets);
-            this.pnlDashboard.Location = new System.Drawing.Point(20, 15);
+            this.pnlDashboard.Location = new System.Drawing.Point(3, 3);
             this.pnlDashboard.Name = "pnlDashboard";
-            this.pnlDashboard.Size = new System.Drawing.Size(486, 337);
+            this.pnlDashboard.Size = new System.Drawing.Size(422, 316);
             this.pnlDashboard.TabIndex = 45;
             // 
             // PackedRowControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
+            this.BackColor = System.Drawing.Color.White;
             this.Controls.Add(this.chkbxStatus);
             this.Controls.Add(this.btnView);
             this.Controls.Add(this.txtPackDate);
@@ -216,7 +219,7 @@
             this.Controls.Add(this.lblPallets);
             this.Controls.Add(this.pnlDashboard);
             this.Name = "PackedRowControl";
-            this.Size = new System.Drawing.Size(523, 375);
+            this.Size = new System.Drawing.Size(430, 325);
             this.pnlDashboard.ResumeLayout(false);
             this.pnlDashboard.PerformLayout();
             this.ResumeLayout(false);

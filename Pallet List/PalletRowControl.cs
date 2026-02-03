@@ -68,7 +68,7 @@ namespace WindowsFormsApp1
             _model = model;
 
             lblPbJobName.Text = model.JobName;
-            lblAxRef.Text = model.JobNumber;
+            lblAxRef.Text = model.JobNumber.ToString(); 
 
             lblEnvelopeQty.Text = model.EnvelopeQty.ToString("N0");
             lblScannedWOs.Text = model.ScannedWorkOrders.ToString("N0");

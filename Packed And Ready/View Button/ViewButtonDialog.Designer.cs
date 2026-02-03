@@ -31,6 +31,10 @@
             this.pnlHeader = new Krypton.Toolkit.KryptonPanel();
             this.btnExit = new Krypton.Toolkit.KryptonButton();
             this.pnlDashboard = new System.Windows.Forms.Panel();
+            this.txtPackedTime = new Krypton.Toolkit.KryptonLabel();
+            this.txtTrayCount = new Krypton.Toolkit.KryptonLabel();
+            this.txtScannedWO = new Krypton.Toolkit.KryptonLabel();
+            this.txtEnvelopeQty = new Krypton.Toolkit.KryptonLabel();
             this.pnlDetails = new System.Windows.Forms.Panel();
             this.lblPackedTime = new Krypton.Toolkit.KryptonLabel();
             this.lblEnvelopeQty = new Krypton.Toolkit.KryptonLabel();
@@ -43,14 +47,12 @@
             this.lblPackDate = new Krypton.Toolkit.KryptonLabel();
             this.txtPBJobName = new Krypton.Toolkit.KryptonLabel();
             this.pnlPalletNoList = new Krypton.Toolkit.KryptonPanel();
-            this.txtEnvelopeQty = new Krypton.Toolkit.KryptonLabel();
-            this.txtScannedWO = new Krypton.Toolkit.KryptonLabel();
-            this.txtTrayCount = new Krypton.Toolkit.KryptonLabel();
-            this.txtPackedTime = new Krypton.Toolkit.KryptonLabel();
+            this.palletNumListViewList1 = new WindowsFormsApp1.Packed_And_Ready.View_Button.PalletNumListViewList();
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
             this.pnlDashboard.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pnlPalletNoList)).BeginInit();
+            this.pnlPalletNoList.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlHeader
@@ -98,6 +100,42 @@
             this.pnlDashboard.Name = "pnlDashboard";
             this.pnlDashboard.Size = new System.Drawing.Size(677, 458);
             this.pnlDashboard.TabIndex = 58;
+            // 
+            // txtPackedTime
+            // 
+            this.txtPackedTime.Location = new System.Drawing.Point(587, 35);
+            this.txtPackedTime.Name = "txtPackedTime";
+            this.txtPackedTime.Size = new System.Drawing.Size(76, 24);
+            this.txtPackedTime.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
+            this.txtPackedTime.TabIndex = 59;
+            this.txtPackedTime.Values.Text = "00:00 AM";
+            // 
+            // txtTrayCount
+            // 
+            this.txtTrayCount.Location = new System.Drawing.Point(634, 5);
+            this.txtTrayCount.Name = "txtTrayCount";
+            this.txtTrayCount.Size = new System.Drawing.Size(28, 24);
+            this.txtTrayCount.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
+            this.txtTrayCount.TabIndex = 8;
+            this.txtTrayCount.Values.Text = "00";
+            // 
+            // txtScannedWO
+            // 
+            this.txtScannedWO.Location = new System.Drawing.Point(112, 35);
+            this.txtScannedWO.Name = "txtScannedWO";
+            this.txtScannedWO.Size = new System.Drawing.Size(28, 24);
+            this.txtScannedWO.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
+            this.txtScannedWO.TabIndex = 7;
+            this.txtScannedWO.Values.Text = "00";
+            // 
+            // txtEnvelopeQty
+            // 
+            this.txtEnvelopeQty.Location = new System.Drawing.Point(112, 5);
+            this.txtEnvelopeQty.Name = "txtEnvelopeQty";
+            this.txtEnvelopeQty.Size = new System.Drawing.Size(28, 24);
+            this.txtEnvelopeQty.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
+            this.txtEnvelopeQty.TabIndex = 6;
+            this.txtEnvelopeQty.Values.Text = "00";
             // 
             // pnlDetails
             // 
@@ -218,6 +256,7 @@
             // 
             // pnlPalletNoList
             // 
+            this.pnlPalletNoList.Controls.Add(this.palletNumListViewList1);
             this.pnlPalletNoList.Location = new System.Drawing.Point(26, 180);
             this.pnlPalletNoList.Name = "pnlPalletNoList";
             this.pnlPalletNoList.Size = new System.Drawing.Size(238, 454);
@@ -225,41 +264,12 @@
             this.pnlPalletNoList.StateCommon.ColorStyle = Krypton.Toolkit.PaletteColorStyle.Solid;
             this.pnlPalletNoList.TabIndex = 55;
             // 
-            // txtEnvelopeQty
+            // palletNumListViewList1
             // 
-            this.txtEnvelopeQty.Location = new System.Drawing.Point(112, 5);
-            this.txtEnvelopeQty.Name = "txtEnvelopeQty";
-            this.txtEnvelopeQty.Size = new System.Drawing.Size(28, 24);
-            this.txtEnvelopeQty.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.txtEnvelopeQty.TabIndex = 6;
-            this.txtEnvelopeQty.Values.Text = "00";
-            // 
-            // txtScannedWO
-            // 
-            this.txtScannedWO.Location = new System.Drawing.Point(112, 35);
-            this.txtScannedWO.Name = "txtScannedWO";
-            this.txtScannedWO.Size = new System.Drawing.Size(28, 24);
-            this.txtScannedWO.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.txtScannedWO.TabIndex = 7;
-            this.txtScannedWO.Values.Text = "00";
-            // 
-            // txtTrayCount
-            // 
-            this.txtTrayCount.Location = new System.Drawing.Point(634, 5);
-            this.txtTrayCount.Name = "txtTrayCount";
-            this.txtTrayCount.Size = new System.Drawing.Size(28, 24);
-            this.txtTrayCount.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.txtTrayCount.TabIndex = 8;
-            this.txtTrayCount.Values.Text = "00";
-            // 
-            // txtPackedTime
-            // 
-            this.txtPackedTime.Location = new System.Drawing.Point(587, 35);
-            this.txtPackedTime.Name = "txtPackedTime";
-            this.txtPackedTime.Size = new System.Drawing.Size(76, 24);
-            this.txtPackedTime.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.txtPackedTime.TabIndex = 59;
-            this.txtPackedTime.Values.Text = "00:00 AM";
+            this.palletNumListViewList1.Location = new System.Drawing.Point(3, 5);
+            this.palletNumListViewList1.Name = "palletNumListViewList1";
+            this.palletNumListViewList1.Size = new System.Drawing.Size(232, 446);
+            this.palletNumListViewList1.TabIndex = 0;
             // 
             // ViewButtonDialog
             // 
@@ -284,6 +294,7 @@
             this.pnlDashboard.ResumeLayout(false);
             this.pnlDashboard.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pnlPalletNoList)).EndInit();
+            this.pnlPalletNoList.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -310,5 +321,6 @@
         private Krypton.Toolkit.KryptonLabel txtTrayCount;
         private Krypton.Toolkit.KryptonLabel txtScannedWO;
         private Krypton.Toolkit.KryptonLabel txtEnvelopeQty;
+        private PalletNumListViewList palletNumListViewList1;
     }
 }

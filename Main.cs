@@ -13,7 +13,8 @@ namespace WindowsFormsApp1
 
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
         private readonly List<PickListModel> _pickLists = new List<PickListModel>();
-      
+
+
 
 
         public Main()
@@ -42,20 +43,75 @@ namespace WindowsFormsApp1
             var list = lvBuild; // the one on your page (select it in designer to see its name)
             var list2 = packedListView2;
             var list3 = pickedUpListView;
-           
+
 
 
             var packedRow = new PackedRowControl();
             var pickedRow = new PickedUpRowControl();
             var row1 = new PalletRowControl();
-            var test = new PickListModel { JobName = "CAPONE", JobNumber = 23413, EnvelopeQty = 10000, Trays = 10, Pallets = 3, ShipDateTime = DateTime.Parse("2025-11-23") };
+
+
+            var test = new PickListModel
+            {
+                JobName = "CAPONE",
+                JobNumber = 23413,
+                EnvelopeQty = 10000,
+                Trays = 10,
+                Pallets = 3,
+                ShipDateTime = DateTime.Parse("2025-11-23")
+            };
+
+            var test2 = new PbJobModel
+            {
+                JobName = "CAPONE",
+                JobNumber = 23413,
+                EnvelopeQty = 10000,
+             
+
+                Pallets = new List<Pallet>
+                 {
+                    //total traycount 85
+                     new Pallet { TrayCount = 30},
+                     new Pallet { TrayCount = 40},
+                     new Pallet { TrayCount = 15 },
+
+                 },
+
+                PackDate = DateTime.Parse("2025-11-23"),
+            };
+            var test3 = new PbJobModel
+            {
+                JobName = "Test",
+                JobNumber = 23414,
+                EnvelopeQty = 20000,
+       
+
+                Pallets = new List<Pallet>
+                 {
+               
+                     new Pallet { TrayCount = 30},
+                     new Pallet { TrayCount = 40},
+                     new Pallet { TrayCount = 50 },
+                     new Pallet { TrayCount = 50 },
+                     new Pallet { TrayCount = 55 },
+
+                 },
+
+                PackDate = DateTime.Parse("2025-11-23"),
+            };
 
             // row1.Bind(...) later
             _pickLists.Add(test);                 // ← DATA updated here
+            _pbJobs.Add(test2);
+            _pbJobs.Add(test3);
 
-            packedListView2.SetItems(_pickLists);
+
+            //for Packed and ready View Form
+            packedListView2.SetItems(_pbJobs);
+
+
             pickedUpListView.SetItems(_pickLists);
-            
+
             //load the pack & ready using the pickedUpListView data
 
             //   LoadPackedReady();
@@ -74,27 +130,7 @@ namespace WindowsFormsApp1
 
 
         }
-       /* private void LoadPackedReady()
-        {
-            pgPacked.Controls.Clear();
 
-            foreach (var pick in _pickLists)
-            {
-                var PackedRow = new PackedRowControl();
-
-                PackedRow.Bind(pick);              // ← PASS DATA HERE
-                pgPacked.Controls.Add(PackedRow);
-            }
-
-        }*/
-        /* private void loadShipAll()
-        {
-
-            ShipPalletsRowControl shipPallets = new ShipPalletsRowControl();
-            pgPacked.Controls.Add(shipPallets);
-
-        }
-        */
         private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
 
@@ -231,10 +267,11 @@ namespace WindowsFormsApp1
             {
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
+
                     var job = new PbJobModel
                     {
-                        JobName = dlg.JobName,
-                        JobNumber = dlg.JobNumber,
+                        JobName = dlg.JobName.ToString(),
+                        JobNumber = int.TryParse(dlg.JobNumber, out var jobNumer) ? jobNumer : 0,
                         EnvelopeQty = 0,
                         ScannedWorkOrders = 0
                     };
