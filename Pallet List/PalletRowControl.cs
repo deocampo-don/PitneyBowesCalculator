@@ -70,8 +70,12 @@ namespace WindowsFormsApp1
             lblPbJobName.Text = model.JobName;
             lblAxRef.Text = model.JobNumber.ToString(); 
 
-            lblEnvelopeQty.Text = model.EnvelopeQty.ToString("N0");
-            lblScannedWOs.Text = model.ScannedWorkOrders.ToString("N0");
+        //    lblEnvelopeQty.Text = model.EnvelopeQty.ToString("N0");
+        //    lblScannedWOs.Text = model.ScannedWorkOrders.ToString("N0");
+
+
+            lblEnvelopeQty.Text = $"Envelope Qty: {model.EnvelopeQty.ToString("N0")}";
+            lblScannedWOs.Text = $"Scanned Work Orders: {model.ScannedWorkOrders.ToString("N0")}";
         }
 
      

@@ -328,7 +328,7 @@ namespace WindowsFormsApp1
             this.pgBuild,
             this.pgPacked,
             this.pgPicked});
-            this.nvNavigator.SelectedIndex = 1;
+            this.nvNavigator.SelectedIndex = 2;
             this.nvNavigator.Size = new System.Drawing.Size(1369, 525);
             this.nvNavigator.StateCommon.Page.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.nvNavigator.StateCommon.Page.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));

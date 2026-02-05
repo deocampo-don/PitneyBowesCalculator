@@ -4,139 +4,87 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using WindowsFormsApp1.Packed_And_Ready;
-using WindowsFormsApp1.Picked_Up;
 
 namespace WindowsFormsApp1
 {
     public partial class Main : Form
     {
-
+        // -----------------------------
+        // Fields
+        // -----------------------------
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
         private readonly List<PickListModel> _pickLists = new List<PickListModel>();
+    
 
-
-
-
+        // -----------------------------
+        // Constructor
+        // -----------------------------
         public Main()
         {
             InitializeComponent();
 
+            // UI Setup
+            ApplyTabStyles();
+            WireCheckSetToNavigator();
+            InitializeTitleBarButtons();
 
+            // Seed data and bind to views
+            SeedSampleData();
+            RefreshAllViews();
 
-            //Apply styles to tabs
+            // Add initial rows for custom list controls (if needed)
+            InitializeListRows();
+        }
+
+        // -----------------------------
+        // Form Events
+        // -----------------------------
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // If you want to ensure nav sync on load:
+            SyncNavigatorWithCheckedTab();
+        }
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+            // Intentionally left blank (remove if unused)
+        }
+
+        // -----------------------------
+        // UI Styling / Wiring
+        // -----------------------------
+        private void ApplyTabStyles()
+        {
+            // Apply styles to tabs
             ApplyTabColors(kcbPickedUp);
             ApplyTabColors(kcbBuildPallets);
             ApplyTabColors(kcbPackedReady);
+        }
 
+        private void WireCheckSetToNavigator()
+        {
+            // Ensure check buttons belong to the same set
             kryptonCheckSet1.CheckButtons.Add(kcbBuildPallets);
             kryptonCheckSet1.CheckButtons.Add(kcbPackedReady);
             kryptonCheckSet1.CheckButtons.Add(kcbPickedUp);
 
+            // Keep Navigator index in sync with selected tab
             kryptonCheckSet1.CheckedButtonChanged += (_, __) =>
             {
                 nvNavigator.SelectedIndex = kryptonCheckSet1.CheckedIndex;
             };
 
-            // Default selected tab
+            // Set default selected tab and sync immediately
             kryptonCheckSet1.CheckedButton = kcbBuildPallets;
-
-            var list = lvBuild; // the one on your page (select it in designer to see its name)
-            var list2 = packedListView2;
-            var list3 = pickedUpListView;
-
-
-
-            var packedRow = new PackedRowControl();
-            var pickedRow = new PickedUpRowControl();
-            var row1 = new PalletRowControl();
-
-
-            var test = new PickListModel
-            {
-                JobName = "CAPONE",
-                JobNumber = 23413,
-                EnvelopeQty = 10000,
-                Trays = 10,
-                Pallets = 3,
-                ShipDateTime = DateTime.Parse("2025-11-23")
-            };
-
-            var test2 = new PbJobModel
-            {
-                JobName = "CAPONE",
-                JobNumber = 23413,
-                EnvelopeQty = 10000,
-             
-
-                Pallets = new List<Pallet>
-                 {
-                    //total traycount 85
-                     new Pallet { TrayCount = 30},
-                     new Pallet { TrayCount = 40},
-                     new Pallet { TrayCount = 15 },
-
-                 },
-
-                PackDate = DateTime.Parse("2025-11-23"),
-            };
-            var test3 = new PbJobModel
-            {
-                JobName = "Test",
-                JobNumber = 23414,
-                EnvelopeQty = 20000,
-       
-
-                Pallets = new List<Pallet>
-                 {
-               
-                     new Pallet { TrayCount = 30},
-                     new Pallet { TrayCount = 40},
-                     new Pallet { TrayCount = 50 },
-                     new Pallet { TrayCount = 50 },
-                     new Pallet { TrayCount = 55 },
-
-                 },
-
-                PackDate = DateTime.Parse("2025-11-23"),
-            };
-
-            // row1.Bind(...) later
-            _pickLists.Add(test);                 // ← DATA updated here
-            _pbJobs.Add(test2);
-            _pbJobs.Add(test3);
-
-
-            //for Packed and ready View Form
-            packedListView2.SetItems(_pbJobs);
-
-
-            pickedUpListView.SetItems(_pickLists);
-
-            //load the pack & ready using the pickedUpListView data
-
-            //   LoadPackedReady();
-            // loadShipAll();
-            list.AddRow(row1);
-            list2.AddRow(packedRow);
-            //list3.AddRow(pickedRow);
-
-
-
-            MakeTitleBarButton(btnMaximize);
-            MakeTitleBarButton(btnMinimize);
-            MakeTitleBarButton(btnClose);
-            MakeTitleBarButton(btnSettings);
-
-
-
+            SyncNavigatorWithCheckedTab();
         }
 
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        private void SyncNavigatorWithCheckedTab()
         {
-
+            // Guard against -1 in rare cases
+            var idx = kryptonCheckSet1.CheckedIndex;
+            nvNavigator.SelectedIndex = (idx >= 0) ? idx : 0;
         }
-
-
 
         private void ApplyTabColors(KryptonCheckButton b)
         {
@@ -147,7 +95,8 @@ namespace WindowsFormsApp1
             b.StateCommon.Content.Padding = pad;
             b.StateCommon.Content.ShortText.Font = tabFont;
             b.AutoSize = true;
-            // CHECKED states: MUST draw background/border
+
+            // CHECKED states: background/border visible
             b.StateCheckedNormal.Back.Draw = InheritBool.True;
             b.StateCheckedNormal.Back.Color1 = purple;
             b.StateCheckedNormal.Back.Color2 = purple;
@@ -157,7 +106,6 @@ namespace WindowsFormsApp1
             b.StateCheckedNormal.Border.Color2 = purple;
             b.StateCheckedNormal.Border.Rounding = 7;
             b.StateCheckedNormal.Content.ShortText.Color1 = Color.White;
-
 
             // Checked hover (keep purple)
             b.StateCheckedTracking.Back.Draw = InheritBool.True;
@@ -170,8 +118,7 @@ namespace WindowsFormsApp1
             b.StateCheckedTracking.Border.Rounding = 7;
             b.StateCheckedTracking.Content.ShortText.Color1 = Color.White;
 
-
-            //Pressed on checked
+            // Pressed on checked
             b.StateCheckedPressed.Back.Draw = InheritBool.True;
             b.StateCheckedPressed.Back.Color1 = purple;
             b.StateCheckedPressed.Back.Color2 = purple;
@@ -182,59 +129,37 @@ namespace WindowsFormsApp1
             b.StateCheckedPressed.Border.Rounding = 7;
             b.StateCheckedPressed.Content.ShortText.Color1 = Color.White;
 
-
-            //Normal state
+            // Normal state
             b.StateNormal.Back.Draw = InheritBool.False;
             b.StateNormal.Border.Draw = InheritBool.False;
             b.StateNormal.Content.ShortText.Color1 = Color.Black;
 
-
-            //Hover state
+            // Hover state
             b.StateTracking.Back.Draw = InheritBool.False;
             b.StateTracking.Border.Draw = InheritBool.False;
             b.StateTracking.Content.ShortText.Color1 = Color.Black;
 
-
+            // Pressed state (when not checked)
             b.StatePressed.Back.Draw = InheritBool.False;
             b.StatePressed.Border.Draw = InheritBool.False;
             b.StatePressed.Content.ShortText.Color1 = Color.Black;
-
         }
 
-
-        private void Form1_Load(object sender, EventArgs e)
+        private void InitializeTitleBarButtons()
         {
-
-        }
-        private void btnClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
+            MakeTitleBarButton(btnMaximize);
+            MakeTitleBarButton(btnMinimize);
+            MakeTitleBarButton(btnClose);
+            MakeTitleBarButton(btnSettings);
         }
 
-        private void btnMinimize_Click(object sender, EventArgs e)
+        private void MakeTitleBarButton(KryptonButton b)
         {
-            this.WindowState = FormWindowState.Minimized;
-        }
-
-        private void btnMaximize_Click(object sender, EventArgs e)
-        {
-            if (this.WindowState == FormWindowState.Maximized) this.WindowState = FormWindowState.Normal; else this.WindowState = FormWindowState.Maximized;
-        }
-
-        private void palletListView1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        void MakeTitleBarButton(KryptonButton b)
-        {
-            // Disable background in ALL states
-            //b.StateCommon.Back.Draw = InheritBool.False;
+            // Disable background in pressed/disabled states
             b.StatePressed.Back.Draw = InheritBool.False;
             b.StateDisabled.Back.Draw = InheritBool.False;
 
-            // Disable borders in ALL states
-            //b.StateCommon.Border.Draw = InheritBool.False;
+            // Disable borders in pressed/disabled states
             b.StatePressed.Border.Draw = InheritBool.False;
             b.StateDisabled.Border.Draw = InheritBool.False;
 
@@ -243,13 +168,136 @@ namespace WindowsFormsApp1
 
             // No focus rectangle
             b.TabStop = false;
-
-            // Optional: transparent background inheritance
-
         }
 
+        // -----------------------------
+        // Data: Seeding & Refresh
+        // -----------------------------
+        private void SeedSampleData()
+        {
+            var packDate = DateTime.Parse("2025-11-23"); // or however you get it
+            // Sample PickList
+            var pickSample = new PickListModel
+            {
+                JobName = "CAPONE",
+                JobNumber = 23413,
+                //EnvelopeQty = 0,
+                Trays = 10,
+                Pallets = 3,
+                ShipDateTime = DateTime.Parse("2025-11-23")
+            };
+
+            // Sample Packed & Ready job 1
+            var pb1 = new PbJobModel
+            {
+                JobName = "CAPONE",
+                JobNumber = 23413,
+                // TrayCount = 10,
+                PackDate =packDate,
+
+                Pallets = new List<Pallet>
+                {
+                    // total traycount: 85
+                    new Pallet
+                    {
+                        TrayCount = 40,
+                        WorkOrders = new List<WorkOrder>
+                        {
+                            
+                            new WorkOrder { Code = "WO-001", Quantity = 1000 },
+                            new WorkOrder { Code = "WO-002", Quantity = 500 }
+                        },
+                       
+                        // ✅ 9:30 PM on the job's pack date
+                          PackedTime = packDate.Date.AddHours(21).AddMinutes(30)
+
+                    },
+                      new Pallet
+                    {
+                         TrayCount = 42,
+                        WorkOrders = new List<WorkOrder>
+                        {
+                            new WorkOrder { Code = "WO2-001", Quantity = 1000},
+                            new WorkOrder { Code = "WO2-002", Quantity = 500 }
+                        }
+
+                    },
+
+                    new Pallet {  },
+                    new Pallet {  },
+                },
+               
 
 
+
+            };
+
+            // Sample Packed & Ready job 2
+            var pb2 = new PbJobModel
+            {
+                JobName = "Test",
+                JobNumber = 23414,
+           //     TrayCount = 40,
+                Pallets = new List<Pallet>
+                {
+                    new Pallet { 
+                    },
+                    new Pallet {
+                    },
+                    new Pallet {  },
+                    new Pallet {  },
+                    new Pallet {  },
+                },
+                PackDate = DateTime.Parse("2025-11-23"),
+            };
+
+            _pickLists.Add(pickSample);
+            _pbJobs.Add(pb1);
+            _pbJobs.Add(pb2);
+        }
+
+        private void RefreshAllViews()
+        {
+            // Refresh / bind all list views from the backing lists
+            lvBuild?.SetItems(_pbJobs);
+            packedListView2?.SetItems(_pbJobs);
+            pickedUpListView?.SetItems(_pickLists);
+        }
+
+        private void InitializeListRows()
+        {
+            // If your custom list views require at least one row control present
+            var palletRow = new PalletRowControl();
+            var packedRow = new PackedRowControl();
+            // var pickedRow = new PickedUpRowControl(); // If needed
+
+            lvBuild?.AddRow(palletRow);
+            packedListView2?.AddRow(packedRow);
+            // pickedUpListView?.AddRow(pickedRow);
+        }
+
+        // -----------------------------
+        // Window Buttons
+        // -----------------------------
+        private void btnClose_Click(object sender, EventArgs e) => Close();
+
+        private void btnMinimize_Click(object sender, EventArgs e) =>
+            WindowState = FormWindowState.Minimized;
+
+        private void btnMaximize_Click(object sender, EventArgs e)
+        {
+            WindowState = (WindowState == FormWindowState.Maximized)
+                ? FormWindowState.Normal
+                : FormWindowState.Maximized;
+        }
+
+        // -----------------------------
+        // Other Control Events
+        // -----------------------------
+        private void palletListView1_Load(object sender, EventArgs e)
+        {
+            // If anything needs to happen once the listview is loaded
+        }
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
@@ -257,30 +305,32 @@ namespace WindowsFormsApp1
             {
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-
+                    // Apply settings if needed
                 }
             }
         }
+
+        // -----------------------------
+        // Actions
+        // -----------------------------
         private void btnAddPBJob_Click(object sender, EventArgs e)
         {
             using (var dlg = new CreatePBJobDialog())
             {
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
-
                     var job = new PbJobModel
                     {
-                        JobName = dlg.JobName.ToString(),
-                        JobNumber = int.TryParse(dlg.JobNumber, out var jobNumer) ? jobNumer : 0,
-                        EnvelopeQty = 0,
+                        JobName = dlg.JobName?.ToString() ?? string.Empty,
+                        JobNumber = int.TryParse(dlg.JobNumber, out var jobNumber) ? jobNumber : 0,
+                        //EnvelopeQty = 0,
                         ScannedWorkOrders = 0
                     };
 
-                    _pbJobs.Add(job);                 // ← DATA updated here
-                    lvBuild.SetItems(_pbJobs); // ← UI refreshed here
+                    _pbJobs.Add(job);
+                    RefreshAllViews();
                 }
             }
         }
     }
 }
-

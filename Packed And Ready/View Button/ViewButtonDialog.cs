@@ -16,6 +16,12 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         /// Job data passed from PackedRowControl.
         /// </summary>
         private PbJobModel _job;
+        private PbJobModel _currentJob;
+
+
+        private PalletNumListViewList palletNumListView;
+        private PalletDetailsRowControl palletDetailsRowControl;
+
 
         /* -------------------------------------------------------------
          * WIN32 IMPORTS (DRAGGABLE BORDERLESS FORM)
@@ -125,5 +131,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         {
             this.Close();
         }
+
+
+      
     }
 }

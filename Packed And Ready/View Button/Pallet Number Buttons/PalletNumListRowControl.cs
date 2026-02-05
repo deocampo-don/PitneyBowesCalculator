@@ -37,6 +37,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         /// <summary>
         /// Binds a PB job model to this row and updates UI elements.
         /// </summary>
+        /// 
+
         public void Bind(PbJobModel model, int palletIndex)
         {
             if (model == null)
@@ -47,6 +49,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
             // Display correct label
             btnPalletNum.Text = $"Pallet # {palletIndex + 1}";
+
 
         }
 
@@ -61,6 +64,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             // Example: Show pallet details, highlight row, etc.
 
             PalletClicked?.Invoke(_palletIndex);
+
         }
        
 

@@ -130,22 +130,28 @@
     <Compile Include="Packed And Ready\ShipPalletsRowControl.Designer.cs">
       <DependentUpon>ShipPalletsRowControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Packed And Ready\View Button\PalletDetailsRowControl.cs">
+    <Compile Include="Packed And Ready\View Button\Pallet Details List\PalletDetailsListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Packed And Ready\View Button\PalletDetailsRowControl.Designer.cs">
+    <Compile Include="Packed And Ready\View Button\Pallet Details List\PalletDetailsListView.Designer.cs">
+      <DependentUpon>PalletDetailsListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Packed And Ready\View Button\Pallet Details List\PalletDetailsRowControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Packed And Ready\View Button\Pallet Details List\PalletDetailsRowControl.Designer.cs">
       <DependentUpon>PalletDetailsRowControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Packed And Ready\View Button\PalletNumListRowControl.cs">
+    <Compile Include="Packed And Ready\View Button\Pallet Number Buttons\PalletNumListRowControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Packed And Ready\View Button\PalletNumListRowControl.Designer.cs">
+    <Compile Include="Packed And Ready\View Button\Pallet Number Buttons\PalletNumListRowControl.Designer.cs">
       <DependentUpon>PalletNumListRowControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Packed And Ready\View Button\PalletNumListViewList.cs">
+    <Compile Include="Packed And Ready\View Button\Pallet Number Buttons\PalletNumListViewList.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Packed And Ready\View Button\PalletNumListViewList.Designer.cs">
+    <Compile Include="Packed And Ready\View Button\Pallet Number Buttons\PalletNumListViewList.Designer.cs">
       <DependentUpon>PalletNumListViewList.cs</DependentUpon>
     </Compile>
     <Compile Include="Packed And Ready\View Button\RemovePallets.cs">
@@ -233,13 +239,16 @@
     <EmbeddedResource Include="Packed And Ready\ShipPalletsRowControl.resx">
       <DependentUpon>ShipPalletsRowControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Packed And Ready\View Button\PalletDetailsRowControl.resx">
+    <EmbeddedResource Include="Packed And Ready\View Button\Pallet Details List\PalletDetailsListView.resx">
+      <DependentUpon>PalletDetailsListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Packed And Ready\View Button\Pallet Details List\PalletDetailsRowControl.resx">
       <DependentUpon>PalletDetailsRowControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Packed And Ready\View Button\PalletNumListRowControl.resx">
+    <EmbeddedResource Include="Packed And Ready\View Button\Pallet Number Buttons\PalletNumListRowControl.resx">
       <DependentUpon>PalletNumListRowControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Packed And Ready\View Button\PalletNumListViewList.resx">
+    <EmbeddedResource Include="Packed And Ready\View Button\Pallet Number Buttons\PalletNumListViewList.resx">
       <DependentUpon>PalletNumListViewList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Packed And Ready\View Button\RemovePallets.resx">

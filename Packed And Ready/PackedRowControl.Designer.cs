@@ -76,23 +76,23 @@
             // 
             // txtPackDate
             // 
-            this.txtPackDate.Location = new System.Drawing.Point(303, 234);
+            this.txtPackDate.Location = new System.Drawing.Point(287, 231);
             this.txtPackDate.Name = "txtPackDate";
-            this.txtPackDate.Size = new System.Drawing.Size(90, 24);
+            this.txtPackDate.Size = new System.Drawing.Size(105, 24);
             this.txtPackDate.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
             this.txtPackDate.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPackDate.TabIndex = 41;
-            this.txtPackDate.Values.Text = "01/30/2026";
+            this.txtPackDate.Values.Text = "MM/DD/YYYY";
             // 
             // txtPBJobNum
             // 
             this.txtPBJobNum.Location = new System.Drawing.Point(29, 73);
             this.txtPBJobNum.Name = "txtPBJobNum";
-            this.txtPBJobNum.Size = new System.Drawing.Size(45, 24);
+            this.txtPBJobNum.Size = new System.Drawing.Size(20, 24);
             this.txtPBJobNum.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
             this.txtPBJobNum.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPBJobNum.TabIndex = 39;
-            this.txtPBJobNum.Values.Text = "0000";
+            this.txtPBJobNum.Values.Text = "0";
             // 
             // txtPBJobName
             // 
@@ -130,11 +130,11 @@
             // 
             this.txtTrays.Location = new System.Drawing.Point(11, 210);
             this.txtTrays.Name = "txtTrays";
-            this.txtTrays.Size = new System.Drawing.Size(104, 48);
+            this.txtTrays.Size = new System.Drawing.Size(40, 48);
             this.txtTrays.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
             this.txtTrays.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtTrays.TabIndex = 36;
-            this.txtTrays.Values.Text = "0000";
+            this.txtTrays.Values.Text = "0";
             // 
             // lblEnvelopeQty
             // 
@@ -152,11 +152,11 @@
             this.txtEnvelopeQty.LabelStyle = Krypton.Toolkit.LabelStyle.TitleControl;
             this.txtEnvelopeQty.Location = new System.Drawing.Point(11, 137);
             this.txtEnvelopeQty.Name = "txtEnvelopeQty";
-            this.txtEnvelopeQty.Size = new System.Drawing.Size(104, 48);
+            this.txtEnvelopeQty.Size = new System.Drawing.Size(40, 48);
             this.txtEnvelopeQty.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
             this.txtEnvelopeQty.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtEnvelopeQty.TabIndex = 34;
-            this.txtEnvelopeQty.Values.Text = "0000";
+            this.txtEnvelopeQty.Values.Text = "0";
             // 
             // lblPallets
             // 
@@ -171,13 +171,13 @@
             // txtPallets
             // 
             this.txtPallets.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPallets.Location = new System.Drawing.Point(308, 134);
+            this.txtPallets.Location = new System.Drawing.Point(350, 134);
             this.txtPallets.Name = "txtPallets";
-            this.txtPallets.Size = new System.Drawing.Size(82, 48);
+            this.txtPallets.Size = new System.Drawing.Size(40, 48);
             this.txtPallets.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
             this.txtPallets.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPallets.TabIndex = 32;
-            this.txtPallets.Values.Text = "000";
+            this.txtPallets.Values.Text = "0";
             // 
             // chkbxStatus
             // 
@@ -196,6 +196,7 @@
             this.pnlDashboard.BackColor = System.Drawing.Color.Transparent;
             this.pnlDashboard.Controls.Add(this.txtStatus);
             this.pnlDashboard.Controls.Add(this.txtPallets);
+            this.pnlDashboard.Controls.Add(this.txtPackDate);
             this.pnlDashboard.Location = new System.Drawing.Point(3, 3);
             this.pnlDashboard.Name = "pnlDashboard";
             this.pnlDashboard.Size = new System.Drawing.Size(422, 316);
@@ -208,7 +209,6 @@
             this.BackColor = System.Drawing.Color.White;
             this.Controls.Add(this.chkbxStatus);
             this.Controls.Add(this.btnView);
-            this.Controls.Add(this.txtPackDate);
             this.Controls.Add(this.txtPBJobNum);
             this.Controls.Add(this.txtPBJobName);
             this.Controls.Add(this.lblPackDate);

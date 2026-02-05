@@ -53,7 +53,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
         /// <summary>
         /// Binds a PB job model to the row and updates all UI fields.
         /// </summary>
-        public void Bind(PbJobModel job)
+        public void Bind(PbJobModel job )
         {
             if (job == null)
                 return;
@@ -62,12 +62,13 @@ namespace WindowsFormsApp1.Packed_And_Ready
 
             txtPBJobName.Text   = job.JobName;
             txtPBJobNum.Text    = job.JobNumber.ToString();
+
             txtEnvelopeQty.Text = job.EnvelopeQty.ToString();
+       
             txtPallets.Text     = (job.Pallets?.Count ?? 0).ToString();
 
-            // Sum of all trays across all pallets
-            var totalTrays = job.Pallets?.Sum(p => p.TrayCount) ?? 0;
-            txtTrays.Text = totalTrays.ToString();
+          
+            txtTrays.Text = (job?.TotalTrays ?? 0).ToString();
 
             txtPackDate.Text = job.PackDate.ToShortDateString();
         }

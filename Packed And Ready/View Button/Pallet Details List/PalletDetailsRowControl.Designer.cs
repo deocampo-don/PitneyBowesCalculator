@@ -47,7 +47,7 @@
             // 
             this.txtValue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txtValue.AutoSize = true;
-            this.txtValue.Location = new System.Drawing.Point(613, 4);
+            this.txtValue.Location = new System.Drawing.Point(605, 5);
             this.txtValue.Name = "txtValue";
             this.txtValue.Size = new System.Drawing.Size(35, 16);
             this.txtValue.TabIndex = 1;
