@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+/*
 public class PbJobModel
 {
     public List<WorkOrder> WorkOrders { get; set; } = new List<WorkOrder>();
@@ -49,7 +49,7 @@ public class WorkOrder
     public string Code { get; set; } = string.Empty; // CXXX26010101PER0001
     public int Quantity { get; set; }                // 150, 1500, etc.
     public bool IsSelected { get; set; }             // checkbox
-  //  public int ScannedWorkOrders { get; set; } = 0;
+    public int ScannedWorkOrders { get; set; } = 0;
 }
 
 public class Pallet
@@ -85,4 +85,114 @@ public class Pallet
         // Ceil division without floating point: (a + b - 1) / b
         return (qty + capacity - 1) / capacity;
     }
+}
+*/
+ 
+ 
+//===========================================================================================================================
+
+// ================
+// Aggregate Root: JOB PB
+// ================
+public class PbJobModel
+{
+    // Identity
+    public string JobName { get; set; } = string.Empty;
+    public int JobNumber { get; set; }
+
+    // Composition
+    public List<Pallet> Pallets { get; set; } = new List<Pallet>();
+
+    // ===== Job Totals (computed, read-only) =====
+
+    /// <summary>Total number of pallets in the job.</summary>
+    //public int TotalPallets => Pallets?.Count ?? 0;
+
+    /// <summary>Total envelope quantity across ALL pallets (sums WO.EnvelopeQty).</summary>
+    public int TotalEnvelopeOfJob =>
+        Pallets?
+            .SelectMany(p => p?.WorkOrders ?? Enumerable.Empty<WorkOrder>())
+            .Sum(w => w?.EnvelopeQty ?? 0) ?? 0;
+
+    /// <summary>Total trays across ALL pallets (sums Pallet.PalletTrays).</summary>
+    public int TotalTraysOfJob =>
+        Pallets?.Sum(p => p?.Trays ?? 0) ?? 0;
+
+    /// <summary>Total scanned WO across ALL pallets (sums Pallet.PalletScannedWO).</summary>
+    public int TotalScannedWOOfJob =>
+        Pallets?.Sum(p => p?.PalletScannedWO ?? 0) ?? 0;
+    public DateTime PackDate { get; set; } = DateTime.Today;
+}
+
+// ================
+// Work Order (scan unit)
+// ================
+public class WorkOrder
+{
+    /// <summary>WO code (display with envelope value when scanned).</summary>
+    public string Code { get; set; } = string.Empty;
+
+    /// <summary>Envelope quantity for this WO (int; retrieved from DB).</summary>
+    public int EnvelopeQty { get; set; }
+
+    /// <summary>UI checkbox for manual selection (not related to scanning).</summary>
+    public bool IsSelected { get; set; }
+
+    /// <summary>Auto-incremented per scan (device triggers +1 per successful scan).</summary>
+    public int ScannedWorkOrders { get; private set; } = 0;
+
+    /// <summary>Manual trays input (used to pack the pallet).</summary>
+    //   public int Trays { get; set; } = 0;
+
+    /// <summary>Pack time (set when packing; default 9:30 PM today).</summary>
+
+
+
+    /// <summary>
+    /// Call this when the device scans THIS WO.
+    /// It increments the scanned counter by 1 and (optionally) updates the envelope qty
+    /// if the scanner/device provides it at scan-time.
+    /// </summary>
+    /// <param name="scannedEnvelopeQty">Optional envelope quantity from scanner (if provided at scan time).</param>
+    public void RecordScan(int? scannedEnvelopeQty = null)
+    {
+        // Increment scanned WO counter (1 scan = +1)
+        ScannedWorkOrders++;
+
+        // If your flow updates/display envelope before OK, you can accept it here:
+        if (scannedEnvelopeQty.HasValue && scannedEnvelopeQty.Value >= 0)
+        {
+            EnvelopeQty = scannedEnvelopeQty.Value;
+        }
+        // PackTime typically set when packing; leave as-is here.
+    }
+}
+
+// ================
+// Pallet (aggregates WOs)
+// ================
+public class Pallet
+{
+
+    public DateTime PackedTime { get; set; }
+            = DateTime.Now.Date.AddHours(21).AddMinutes(30); // 9:30 PM default
+
+    /// <summary>UI selection (not used for totals).</summary>
+    public bool IsSelected { get; set; }
+    public int Trays { get; set; } = 0;
+    /// <summary>Work orders loaded to this pallet.</summary>
+    public List<WorkOrder> WorkOrders { get; set; } = new List<WorkOrder>();
+
+    /// <summary>Total trays on this pallet (sum of WO.Trays; trays are manual input).</summary>
+    /// 
+    //time
+
+
+    /// <summary>Total scanned WOs on this pallet (sum of WO.ScannedWorkOrders).</summary>
+    public int PalletScannedWO =>
+        WorkOrders?.Sum(w => w?.ScannedWorkOrders ?? 0) ?? 0;
+
+    /// <summary>Total envelope qty on this pallet (sum of WO.EnvelopeQty). Handy for grids.</summary>
+    public int PalletEnvelopeQty =>
+        WorkOrders?.Sum(w => w?.EnvelopeQty ?? 0) ?? 0;
 }

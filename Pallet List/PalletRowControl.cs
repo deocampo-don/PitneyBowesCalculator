@@ -65,20 +65,24 @@ namespace WindowsFormsApp1
 
         public void Bind(PbJobModel model)
         {
+            if (model == null)
+                return;
+
             _model = model;
 
-            lblPbJobName.Text = model.JobName;
-            lblAxRef.Text = model.JobNumber.ToString(); 
+            // Job identity
+            lblPbJobName.Text = model.JobName ?? string.Empty;
+            lblAxRef.Text = model.JobNumber.ToString();
 
-        //    lblEnvelopeQty.Text = model.EnvelopeQty.ToString("N0");
-        //    lblScannedWOs.Text = model.ScannedWorkOrders.ToString("N0");
+            // Job totals (computed in the model)
+            lblEnvelopeQty.Text =
+                $"Envelope Qty: {(model.TotalEnvelopeOfJob).ToString("N0")}";
 
+            lblScannedWOs.Text =
+                $"Scanned Work Orders: {(model.TotalScannedWOOfJob).ToString("N0")}";
 
-            lblEnvelopeQty.Text = $"Envelope Qty: {model.EnvelopeQty.ToString("N0")}";
-            lblScannedWOs.Text = $"Scanned Work Orders: {model.ScannedWorkOrders.ToString("N0")}";
         }
 
-     
 
         private void btnPackPallet_Click(object sender, EventArgs e)
         {

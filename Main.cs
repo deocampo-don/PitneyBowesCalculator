@@ -14,7 +14,7 @@ namespace WindowsFormsApp1
         // -----------------------------
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
         private readonly List<PickListModel> _pickLists = new List<PickListModel>();
-    
+
 
         // -----------------------------
         // Constructor
@@ -33,7 +33,7 @@ namespace WindowsFormsApp1
             RefreshAllViews();
 
             // Add initial rows for custom list controls (if needed)
-            InitializeListRows();
+            //  InitializeListRows();
         }
 
         // -----------------------------
@@ -188,59 +188,62 @@ namespace WindowsFormsApp1
             };
 
             // Sample Packed & Ready job 1
+
             var pb1 = new PbJobModel
             {
                 JobName = "CAPONE",
                 JobNumber = 23413,
-                // TrayCount = 10,
-                PackDate =packDate,
+                PackDate = packDate,
 
                 Pallets = new List<Pallet>
                 {
-                    // total traycount: 85
+                    // Pallet 1
                     new Pallet
                     {
-                        TrayCount = 40,
-                        WorkOrders = new List<WorkOrder>
-                        {
-                            
-                            new WorkOrder { Code = "WO-001", Quantity = 1000 },
-                            new WorkOrder { Code = "WO-002", Quantity = 500 }
-                        },
-                       
-                        // ✅ 9:30 PM on the job's pack date
-                          PackedTime = packDate.Date.AddHours(21).AddMinutes(30)
+                        // ✅ Manual tray input (per pallet)
+                        Trays = 40,
 
-                    },
-                      new Pallet
-                    {
-                         TrayCount = 42,
+                        // ✅ Actual packing time of THIS pallet
+                        PackedTime = packDate.Date.AddHours(21).AddMinutes(30), // 9:30 PM
+
                         WorkOrders = new List<WorkOrder>
                         {
-                            new WorkOrder { Code = "WO2-001", Quantity = 1000},
-                            new WorkOrder { Code = "WO2-002", Quantity = 500 }
+                            // ✅ Envelope quantity comes from DB / scanner
+                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 }
                         }
-
                     },
 
-                    new Pallet {  },
-                    new Pallet {  },
-                },
-               
+                    // Pallet 2
+                    new Pallet
+                    {
+                        Trays = 42,
 
+                        PackedTime = packDate.Date.AddHours(22).AddMinutes(30), // 10:30 PM (example)
 
+                        WorkOrders = new List<WorkOrder>
+                        {
+                            new WorkOrder { Code = "WO2-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO2-002", EnvelopeQty = 500 }
+                        }
+                    },
 
-            };
+                    // Empty pallets (allowed)
+                    new Pallet { },
+                    new Pallet { }
+                }
+                        };
+
 
             // Sample Packed & Ready job 2
             var pb2 = new PbJobModel
             {
                 JobName = "Test",
                 JobNumber = 23414,
-           //     TrayCount = 40,
+                //     TrayCount = 40,
                 Pallets = new List<Pallet>
                 {
-                    new Pallet { 
+                    new Pallet {
                     },
                     new Pallet {
                     },
@@ -313,6 +316,7 @@ namespace WindowsFormsApp1
         // -----------------------------
         // Actions
         // -----------------------------
+
         private void btnAddPBJob_Click(object sender, EventArgs e)
         {
             using (var dlg = new CreatePBJobDialog())
@@ -322,9 +326,12 @@ namespace WindowsFormsApp1
                     var job = new PbJobModel
                     {
                         JobName = dlg.JobName?.ToString() ?? string.Empty,
-                        JobNumber = int.TryParse(dlg.JobNumber, out var jobNumber) ? jobNumber : 0,
-                        //EnvelopeQty = 0,
-                        ScannedWorkOrders = 0
+                        JobNumber = int.TryParse(dlg.JobNumber, out var jobNumber)
+                                        ? jobNumber
+                                        : 0,
+
+                        // ✅ Job-level date (use dialog value if you have one)
+                        PackDate = DateTime.Today
                     };
 
                     _pbJobs.Add(job);
@@ -332,5 +339,6 @@ namespace WindowsFormsApp1
                 }
             }
         }
+
     }
 }

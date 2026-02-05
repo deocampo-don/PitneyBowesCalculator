@@ -60,17 +60,19 @@ namespace WindowsFormsApp1.Packed_And_Ready
 
             _modelpbjob = job;
 
-            txtPBJobName.Text   = job.JobName;
-            txtPBJobNum.Text    = job.JobNumber.ToString();
 
-            txtEnvelopeQty.Text = job.EnvelopeQty.ToString();
-       
-            txtPallets.Text     = (job.Pallets?.Count ?? 0).ToString();
+            // Job identity
+            txtPBJobName.Text = job.JobName ?? string.Empty;
+            txtPBJobNum.Text = job.JobNumber.ToString();
 
-          
-            txtTrays.Text = (job?.TotalTrays ?? 0).ToString();
+            // Job totals (computed in the model)
+            txtEnvelopeQty.Text = job.TotalEnvelopeOfJob.ToString();
+            txtPallets.Text = (job.Pallets?.Count ?? 0).ToString();
+            txtTrays.Text = job.TotalTraysOfJob.ToString();
 
+            // Job-level date
             txtPackDate.Text = job.PackDate.ToShortDateString();
+
         }
 
 

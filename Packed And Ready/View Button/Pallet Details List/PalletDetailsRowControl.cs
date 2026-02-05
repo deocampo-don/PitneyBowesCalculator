@@ -17,10 +17,6 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             if (workorder == null)
                 return;
 
-            _workorder = workorder;
-
-            txtWOName.Text = workorder.Code;
-            txtValue.Text = workorder.Quantity.ToString();
 
 
         }
