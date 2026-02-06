@@ -9,6 +9,7 @@
     <RootNamespace>WindowsFormsApp1</RootNamespace>
     <AssemblyName>WindowsFormsApp1</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>8.0</LangVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -70,6 +71,9 @@
     <Reference Include="Krypton.Toolkit.Suite.Extended.Panels, Version=100.25.11.328, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e, processorArchitecture=MSIL">
       <HintPath>packages\Krypton.Toolkit.Suite.Extended.Panels.100.25.11.328\lib\net48\Krypton.Toolkit.Suite.Extended.Panels.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
@@ -86,6 +90,7 @@
   <ItemGroup>
     <Compile Include="ApplyRoundedCorners.cs" />
     <Compile Include="CSS Style\CSSDesign.cs" />
+    <Compile Include="DBHelper.cs" />
     <Compile Include="Dialogs\AddToPalletDialog.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -41,7 +41,7 @@
             this.pickedScrollHost.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pickedScrollHost.Location = new System.Drawing.Point(0, 0);
             this.pickedScrollHost.Name = "pickedScrollHost";
-            this.pickedScrollHost.Size = new System.Drawing.Size(693, 247);
+            this.pickedScrollHost.Size = new System.Drawing.Size(693, 246);
             this.pickedScrollHost.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.pickedScrollHost.TabIndex = 0;
             this.pickedScrollHost.Paint += new System.Windows.Forms.PaintEventHandler(this.pickedScrollHost_Paint);
@@ -59,13 +59,13 @@
             this.pickflowRows.TabIndex = 1;
             this.pickflowRows.WrapContents = false;
             // 
-            // PickedUpList
+            // PickedUpListView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.pickedScrollHost);
-            this.Name = "PickedUpList";
-            this.Size = new System.Drawing.Size(693, 247);
+            this.Name = "PickedUpListView";
+            this.Size = new System.Drawing.Size(554, 197);
             ((System.ComponentModel.ISupportInitialize)(this.pickedScrollHost)).EndInit();
             this.pickedScrollHost.ResumeLayout(false);
             this.pickedScrollHost.PerformLayout();

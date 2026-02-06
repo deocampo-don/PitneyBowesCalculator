@@ -43,8 +43,8 @@ namespace WindowsFormsApp1
             this.scrollHost.Controls.Add(this.flowRows);
             this.scrollHost.Dock = System.Windows.Forms.DockStyle.Fill;
             this.scrollHost.Location = new System.Drawing.Point(0, 0);
-            this.scrollHost.Margin = new System.Windows.Forms.Padding(5);
             this.scrollHost.Name = "scrollHost";
+            this.scrollHost.Padding = new System.Windows.Forms.Padding(13, 15, 0, 10);
             this.scrollHost.Size = new System.Drawing.Size(497, 150);
             this.scrollHost.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.scrollHost.TabIndex = 0;
@@ -56,10 +56,10 @@ namespace WindowsFormsApp1
             this.flowRows.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.flowRows.Dock = System.Windows.Forms.DockStyle.Top;
             this.flowRows.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flowRows.Location = new System.Drawing.Point(0, 0);
+            this.flowRows.Location = new System.Drawing.Point(13, 16);
             this.flowRows.Margin = new System.Windows.Forms.Padding(0);
             this.flowRows.Name = "flowRows";
-            this.flowRows.Size = new System.Drawing.Size(497, 0);
+            this.flowRows.Size = new System.Drawing.Size(484, 0);
             this.flowRows.TabIndex = 0;
             this.flowRows.WrapContents = false;
             // 

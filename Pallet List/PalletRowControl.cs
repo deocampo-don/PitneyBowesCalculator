@@ -108,7 +108,7 @@ private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
                 StylePrimaryEnabled(btnPackPallet, "Pack Pallet", Blue1, Blue2, Blue1, Color.White);
 
                 // View: enabled (white w/ grey border)
-                StyleNeutralEnabled(kryptonButton3, "View", Color.White, Color.White, Grey, Color.Black);
+                StyleNeutralEnabled(btnView, "View", Color.White, Color.White, Grey, Color.Black);
             }
             else
             {
@@ -117,7 +117,7 @@ private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
 
                 // Pack/View: disabled greys
                 StyleDisabled(btnPackPallet, "Pack Pallet", Grey, Grey, Color.White);
-                StyleDisabled(kryptonButton3, "View", Grey, Grey, Color.White);
+                StyleDisabled(btnView, "View", Grey, Grey, Color.White);
             }
         }
 
@@ -125,7 +125,16 @@ private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
 
         private void PanelTableLayout_Paint(object sender, PaintEventArgs e)
         {
+            if (_model.Pallets.Count == 0)
+            {
+                btnAddPallet.Text = "New Pallet";
+                btnAddPallet.StateCommon.Back.Color1 = Color.FromArgb(60, 200, 120);
+                btnPackPallet.StateCommon.Back.Color1 = Color.FromArgb(198, 198, 198);
+                btnView.StateCommon.Back.Color1 = Color.White;
+                btnView.StateCommon.Content.ShortText.Color1 = Color.FromArgb(103, 80, 164);
+                btnPackPallet.Enabled = false;
 
+            }
         }
 
         private void RoundedGroupBox_Paint(object sender, PaintEventArgs e)
@@ -139,7 +148,6 @@ private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
         {
             return _model?.Pallets?.FirstOrDefault();
         }
-
         private void btnAddPallet_Click(object sender, EventArgs e)
         {
 

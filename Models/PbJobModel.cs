@@ -96,19 +96,19 @@ public class Pallet
 // ================
 public class PbJobModel
 {
-    // Identity
+    //public PbJobModel(string jobName, int jobNumber)
+    //{
+    //    JobName = jobName;
+    //    JobNumber = jobNumber;
+    //    isReady = 0;
+    //}
+
+    public DateTime PackDate { get; set; } = DateTime.Today;
     public string JobName { get; set; } = string.Empty;
     public int JobNumber { get; set; }
 
-    // Composition
-    public List<Pallet> Pallets { get; set; } = new List<Pallet>();
+    public int isReady { get; set; }
 
-    // ===== Job Totals (computed, read-only) =====
-
-    /// <summary>Total number of pallets in the job.</summary>
-    //public int TotalPallets => Pallets?.Count ?? 0;
-
-    /// <summary>Total envelope quantity across ALL pallets (sums WO.EnvelopeQty).</summary>
     public int TotalEnvelopeOfJob =>
         Pallets?
             .SelectMany(p => p?.WorkOrders ?? Enumerable.Empty<WorkOrder>())
@@ -121,7 +121,9 @@ public class PbJobModel
     /// <summary>Total scanned WO across ALL pallets (sums Pallet.PalletScannedWO).</summary>
     public int TotalScannedWOOfJob =>
         Pallets?.Sum(p => p?.PalletScannedWO ?? 0) ?? 0;
-    public DateTime PackDate { get; set; } = DateTime.Today;
+
+    public List<Pallet> Pallets { get; set; } = new List<Pallet>();
+
 }
 
 // ================

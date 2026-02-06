@@ -15,7 +15,7 @@ namespace WindowsFormsApp1.Picked_Up
     public partial class PickedUpRowControl : UserControl
     {
 
-        private PickListModel _model;
+        private PbJobModel _model;
         public PickedUpRowControl()
         {
             InitializeComponent();
@@ -23,16 +23,16 @@ namespace WindowsFormsApp1.Picked_Up
   
         }
 
-        public void Bind(PickListModel model)
+        public void Bind(PbJobModel model)
         {
             _model = model;
 
             lblPBNameCode.Text = model.JobNumber + " " + model.JobName;
 
-            lblQty.Text = model.EnvelopeQty.ToString("N0");
-            lblTrays.Text = model.Trays.ToString("N0");
-            lblPallets.Text = model.Pallets.ToString("No");
-            lblShipTime.Text = model.ShipDateTime.ToString();
+            lblQty.Text = model.TotalEnvelopeOfJob.ToString();
+            lblTrays.Text = model.TotalTraysOfJob.ToString();
+            lblPallets.Text = model.Pallets.Count.ToString();
+            lblShipTime.Text = model.PackDate.ToString();
         }
 
         private void tableLayoutPanel2_Paint(object sender, PaintEventArgs e)
