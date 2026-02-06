@@ -35,6 +35,21 @@ namespace WindowsFormsApp1.Packed_And_Ready
 
             packedFlowRow.ResumeLayout();
         }
+
+
+        public void SetAllReadyToShip(bool isReady)
+        {
+            foreach (Control c in packedFlowRow.Controls)
+            {
+                if (c is PackedRowControl row)
+                {
+                    row.SetReadyToShip(isReady);
+                }
+            }
+        }
+
+
+
         public void AddRow(PackedRowControl row)
         {
             //   row.Width = packedScrollHost.ClientSize.Width -90; // leave room for scrollbar

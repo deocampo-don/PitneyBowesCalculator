@@ -11,6 +11,7 @@
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+     
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -76,7 +77,7 @@
             // 
             // txtPackDate
             // 
-            this.txtPackDate.Location = new System.Drawing.Point(287, 231);
+            this.txtPackDate.Location = new System.Drawing.Point(300, 231);
             this.txtPackDate.Name = "txtPackDate";
             this.txtPackDate.Size = new System.Drawing.Size(105, 24);
             this.txtPackDate.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;

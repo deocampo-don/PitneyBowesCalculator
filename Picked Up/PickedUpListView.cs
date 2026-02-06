@@ -45,8 +45,18 @@ namespace WindowsFormsApp1.Picked_Up
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
+            ResizeRowsToHost();
+        }
+
+
+        private void ResizeRowsToHost()
+        {
+            int width = pickflowRows.ClientSize.Width;
+
             foreach (Control c in pickflowRows.Controls)
-                c.Width = pickedScrollHost.ClientSize.Width - 25;
+            {
+                c.Width = width;
+            }
         }
         private void pickedScrollHost_Paint(object sender, PaintEventArgs e)
         {

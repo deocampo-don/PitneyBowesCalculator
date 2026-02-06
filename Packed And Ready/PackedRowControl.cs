@@ -12,26 +12,18 @@ namespace WindowsFormsApp1.Packed_And_Ready
          * FIELDS
          * ------------------------------------------------------------- */
 
-        /// <summary>
-        /// Model containing PB Job information for this row.
-        /// </summary>
+        public event EventHandler SelectionChanged;
+
+
+      
         private PbJobModel _modelpbjob;
 
-        /// <summary>
-        /// Optional pallet data (reserved for future features).
-        /// </summary>
+      
         private Pallet _modelpallet;
 
-        /// <summary>
-        /// Event fired when user clicks the VIEW button.
-        /// Allows parent container to intercept or override behavior.
-        /// </summary>
         public event EventHandler ViewClicked;
 
-        /// <summary>
-        /// Event fired when the View dialog is closed AND job data changed.
-        /// Used to notify parent controls to refresh.
-        /// </summary>
+        
         public event EventHandler ViewDialogClosed;
 
 
@@ -73,7 +65,14 @@ namespace WindowsFormsApp1.Packed_And_Ready
             txtTrays.Text = job.TotalTraysOfJob.ToString();
 
             // Job-level date
-            txtPackDate.Text = job.PackDate.ToShortDateString();
+            var hasPackedPallet = job.Pallets?.Any(p => p != null /* optionally: && p.WorkOrders?.Any() == true */) == true;
+
+            txtPackDate.Text =
+                hasPackedPallet
+                    ? job.EffectivePackDate.ToString("MM/dd/yyyy")
+                    : "--/--/----";
+
+
         }
 
 
@@ -85,6 +84,15 @@ namespace WindowsFormsApp1.Packed_And_Ready
         /// <summary>
         /// Triggers callback and opens the View dialog.
         /// </summary>
+        /// 
+
+
+        public void SetReadyToShip(bool isReady)
+        {
+            chkbxStatus.Checked = isReady;
+        }
+
+
         private void btnView_Click(object sender, EventArgs e)
         {
             // Optional: notify listeners that View was clicked
@@ -102,6 +110,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
                 }
             }
         }
+
 
         /// <summary>
         /// Toggles status text and color based on checkbox.

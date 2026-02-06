@@ -32,6 +32,7 @@
             this.chkbxSelectAll = new Krypton.Toolkit.KryptonCheckBox();
             this.lblSelectAll = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnShipPallets
@@ -43,17 +44,19 @@
             this.btnShipPallets.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(80)))), ((int)(((byte)(164)))));
             this.btnShipPallets.FlatAppearance.BorderSize = 0;
             this.btnShipPallets.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnShipPallets.ForeColor = System.Drawing.Color.Black;
-            this.btnShipPallets.Location = new System.Drawing.Point(195, 19);
+            this.btnShipPallets.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnShipPallets.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
+            this.btnShipPallets.Location = new System.Drawing.Point(140, 9);
             this.btnShipPallets.Name = "btnShipPallets";
-            this.btnShipPallets.Size = new System.Drawing.Size(149, 37);
+            this.btnShipPallets.Size = new System.Drawing.Size(183, 51);
             this.btnShipPallets.TabIndex = 44;
             this.btnShipPallets.Text = "Ship Pallets";
             this.btnShipPallets.UseVisualStyleBackColor = false;
+            this.btnShipPallets.Click += new System.EventHandler(this.btnShipPallets_Click);
             // 
             // chkbxSelectAll
             // 
-            this.chkbxSelectAll.Location = new System.Drawing.Point(82, 29);
+            this.chkbxSelectAll.Location = new System.Drawing.Point(30, 29);
             this.chkbxSelectAll.Name = "chkbxSelectAll";
             this.chkbxSelectAll.Size = new System.Drawing.Size(22, 16);
             this.chkbxSelectAll.TabIndex = 46;
@@ -63,15 +66,18 @@
             // 
             this.lblSelectAll.AutoSize = true;
             this.lblSelectAll.BackColor = System.Drawing.Color.Transparent;
-            this.lblSelectAll.Location = new System.Drawing.Point(110, 29);
+            this.lblSelectAll.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSelectAll.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
+            this.lblSelectAll.Location = new System.Drawing.Point(58, 29);
             this.lblSelectAll.Name = "lblSelectAll";
-            this.lblSelectAll.Size = new System.Drawing.Size(63, 16);
+            this.lblSelectAll.Size = new System.Drawing.Size(71, 20);
             this.lblSelectAll.TabIndex = 47;
             this.lblSelectAll.Text = "Select All";
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Transparent;
+            this.panel1.Controls.Add(this.btnShipPallets);
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(346, 67);
@@ -83,10 +89,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.lblSelectAll);
             this.Controls.Add(this.chkbxSelectAll);
-            this.Controls.Add(this.btnShipPallets);
             this.Controls.Add(this.panel1);
             this.Name = "ShipPalletsRowControl";
             this.Size = new System.Drawing.Size(352, 73);
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -16,7 +16,7 @@ namespace WindowsFormsApp1
         // -----------------------------
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
         private readonly List<PickListModel> _pickLists = new List<PickListModel>();
-
+        private ShipPalletsRowControl _shipPalletsControl;
         public event EventHandler ItemsChanged;
         // -----------------------------
         // Constructor
@@ -34,7 +34,7 @@ namespace WindowsFormsApp1
             SeedSampleData();
             RefreshAllViews();
 
-
+            InitializeShipPalletsBar();
             //refresh this panel
             packedListView2.ItemsChanged += (_, __) =>
             {
@@ -135,21 +135,21 @@ namespace WindowsFormsApp1
                         {
                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                              new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                               new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                                new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
 
                         }
@@ -184,6 +184,10 @@ namespace WindowsFormsApp1
             _pbJobs.Add(pb2);
         }
 
+        // -----------------------------
+        // Window Buttons
+        // -----------------------------
+
         private void RefreshAllViews()
         {
             lvBuild?.SetItems(_pbJobs);
@@ -211,11 +215,21 @@ namespace WindowsFormsApp1
         // -----------------------------
         // Other Control Events
         // -----------------------------
-        private void palletListView1_Load(object sender, EventArgs e)
-        {
-            // If anything needs to happen once the listview is loaded
 
+        private void InitializeShipPalletsBar()
+        {
+            if (_shipPalletsControl != null)
+                return;
+
+            _shipPalletsControl = new ShipPalletsRowControl
+            {
+                Dock = DockStyle.Right,   // bottom-right inside panel
+                        
+            };
+
+            pnlShipPallets.Controls.Add(_shipPalletsControl);
         }
+
 
         private void btnSettings_Click(object sender, EventArgs e)
         {

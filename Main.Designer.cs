@@ -47,12 +47,10 @@ namespace WindowsFormsApp1
             this.pnlBottom = new Krypton.Toolkit.KryptonPanel();
             this.tlpAddPbJob = new System.Windows.Forms.TableLayoutPanel();
             this.btnAddPBJob = new Krypton.Toolkit.KryptonButton();
-            this.lvBuild = new WindowsFormsApp1.PalletListView();
             this.pgPacked = new Krypton.Navigator.KryptonPage();
-            this.packedListView2 = new WindowsFormsApp1.Packed_And_Ready.PackedListView();
+            this.pnlShipPallets = new Krypton.Toolkit.KryptonPanel();
             this.pgPicked = new Krypton.Navigator.KryptonPage();
             this.kryptonPanel2 = new Krypton.Toolkit.KryptonPanel();
-            this.pickedUpListView = new WindowsFormsApp1.Picked_Up.PickedUpListView();
             this.kryptonPanel6 = new Krypton.Toolkit.KryptonPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.kryptonLabel6 = new Krypton.Toolkit.KryptonLabel();
@@ -80,6 +78,9 @@ namespace WindowsFormsApp1
             this.kcbPackedReady = new Krypton.Toolkit.KryptonCheckButton();
             this.pnlSettings = new Krypton.Toolkit.KryptonPanel();
             this.btnSettings = new Krypton.Toolkit.KryptonButton();
+            this.lvBuild = new WindowsFormsApp1.PalletListView();
+            this.packedListView2 = new WindowsFormsApp1.Packed_And_Ready.PackedListView();
+            this.pickedUpListView = new WindowsFormsApp1.Picked_Up.PickedUpListView();
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -102,6 +103,7 @@ namespace WindowsFormsApp1
             this.tlpAddPbJob.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pgPacked)).BeginInit();
             this.pgPacked.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pnlShipPallets)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pgPicked)).BeginInit();
             this.pgPicked.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel2)).BeginInit();
@@ -349,19 +351,10 @@ namespace WindowsFormsApp1
             this.btnAddPBJob.Values.Text = "Add New PB Job";
             this.btnAddPBJob.Click += new System.EventHandler(this.btnAddPBJob_Click_1);
             // 
-            // lvBuild
-            // 
-            this.lvBuild.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.lvBuild.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvBuild.Location = new System.Drawing.Point(0, 0);
-            this.lvBuild.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
-            this.lvBuild.Name = "lvBuild";
-            this.lvBuild.Size = new System.Drawing.Size(1367, 494);
-            this.lvBuild.TabIndex = 0;
-            // 
             // pgPacked
             // 
             this.pgPacked.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
+            this.pgPacked.Controls.Add(this.pnlShipPallets);
             this.pgPacked.Controls.Add(this.packedListView2);
             this.pgPacked.Flags = 65534;
             this.pgPacked.LastVisibleSet = true;
@@ -373,14 +366,15 @@ namespace WindowsFormsApp1
             this.pgPacked.ToolTipTitle = "Page ToolTip";
             this.pgPacked.UniqueName = "78120dba424747da8ffc132c067ceb97";
             // 
-            // packedListView2
+            // pnlShipPallets
             // 
-            this.packedListView2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packedListView2.Location = new System.Drawing.Point(0, 0);
-            this.packedListView2.Margin = new System.Windows.Forms.Padding(4);
-            this.packedListView2.Name = "packedListView2";
-            this.packedListView2.Size = new System.Drawing.Size(1367, 494);
-            this.packedListView2.TabIndex = 1;
+            this.pnlShipPallets.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlShipPallets.Location = new System.Drawing.Point(0, 419);
+            this.pnlShipPallets.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pnlShipPallets.Name = "pnlShipPallets";
+            this.pnlShipPallets.Size = new System.Drawing.Size(1367, 75);
+            this.pnlShipPallets.StateCommon.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(249)))), ((int)(((byte)(249)))), ((int)(((byte)(249)))));
+            this.pnlShipPallets.TabIndex = 7;
             // 
             // pgPicked
             // 
@@ -408,15 +402,6 @@ namespace WindowsFormsApp1
             this.kryptonPanel2.Size = new System.Drawing.Size(1367, 494);
             this.kryptonPanel2.StateCommon.Color1 = System.Drawing.Color.White;
             this.kryptonPanel2.TabIndex = 1;
-            // 
-            // pickedUpListView
-            // 
-            this.pickedUpListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pickedUpListView.Location = new System.Drawing.Point(0, 100);
-            this.pickedUpListView.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.pickedUpListView.Name = "pickedUpListView";
-            this.pickedUpListView.Size = new System.Drawing.Size(1367, 394);
-            this.pickedUpListView.TabIndex = 2;
             // 
             // kryptonPanel6
             // 
@@ -813,6 +798,36 @@ namespace WindowsFormsApp1
             this.btnSettings.Values.Text = "";
             this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
             // 
+            // lvBuild
+            // 
+            this.lvBuild.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
+            this.lvBuild.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvBuild.Location = new System.Drawing.Point(0, 0);
+            this.lvBuild.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
+            this.lvBuild.Name = "lvBuild";
+            this.lvBuild.Padding = new System.Windows.Forms.Padding(0, 0, 0, 80);
+            this.lvBuild.Size = new System.Drawing.Size(1367, 494);
+            this.lvBuild.TabIndex = 0;
+            // 
+            // packedListView2
+            // 
+            this.packedListView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.packedListView2.Location = new System.Drawing.Point(0, 0);
+            this.packedListView2.Margin = new System.Windows.Forms.Padding(4);
+            this.packedListView2.Name = "packedListView2";
+            this.packedListView2.Padding = new System.Windows.Forms.Padding(0, 0, 0, 80);
+            this.packedListView2.Size = new System.Drawing.Size(1367, 494);
+            this.packedListView2.TabIndex = 1;
+            // 
+            // pickedUpListView
+            // 
+            this.pickedUpListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pickedUpListView.Location = new System.Drawing.Point(0, 100);
+            this.pickedUpListView.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.pickedUpListView.Name = "pickedUpListView";
+            this.pickedUpListView.Size = new System.Drawing.Size(1367, 394);
+            this.pickedUpListView.TabIndex = 2;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -851,6 +866,7 @@ namespace WindowsFormsApp1
             this.tlpAddPbJob.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pgPacked)).EndInit();
             this.pgPacked.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pnlShipPallets)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pgPicked)).EndInit();
             this.pgPicked.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel2)).EndInit();
@@ -931,6 +947,7 @@ namespace WindowsFormsApp1
         private Krypton.Toolkit.KryptonPanel pnlBottom;
         private System.Windows.Forms.TableLayoutPanel tlpAddPbJob;
         private Krypton.Toolkit.KryptonButton btnAddPBJob;
+        private Krypton.Toolkit.KryptonPanel pnlShipPallets;
     }
 }
 

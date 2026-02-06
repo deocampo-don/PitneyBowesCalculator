@@ -61,8 +61,13 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             txtPBJobName.Text = _job.JobName;
             txtPBJobNumber.Text = _job.JobNumber.ToString();
 
+            // Job-level date
+            var hasPackedPallet = _job.Pallets?.Any(p => p != null /* optionally: && p.WorkOrders?.Any() == true */) == true;
+
             txtPackDate.Text =
-                _job.EffectivePackDate.ToString("MM/dd/yyyy");
+                hasPackedPallet
+                    ? _job.EffectivePackDate.ToString("MM/dd/yyyy")
+                    : "--/--/----";
 
         }
 
