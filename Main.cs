@@ -17,6 +17,7 @@ namespace WindowsFormsApp1
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
         private readonly List<PickListModel> _pickLists = new List<PickListModel>();
 
+        public event EventHandler ItemsChanged;
         // -----------------------------
         // Constructor
         // -----------------------------
@@ -32,13 +33,19 @@ namespace WindowsFormsApp1
             // Seed data and bind to views (UI-only for now)
             SeedSampleData();
             RefreshAllViews();
-        }
 
+
+            //refresh this panel
+            packedListView2.ItemsChanged += (_, __) =>
+            {
+                RefreshAllViews();
+            };
+        }
         // -----------------------------
         // ⭐ rqlite Initialization
         // -----------------------------
         private async Task InitializeRqliteAsync()
-        {  
+        {
             if (RqliteClient.httpClient == null)
             {
                 RqliteClient.httpClient = new HttpClient();
@@ -140,11 +147,11 @@ namespace WindowsFormsApp1
                                 new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
                              new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 }, 
+                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
                              new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
                             new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                     
+
                         }
                     },
                     new Pallet
@@ -166,7 +173,7 @@ namespace WindowsFormsApp1
             {
                 JobName = "Test",
                 JobNumber = 23414,
-               
+
                 Pallets = new List<Pallet>
                 {
                     new Pallet(), new Pallet(), new Pallet(), new Pallet(), new Pallet()
@@ -182,6 +189,7 @@ namespace WindowsFormsApp1
             lvBuild?.SetItems(_pbJobs);
             packedListView2?.SetItems(_pbJobs);
             pickedUpListView?.SetItems(_pbJobs);
+
         }
 
         // -----------------------------
@@ -197,6 +205,7 @@ namespace WindowsFormsApp1
             WindowState = (WindowState == FormWindowState.Maximized)
                 ? FormWindowState.Normal
                 : FormWindowState.Maximized;
+
         }
 
         // -----------------------------
@@ -204,6 +213,8 @@ namespace WindowsFormsApp1
         // -----------------------------
         private void palletListView1_Load(object sender, EventArgs e)
         {
+            // If anything needs to happen once the listview is loaded
+
         }
 
         private void btnSettings_Click(object sender, EventArgs e)

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details
 {
     public partial class PalletDetailsListView : UserControl
     {
-       
+
         public PalletDetailsListView()
         {
             InitializeComponent();
@@ -44,7 +38,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details
                 row.BackColor = (index % 2 == 0)
                     ? Color.White
                     : Color.FromArgb(245, 245, 245); // light gray
-                   
+
 
                 AddRow(row);
                 index++;

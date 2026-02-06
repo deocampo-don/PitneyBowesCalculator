@@ -16,7 +16,12 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         /// </summary>
         private PbJobModel _modelpbjob;
         private int _palletIndex;
+
+
+
         public event Action<int> PalletClicked;
+        public event Action<int, bool> SelectionChanged; // 🔑 added
+
 
         /* -------------------------------------------------------------
          * CONSTRUCTOR
@@ -27,6 +32,11 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
             // Add border to the row item for visual separation
             CSSDesign.AddPanelBorder(pnlMain, Color.Silver, 1);
+
+
+            // Wire checkbox change
+            chkBox.CheckedChanged += chkBox_CheckedChanged;
+
         }
 
 
@@ -57,7 +67,19 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         /* -------------------------------------------------------------
          * UI EVENT HANDLERS
          * ------------------------------------------------------------- */
-      
+
+
+
+
+        public bool IsSelected
+        {
+            get => chkBox.Checked;
+            set => chkBox.Checked = value;
+        }
+
+
+        public int PalletIndex => _palletIndex;
+
         private void btnPalletNum_Click(object sender, System.EventArgs e)
         {
             // TODO: Raise an event or call a callback to notify parent control
@@ -66,10 +88,11 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             PalletClicked?.Invoke(_palletIndex);
 
         }
-       
+
 
         public void SetSelected(bool isSelected)
         {
+
             if (isSelected)
             {
                 btnPalletNum.BackColor = Color.FromArgb(103, 80, 164); // Violet
@@ -80,6 +103,14 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                 btnPalletNum.BackColor = Color.White;
                 btnPalletNum.ForeColor = Color.Black;
             }
+
         }
+
+
+        private void chkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SelectionChanged?.Invoke(_palletIndex, chkBox.Checked);
+        }
+
     }
 }

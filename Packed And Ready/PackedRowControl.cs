@@ -28,6 +28,12 @@ namespace WindowsFormsApp1.Packed_And_Ready
         /// </summary>
         public event EventHandler ViewClicked;
 
+        /// <summary>
+        /// Event fired when the View dialog is closed AND job data changed.
+        /// Used to notify parent controls to refresh.
+        /// </summary>
+        public event EventHandler ViewDialogClosed;
+
 
         /* -------------------------------------------------------------
          * CONSTRUCTOR
@@ -40,9 +46,6 @@ namespace WindowsFormsApp1.Packed_And_Ready
             // Style enhancements for cleaner UI
             CSSDesign.MakeRounded(btnView, 10);
             CSSDesign.MakePanelRounded(pnlDashboard, 12, Color.Gray, 2);
-
-
-
         }
 
 
@@ -53,13 +56,12 @@ namespace WindowsFormsApp1.Packed_And_Ready
         /// <summary>
         /// Binds a PB job model to the row and updates all UI fields.
         /// </summary>
-        public void Bind(PbJobModel job )
+        public void Bind(PbJobModel job)
         {
             if (job == null)
                 return;
 
             _modelpbjob = job;
-
 
             // Job identity
             txtPBJobName.Text = job.JobName ?? string.Empty;
@@ -72,8 +74,8 @@ namespace WindowsFormsApp1.Packed_And_Ready
 
             // Job-level date
             txtPackDate.Text = job.PackDate.ToShortDateString();
-
         }
+
 
 
         /* -------------------------------------------------------------
@@ -85,16 +87,21 @@ namespace WindowsFormsApp1.Packed_And_Ready
         /// </summary>
         private void btnView_Click(object sender, EventArgs e)
         {
-            // Notify parent listeners (optional override)
+            // Optional: notify listeners that View was clicked
             ViewClicked?.Invoke(this, EventArgs.Empty);
 
-            // Default behavior: Open View dialog
             Form parentForm = this.FindForm();
-            using (ViewButtonDialog dlg = new ViewButtonDialog(_modelpbjob))
+            using (var dlg = new ViewButtonDialog(_modelpbjob))
             {
                 dlg.ShowDialog(parentForm);
+
+                // ✅ Notify parent ONLY if data changed
+                if (dlg.DataChanged)
+                {
+                    ViewDialogClosed?.Invoke(this, EventArgs.Empty);
+                }
             }
-        }   
+        }
 
         /// <summary>
         /// Toggles status text and color based on checkbox.
@@ -114,6 +121,5 @@ namespace WindowsFormsApp1.Packed_And_Ready
                     ColorTranslator.FromHtml("#FF383C"); // red
             }
         }
-
     }
 }

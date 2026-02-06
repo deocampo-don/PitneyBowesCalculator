@@ -1,5 +1,7 @@
-﻿
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace WindowsFormsApp1.Packed_And_Ready.View_Button
@@ -11,9 +13,25 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
          * ------------------------------------------------------------- */
 
         /// <summary>
-        /// Tracks currently loaded job (optional).
+        /// The PB job model containing pallet data.
         /// </summary>
-        private PbJobModel _item;
+        private PbJobModel _job;
+
+        /// <summary>
+        /// Cached row controls for selection and refresh handling.
+        /// </summary>
+        private readonly List<PalletNumListRowControl> _rows =
+            new List<PalletNumListRowControl>();
+
+
+        /* -------------------------------------------------------------
+         * EVENTS
+         * ------------------------------------------------------------- */
+
+        /// <summary>
+        /// Raised when a pallet row button is clicked.
+        /// </summary>
+        public event Action<int> PalletClicked;
 
 
         /* -------------------------------------------------------------
@@ -25,83 +43,106 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             InitializeComponent();
         }
 
-        private int _selectedIndex = -1;
+
         /* -------------------------------------------------------------
-         * PUBLIC METHODS
+         * DATA BINDING
          * ------------------------------------------------------------- */
 
         /// <summary>
-        /// Clears existing rows and adds one button/row for each pallet.
+        /// Initial binding of pallets for a PB job.
         /// </summary>
         public void SetItems(PbJobModel job)
         {
-            if (job == null || job.Pallets == null)
-                return;
-
-            _item = job; // keep reference if needed later
-
-            rowFlow.SuspendLayout();
-            rowFlow.Controls.Clear();
-
-            for (int i = 0; i < job.Pallets.Count; i++)
-            {
-                var row = new PalletNumListRowControl();
-                row.Bind(job, i);
-
-                // Forward pallet click event from row → up to the dialog
-                row.PalletClicked += Row_PalletClicked;
-
-                // Optional: spacing
-                row.Margin = new Padding(0, 0, 10, 0);
-
-                rowFlow.Controls.Add(row);
-            }
-
-            rowFlow.ResumeLayout(true);
-
-            // Debug (optional)
-            // MessageBox.Show("Rows added: " + rowFlow.Controls.Count);
+            _job = job;
+            BuildRows();
         }
 
-
         /// <summary>
-        /// Adds a single pallet row programmatically.
+        /// Rebuilds pallet rows after add/remove operations.
         /// </summary>
-        public void AddRow(PalletNumListRowControl row)
+        public void RefreshItems(PbJobModel job)
         {
-            if (row == null)
-                return;
-
-            row.Margin = new Padding(0, 0, 10, 6);
-            rowFlow.Controls.Add(row);
+            _job = job;
+            BuildRows();
         }
 
 
         /* -------------------------------------------------------------
-         * EVENT BUBBLING → SEND PALLET CLICK UPWARD
+         * ROW CREATION
          * ------------------------------------------------------------- */
-        public event Action<int> PalletClicked;
 
-        private void Row_PalletClicked(int palletIndex)
+        private void BuildRows()
         {
-            _selectedIndex = palletIndex;
-            HighlightSelectedButton();
-            PalletClicked?.Invoke(palletIndex);
-        }
+            SuspendLayout();
 
-        private void HighlightSelectedButton()
-        {
-            for (int i = 0; i < rowFlow.Controls.Count; i++)
+            // Clear existing UI
+            foreach (var row in _rows)
+                row.Dispose();
+
+            _rows.Clear();
+            rowFlow.Controls.Clear();
+
+            if (_job?.Pallets != null)
             {
-                if (rowFlow.Controls[i] is PalletNumListRowControl row)
+                for (int i = 0; i < _job.Pallets.Count; i++)
                 {
-                    if (i == _selectedIndex)
-                        row.SetSelected(true);   // selected
-                    else
-                        row.SetSelected(false);  // not selected
+                    var row = new PalletNumListRowControl();
+                    row.Bind(_job, i);
+
+                    // Relay pallet click to parent dialog
+                    row.PalletClicked += idx =>
+                    {
+                        HighlightRow(idx);
+                        PalletClicked?.Invoke(idx);
+                    };
+
+                    _rows.Add(row);
+                    rowFlow.Controls.Add(row);
                 }
             }
+
+            ResumeLayout();
+        }
+
+
+        /* -------------------------------------------------------------
+         * SELECTION / CHECKBOX HANDLING
+         * ------------------------------------------------------------- */
+
+        /// <summary>
+        /// Returns indices of all checked pallets.
+        /// Used by Remove Pallet/s logic.
+        /// </summary>
+        public List<int> GetSelectedIndices()
+        {
+            return _rows
+                .Where(r => r.IsSelected)
+                .Select(r => r.PalletIndex)
+                .OrderBy(i => i)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Clears all checkbox selections.
+        /// </summary>
+        public void ClearSelection()
+        {
+            foreach (var row in _rows)
+                row.IsSelected = false;
+        }
+
+
+        /* -------------------------------------------------------------
+         * VISUAL SELECTION (CLICKED PALLET)
+         * ------------------------------------------------------------- */
+
+        /// <summary>
+        /// Highlights the selected pallet row.
+        /// </summary>
+        private void HighlightRow(int palletIndex)
+        {
+            foreach (var row in _rows)
+                row.SetSelected(row.PalletIndex == palletIndex);
         }
     }
 }
-

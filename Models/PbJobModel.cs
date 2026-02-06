@@ -87,8 +87,8 @@ public class Pallet
     }
 }
 */
- 
- 
+
+
 //===========================================================================================================================
 
 // ================
@@ -103,12 +103,12 @@ public class PbJobModel
     //    isReady = 0;
     //}
 
-    public DateTime PackDate { get; set; } = DateTime.Today;
+
     public string JobName { get; set; } = string.Empty;
     public int JobNumber { get; set; }
 
     public int isReady { get; set; }
-
+    public List<Pallet> Pallets { get; set; } = new List<Pallet>();
     public int TotalEnvelopeOfJob =>
         Pallets?
             .SelectMany(p => p?.WorkOrders ?? Enumerable.Empty<WorkOrder>())
@@ -121,8 +121,19 @@ public class PbJobModel
     /// <summary>Total scanned WO across ALL pallets (sums Pallet.PalletScannedWO).</summary>
     public int TotalScannedWOOfJob =>
         Pallets?.Sum(p => p?.PalletScannedWO ?? 0) ?? 0;
+    public DateTime PackDate { get; set; } = DateTime.Today;
 
-    public List<Pallet> Pallets { get; set; } = new List<Pallet>();
+
+    public DateTime? LastPackedTime =>
+        Pallets?
+            .Where(p => p != null)
+            .Select(p => p.PackedTime)
+            .OrderByDescending(t => t)
+            .FirstOrDefault();
+
+
+    public DateTime EffectivePackDate =>
+        LastPackedTime ?? PackDate;
 
 }
 
@@ -144,9 +155,10 @@ public class WorkOrder
     public int ScannedWorkOrders { get; private set; } = 0;
 
     /// <summary>Manual trays input (used to pack the pallet).</summary>
-    //   public int Trays { get; set; } = 0;
+
 
     /// <summary>Pack time (set when packing; default 9:30 PM today).</summary>
+
 
 
 
