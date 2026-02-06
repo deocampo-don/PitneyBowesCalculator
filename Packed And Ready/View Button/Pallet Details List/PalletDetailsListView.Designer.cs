@@ -36,18 +36,22 @@
             // 
             // flowRow
             // 
+            this.flowRow.AutoScroll = true;
             this.flowRow.Controls.Add(this.pnlPalletDetailsView);
+            this.flowRow.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowRow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowRow.Location = new System.Drawing.Point(0, 0);
             this.flowRow.Name = "flowRow";
-            this.flowRow.Size = new System.Drawing.Size(316, 194);
+            this.flowRow.Size = new System.Drawing.Size(664, 643);
             this.flowRow.TabIndex = 0;
+            this.flowRow.WrapContents = false;
             // 
             // pnlPalletDetailsView
             // 
             this.pnlPalletDetailsView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlPalletDetailsView.Location = new System.Drawing.Point(3, 3);
             this.pnlPalletDetailsView.Name = "pnlPalletDetailsView";
-            this.pnlPalletDetailsView.Size = new System.Drawing.Size(100, 0);
+            this.pnlPalletDetailsView.Size = new System.Drawing.Size(0, 0);
             this.pnlPalletDetailsView.TabIndex = 0;
             // 
             // PalletDetailsListView
@@ -56,7 +60,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.flowRow);
             this.Name = "PalletDetailsListView";
-            this.Size = new System.Drawing.Size(316, 194);
+            this.Size = new System.Drawing.Size(664, 643);
             this.flowRow.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pnlPalletDetailsView)).EndInit();
             this.ResumeLayout(false);

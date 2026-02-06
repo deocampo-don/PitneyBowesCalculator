@@ -38,6 +38,7 @@
             // 
             this.pnlMain.Controls.Add(this.txtValue);
             this.pnlMain.Controls.Add(this.txtWOName);
+            this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlMain.Location = new System.Drawing.Point(0, 0);
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.Size = new System.Drawing.Size(664, 25);
@@ -46,17 +47,17 @@
             // txtValue
             // 
             this.txtValue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtValue.AutoSize = true;
-            this.txtValue.Location = new System.Drawing.Point(605, 5);
+            this.txtValue.Location = new System.Drawing.Point(536, 5);
             this.txtValue.Name = "txtValue";
-            this.txtValue.Size = new System.Drawing.Size(35, 16);
+            this.txtValue.Size = new System.Drawing.Size(78, 20);
             this.txtValue.TabIndex = 1;
-            this.txtValue.Text = "1500";
+            this.txtValue.Text = "00000000";
+            this.txtValue.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // txtWOName
             // 
             this.txtWOName.AutoSize = true;
-            this.txtWOName.Location = new System.Drawing.Point(15, 5);
+            this.txtWOName.Location = new System.Drawing.Point(17, 5);
             this.txtWOName.Name = "txtWOName";
             this.txtWOName.Size = new System.Drawing.Size(152, 16);
             this.txtWOName.TabIndex = 0;

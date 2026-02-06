@@ -48,9 +48,11 @@
             this.txtPBJobName = new Krypton.Toolkit.KryptonLabel();
             this.pnlPalletNoList = new Krypton.Toolkit.KryptonPanel();
             this.palletNumListViewList1 = new WindowsFormsApp1.Packed_And_Ready.View_Button.PalletNumListViewList();
+            this.palletDetailsListView1 = new WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details.PalletDetailsListView();
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
             this.pnlDashboard.SuspendLayout();
+            this.pnlDetails.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pnlPalletNoList)).BeginInit();
             this.pnlPalletNoList.SuspendLayout();
             this.SuspendLayout();
@@ -140,6 +142,7 @@
             // pnlDetails
             // 
             this.pnlDetails.BackColor = System.Drawing.Color.White;
+            this.pnlDetails.Controls.Add(this.palletDetailsListView1);
             this.pnlDetails.Location = new System.Drawing.Point(5, 65);
             this.pnlDetails.Name = "pnlDetails";
             this.pnlDetails.Size = new System.Drawing.Size(666, 388);
@@ -271,6 +274,14 @@
             this.palletNumListViewList1.Size = new System.Drawing.Size(232, 446);
             this.palletNumListViewList1.TabIndex = 0;
             // 
+            // palletDetailsListView1
+            // 
+            this.palletDetailsListView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.palletDetailsListView1.Location = new System.Drawing.Point(0, 0);
+            this.palletDetailsListView1.Name = "palletDetailsListView1";
+            this.palletDetailsListView1.Size = new System.Drawing.Size(666, 388);
+            this.palletDetailsListView1.TabIndex = 0;
+            // 
             // ViewButtonDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -293,6 +304,7 @@
             this.pnlHeader.ResumeLayout(false);
             this.pnlDashboard.ResumeLayout(false);
             this.pnlDashboard.PerformLayout();
+            this.pnlDetails.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pnlPalletNoList)).EndInit();
             this.pnlPalletNoList.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -322,5 +334,6 @@
         private Krypton.Toolkit.KryptonLabel txtScannedWO;
         private Krypton.Toolkit.KryptonLabel txtEnvelopeQty;
         private PalletNumListViewList palletNumListViewList1;
+        private Pallets_Details.PalletDetailsListView palletDetailsListView1;
     }
 }

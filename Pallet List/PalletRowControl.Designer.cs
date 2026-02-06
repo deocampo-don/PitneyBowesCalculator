@@ -234,7 +234,6 @@
             this.tlButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tlButtons.Size = new System.Drawing.Size(452, 63);
             this.tlButtons.TabIndex = 0;
-          
             // 
             // btnAddPallet
             // 
@@ -244,7 +243,7 @@
             this.btnAddPallet.Margin = new System.Windows.Forms.Padding(0);
             this.btnAddPallet.Name = "btnAddPallet";
             this.btnAddPallet.Size = new System.Drawing.Size(159, 53);
-            this.btnAddPallet.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(80)))), ((int)(((byte)(164)))));
+            this.btnAddPallet.StateCommon.Back.Color1 = System.Drawing.Color.LimeGreen;
             this.btnAddPallet.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(80)))), ((int)(((byte)(164)))));
             this.btnAddPallet.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
             | Krypton.Toolkit.PaletteDrawBorders.Left) 
@@ -257,18 +256,19 @@
             this.btnAddPallet.StateCommon.Content.ShortText.TextV = Krypton.Toolkit.PaletteRelativeAlign.Center;
             this.btnAddPallet.TabIndex = 0;
             this.btnAddPallet.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.btnAddPallet.Values.Text = "Add To Pallet";
+            this.btnAddPallet.Values.Text = "New Pallet";
             this.btnAddPallet.Click += new System.EventHandler(this.btnAddPallet_Click);
             // 
             // btnPackPallet
             // 
             this.btnPackPallet.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
             this.btnPackPallet.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnPackPallet.Enabled = false;
             this.btnPackPallet.Location = new System.Drawing.Point(176, 5);
             this.btnPackPallet.Margin = new System.Windows.Forms.Padding(0);
             this.btnPackPallet.Name = "btnPackPallet";
             this.btnPackPallet.Size = new System.Drawing.Size(152, 53);
-            this.btnPackPallet.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(136)))), ((int)(((byte)(255)))));
+            this.btnPackPallet.StateCommon.Back.Color1 = System.Drawing.Color.Silver;
             this.btnPackPallet.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(136)))), ((int)(((byte)(255)))));
             this.btnPackPallet.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
             | Krypton.Toolkit.PaletteDrawBorders.Left) 
@@ -291,12 +291,13 @@
             this.kryptonButton3.Margin = new System.Windows.Forms.Padding(0);
             this.kryptonButton3.Name = "kryptonButton3";
             this.kryptonButton3.Size = new System.Drawing.Size(98, 53);
-            this.kryptonButton3.StateCommon.Back.Color1 = System.Drawing.Color.White;
+            this.kryptonButton3.StateCommon.Back.Color1 = System.Drawing.Color.Silver;
             this.kryptonButton3.StateCommon.Border.Color1 = System.Drawing.Color.White;
             this.kryptonButton3.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
             | Krypton.Toolkit.PaletteDrawBorders.Left) 
             | Krypton.Toolkit.PaletteDrawBorders.Right)));
             this.kryptonButton3.StateCommon.Border.Rounding = 5F;
+            this.kryptonButton3.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
             this.kryptonButton3.StateCommon.Content.ShortText.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
             this.kryptonButton3.StateCommon.Content.ShortText.TextV = Krypton.Toolkit.PaletteRelativeAlign.Center;
             this.kryptonButton3.TabIndex = 2;

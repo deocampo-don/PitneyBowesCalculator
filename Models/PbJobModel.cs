@@ -196,3 +196,48 @@ public class Pallet
     public int PalletEnvelopeQty =>
         WorkOrders?.Sum(w => w?.EnvelopeQty ?? 0) ?? 0;
 }
+
+//Create one tiny class to represent the scanning session.
+public class PalletScanSession
+{
+
+    // ✅ Explicitly "not yet committed"
+    public int PendingScannedWO { get; private set; }
+    public int PendingEnvelopeQty { get; private set; }
+
+    public void RegisterScan(int envelopeQty)
+    {
+        PendingScannedWO++;
+        PendingEnvelopeQty += envelopeQty;
+    }
+
+    public void Reset()
+    {
+        PendingScannedWO = 0;
+        PendingEnvelopeQty = 0;
+    }
+
+}
+//
+//This avoids duplicating commit logic in the dialog.
+public static class PalletScanCommitter
+{
+    public static void Commit(Pallet pallet, PalletScanSession session)
+    {
+        if (pallet == null || session == null)
+            return;
+
+        var wo = new WorkOrder
+        {
+            Code = "SCANNED-BATCH",
+            EnvelopeQty = session.PendingEnvelopeQty
+        };
+
+        for (int i = 0; i < session.PendingScannedWO; i++)
+            wo.RecordScan();
+
+        pallet.WorkOrders.Add(wo);
+    }
+}
+
+

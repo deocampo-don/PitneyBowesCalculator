@@ -32,8 +32,7 @@ namespace WindowsFormsApp1
             SeedSampleData();
             RefreshAllViews();
 
-            // Add initial rows for custom list controls (if needed)
-            //  InitializeListRows();
+          
         }
 
         // -----------------------------
@@ -210,7 +209,24 @@ namespace WindowsFormsApp1
                         {
                             // ✅ Envelope quantity comes from DB / scanner
                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 }
+                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
+                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
+                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
+                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
+                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                              new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                               new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                                new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
+                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 }, 
+                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
+                             new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
+                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
+                     
                         }
                     },
 
@@ -232,7 +248,7 @@ namespace WindowsFormsApp1
                     new Pallet { },
                     new Pallet { }
                 }
-                        };
+            };
 
 
             // Sample Packed & Ready job 2
@@ -240,7 +256,7 @@ namespace WindowsFormsApp1
             {
                 JobName = "Test",
                 JobNumber = 23414,
-                //     TrayCount = 40,
+               
                 Pallets = new List<Pallet>
                 {
                     new Pallet {
@@ -267,17 +283,7 @@ namespace WindowsFormsApp1
             pickedUpListView?.SetItems(_pickLists);
         }
 
-        private void InitializeListRows()
-        {
-            // If your custom list views require at least one row control present
-            var palletRow = new PalletRowControl();
-            var packedRow = new PackedRowControl();
-            // var pickedRow = new PickedUpRowControl(); // If needed
-
-            lvBuild?.AddRow(palletRow);
-            packedListView2?.AddRow(packedRow);
-            // pickedUpListView?.AddRow(pickedRow);
-        }
+     
 
         // -----------------------------
         // Window Buttons

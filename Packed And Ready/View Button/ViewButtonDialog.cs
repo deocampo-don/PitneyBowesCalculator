@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-
 namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 {
     public partial class ViewButtonDialog : Form
@@ -39,19 +37,25 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         /* -------------------------------------------------------------
          * CONSTRUCTOR
          * ------------------------------------------------------------- */
+
         public ViewButtonDialog(PbJobModel job)
         {
             InitializeComponent();
 
             _job = job;
 
-            // Load header fields first
+            // Load job header
             LoadHeaderInfo();
 
-            // Load pallet list number Buttons (left)
+            // Load pallet buttons
             palletNumListViewList1.SetItems(_job);
 
-            // Load empty detail panel layout (right)
+            // ✅ Subscribe ONCE
+            palletNumListViewList1.PalletClicked += OnPalletClicked;
+
+       
+
+            // Right panel placeholder (kept as-is)
             LoadPalletDetailsRowControl();
 
             // Wire events
@@ -64,6 +68,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             CSSDesign.AddPanelBorder(pnlDashboard, Color.Silver, 1);
             CSSDesign.AddPanelBorder(pnlDetails, Color.Silver, 1);
         }
+
 
 
         /* -------------------------------------------------------------
@@ -80,16 +85,41 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         }
 
 
+
         /* -------------------------------------------------------------
          * PALLET DETAILS PANEL (RIGHT SIDE)
          * ------------------------------------------------------------- */
         private void LoadPalletDetailsRowControl()
         {
-            // If you have a default layout for pallet details, load it here.
-            // Uncomment when ready:
-            // pnlDetails.Controls.Clear();
-            // pnlDetails.Controls.Add(new PalletDetailsRowControl());
+            //do not remove 
         }
+
+
+        private void LoadDashboard(Pallet pallet)
+        {
+            if (pallet == null)
+            {
+                txtEnvelopeQty.Text = "0";
+                txtScannedWO.Text = "0";
+                txtTrayCount.Text = "0";
+                txtPackedTime.Text = string.Empty;
+                return;
+            }
+
+            txtEnvelopeQty.Text =
+                pallet.PalletEnvelopeQty.ToString("N0");
+
+            txtScannedWO.Text =
+                pallet.PalletScannedWO.ToString("N0");
+
+            txtTrayCount.Text =
+                pallet.Trays.ToString("N0");
+
+            txtPackedTime.Text =
+                pallet.PackedTime.ToString("hh:mm tt");
+        }
+
+
 
 
         /* -------------------------------------------------------------
@@ -133,6 +163,28 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         }
 
 
-      
+
+        private void OnPalletClicked(int palletIndex)
+        {
+            if (_job?.Pallets == null)
+                return;
+
+            if (palletIndex < 0 || palletIndex >= _job.Pallets.Count)
+                return;
+
+            // ✅ THIS LINE DEFINES "pallet"
+            Pallet pallet = _job.Pallets[palletIndex];
+
+            // ✅ Now this compiles
+            LoadDashboard(pallet);
+
+            // ✅ And this
+            palletDetailsListView1.SetItems(pallet.WorkOrders);
+        }
+
+
+
+
+
     }
 }
