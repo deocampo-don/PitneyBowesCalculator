@@ -19,6 +19,29 @@ namespace WindowsFormsApp1.Dialogs
         // Optional: abstraction to get EnvelopeQty by WO code
         private readonly IWorkOrderLookup _woLookup;
 
+        public int EnvelopeQty
+        {
+            get
+            {
+                int value;
+                return int.TryParse(txtEnvelopeQty.Text, out value)
+                    ? value
+                    : 0;
+            }
+        }
+
+        public int ScannedWo
+        {
+            get
+            {
+                int value;
+                return int.TryParse(txtScannedWO.Text, out value)
+                    ? value
+                    : 0;
+            }
+        }
+
+
         public AddToPalletDialog(Pallet targetPallet, IWorkOrderLookup woLookup = null)
         {
             InitializeComponent();
@@ -100,11 +123,11 @@ namespace WindowsFormsApp1.Dialogs
             }
 
             // Create a single WO entry representing this scan batch (or split if your business wants per-code entries)
-            var batchWO = new WorkOrder
-            {
-                Code = BuildBatchCode(), // e.g., "BATCH-20260205-1530"
-                EnvelopeQty = _scanSession.PendingEnvelopeQty
-            };
+            var batchWO = new WorkOrder(
+      BuildBatchCode(),                     // woCode
+      _scanSession.PendingEnvelopeQty       // envelopeQty
+  );
+
 
             // Respect your domain invariant: 1 scan == +1
             for (int i = 0; i < _scanSession.PendingScannedWO; i++)
@@ -141,4 +164,6 @@ namespace WindowsFormsApp1.Dialogs
     {
         public int GetEnvelopeQty(string woCode) => 0; // for smoke testing
     }
+
+
 }

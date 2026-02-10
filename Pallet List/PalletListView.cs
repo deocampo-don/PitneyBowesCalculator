@@ -12,6 +12,8 @@ namespace WindowsFormsApp1
 {
     public partial class PalletListView : UserControl
     {
+        public event EventHandler<PbJobModel> DeleteRequested;
+
         public PalletListView()
         {
             InitializeComponent();
@@ -29,13 +31,19 @@ namespace WindowsFormsApp1
             {
                 var row = new PalletRowControl();
                 row.Bind(list[i]);
-         
+
+                // 🔑 WIRE DELETE HERE
+                row.DeleteRequested += (_, job) =>
+                {
+                    DeleteRequested?.Invoke(this, job);
+                };
 
                 flowRows.Controls.Add(row);
             }
 
             flowRows.ResumeLayout();
         }
+
         public void AddRow(PalletRowControl row)
         {
             row.Width = scrollHost.ClientSize.Width - 25; // leave room for scrollbar

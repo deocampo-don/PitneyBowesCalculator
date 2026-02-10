@@ -36,8 +36,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
             InitializeComponent();
 
             // Style enhancements for cleaner UI
-            CSSDesign.MakeRounded(btnView, 10);
-            CSSDesign.MakePanelRounded(pnlDashboard, 12, Color.Gray, 2);
+            
         }
 
 
@@ -128,6 +127,24 @@ namespace WindowsFormsApp1.Packed_And_Ready
                 txtStatus.Text = "Not Ready";
                 txtStatus.StateCommon.ShortText.Color1 =
                     ColorTranslator.FromHtml("#FF383C"); // red
+            }
+        }
+
+        private void btnView_Click_1(object sender, EventArgs e)
+        {
+            // Optional: notify listeners that View was clicked
+            ViewClicked?.Invoke(this, EventArgs.Empty);
+
+            Form parentForm = this.FindForm();
+            using (var dlg = new ViewButtonDialog(_modelpbjob))
+            {
+                dlg.ShowDialog(parentForm);
+
+                // ✅ Notify parent ONLY if data changed
+                if (dlg.DataChanged)
+                {
+                    ViewDialogClosed?.Invoke(this, EventArgs.Empty);
+                }
             }
         }
     }

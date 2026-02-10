@@ -29,220 +29,341 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnView = new System.Windows.Forms.Button();
+            this.kryptonGroupBox1 = new Krypton.Toolkit.KryptonGroupBox();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.kryptonPanel1 = new Krypton.Toolkit.KryptonPanel();
+            this.chkbxStatus = new System.Windows.Forms.CheckBox();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.txtStatus = new Krypton.Toolkit.KryptonLabel();
-            this.txtPackDate = new Krypton.Toolkit.KryptonLabel();
             this.txtPBJobNum = new Krypton.Toolkit.KryptonLabel();
             this.txtPBJobName = new Krypton.Toolkit.KryptonLabel();
-            this.lblPackDate = new Krypton.Toolkit.KryptonLabel();
-            this.lblTrays = new Krypton.Toolkit.KryptonLabel();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.txtTrays = new Krypton.Toolkit.KryptonLabel();
-            this.lblEnvelopeQty = new Krypton.Toolkit.KryptonLabel();
-            this.txtEnvelopeQty = new Krypton.Toolkit.KryptonLabel();
-            this.lblPallets = new Krypton.Toolkit.KryptonLabel();
+            this.kryptonLabel8 = new Krypton.Toolkit.KryptonLabel();
             this.txtPallets = new Krypton.Toolkit.KryptonLabel();
-            this.chkbxStatus = new Krypton.Toolkit.KryptonCheckBox();
-            this.pnlDashboard = new System.Windows.Forms.Panel();
-            this.pnlDashboard.SuspendLayout();
+            this.txtEnvelopeQty = new Krypton.Toolkit.KryptonLabel();
+            this.kryptonLabel4 = new Krypton.Toolkit.KryptonLabel();
+            this.kryptonLabel5 = new Krypton.Toolkit.KryptonLabel();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.kryptonLabel10 = new Krypton.Toolkit.KryptonLabel();
+            this.txtPackDate = new Krypton.Toolkit.KryptonLabel();
+            this.btnView = new Krypton.Toolkit.KryptonButton();
+            ((System.ComponentModel.ISupportInitialize)(this.kryptonGroupBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.kryptonGroupBox1.Panel)).BeginInit();
+            this.kryptonGroupBox1.Panel.SuspendLayout();
+            this.kryptonGroupBox1.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel1)).BeginInit();
+            this.tableLayoutPanel2.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
+            this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // btnView
+            // kryptonGroupBox1
             // 
-            this.btnView.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.btnView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(80)))), ((int)(((byte)(164)))));
-            this.btnView.CausesValidation = false;
-            this.btnView.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnView.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(80)))), ((int)(((byte)(164)))));
-            this.btnView.FlatAppearance.BorderSize = 0;
-            this.btnView.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnView.ForeColor = System.Drawing.Color.White;
-            this.btnView.Location = new System.Drawing.Point(263, 264);
-            this.btnView.Name = "btnView";
-            this.btnView.Size = new System.Drawing.Size(149, 37);
-            this.btnView.TabIndex = 43;
-            this.btnView.Text = "View";
-            this.btnView.UseVisualStyleBackColor = false;
-            this.btnView.Click += new System.EventHandler(this.btnView_Click);
+            this.kryptonGroupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.kryptonGroupBox1.Location = new System.Drawing.Point(0, 0);
             // 
-            // txtStatus
+            // kryptonGroupBox1.Panel
             // 
-            this.txtStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtStatus.Location = new System.Drawing.Point(326, 70);
-            this.txtStatus.Name = "txtStatus";
-            this.txtStatus.Size = new System.Drawing.Size(83, 24);
-            this.txtStatus.StateCommon.ShortText.Color1 = System.Drawing.Color.Red;
-            this.txtStatus.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtStatus.TabIndex = 42;
-            this.txtStatus.Values.Text = "Not Ready";
+            this.kryptonGroupBox1.Panel.Controls.Add(this.tableLayoutPanel1);
+            this.kryptonGroupBox1.Size = new System.Drawing.Size(322, 272);
+            this.kryptonGroupBox1.StateCommon.Back.Color1 = System.Drawing.Color.White;
+            this.kryptonGroupBox1.StateCommon.Border.Color1 = System.Drawing.Color.Gray;
+            this.kryptonGroupBox1.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.kryptonGroupBox1.StateCommon.Border.Rounding = 10F;
+            this.kryptonGroupBox1.StateCommon.Border.Width = 1;
+            this.kryptonGroupBox1.TabIndex = 1;
+            this.kryptonGroupBox1.Values.Heading = "";
             // 
-            // txtPackDate
+            // tableLayoutPanel1
             // 
-            this.txtPackDate.Location = new System.Drawing.Point(300, 231);
-            this.txtPackDate.Name = "txtPackDate";
-            this.txtPackDate.Size = new System.Drawing.Size(105, 24);
-            this.txtPackDate.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.txtPackDate.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPackDate.TabIndex = 41;
-            this.txtPackDate.Values.Text = "MM/DD/YYYY";
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.kryptonPanel1, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.chkbxStatus, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel3, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.btnView, 0, 4);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.Padding = new System.Windows.Forms.Padding(10, 10, 10, 5);
+            this.tableLayoutPanel1.RowCount = 5;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 23.07692F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 57.91855F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 18.26923F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(314, 264);
+            this.tableLayoutPanel1.TabIndex = 0;
             // 
-            // txtPBJobNum
+            // kryptonPanel1
             // 
-            this.txtPBJobNum.Location = new System.Drawing.Point(29, 73);
-            this.txtPBJobNum.Name = "txtPBJobNum";
-            this.txtPBJobNum.Size = new System.Drawing.Size(20, 24);
-            this.txtPBJobNum.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.txtPBJobNum.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPBJobNum.TabIndex = 39;
-            this.txtPBJobNum.Values.Text = "0";
-            // 
-            // txtPBJobName
-            // 
-            this.txtPBJobName.Location = new System.Drawing.Point(26, 44);
-            this.txtPBJobName.Name = "txtPBJobName";
-            this.txtPBJobName.Size = new System.Drawing.Size(179, 31);
-            this.txtPBJobName.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.txtPBJobName.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPBJobName.TabIndex = 38;
-            this.txtPBJobName.TabStop = false;
-            this.txtPBJobName.Values.Text = "PB JOB NAME";
-            // 
-            // lblPackDate
-            // 
-            this.lblPackDate.Location = new System.Drawing.Point(314, 210);
-            this.lblPackDate.Name = "lblPackDate";
-            this.lblPackDate.Size = new System.Drawing.Size(81, 24);
-            this.lblPackDate.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.lblPackDate.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPackDate.TabIndex = 37;
-            this.lblPackDate.Values.Text = "Pack Date";
-            // 
-            // lblTrays
-            // 
-            this.lblTrays.Location = new System.Drawing.Point(17, 192);
-            this.lblTrays.Margin = new System.Windows.Forms.Padding(0);
-            this.lblTrays.Name = "lblTrays";
-            this.lblTrays.Size = new System.Drawing.Size(48, 24);
-            this.lblTrays.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.lblTrays.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTrays.TabIndex = 35;
-            this.lblTrays.Values.Text = "Trays";
-            // 
-            // txtTrays
-            // 
-            this.txtTrays.Location = new System.Drawing.Point(11, 210);
-            this.txtTrays.Name = "txtTrays";
-            this.txtTrays.Size = new System.Drawing.Size(40, 48);
-            this.txtTrays.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.txtTrays.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtTrays.TabIndex = 36;
-            this.txtTrays.Values.Text = "0";
-            // 
-            // lblEnvelopeQty
-            // 
-            this.lblEnvelopeQty.Location = new System.Drawing.Point(16, 118);
-            this.lblEnvelopeQty.Margin = new System.Windows.Forms.Padding(0);
-            this.lblEnvelopeQty.Name = "lblEnvelopeQty";
-            this.lblEnvelopeQty.Size = new System.Drawing.Size(105, 24);
-            this.lblEnvelopeQty.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.lblEnvelopeQty.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEnvelopeQty.TabIndex = 33;
-            this.lblEnvelopeQty.Values.Text = "Envelope Qty";
-            // 
-            // txtEnvelopeQty
-            // 
-            this.txtEnvelopeQty.LabelStyle = Krypton.Toolkit.LabelStyle.TitleControl;
-            this.txtEnvelopeQty.Location = new System.Drawing.Point(11, 137);
-            this.txtEnvelopeQty.Name = "txtEnvelopeQty";
-            this.txtEnvelopeQty.Size = new System.Drawing.Size(40, 48);
-            this.txtEnvelopeQty.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.txtEnvelopeQty.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtEnvelopeQty.TabIndex = 34;
-            this.txtEnvelopeQty.Values.Text = "0";
-            // 
-            // lblPallets
-            // 
-            this.lblPallets.Location = new System.Drawing.Point(338, 118);
-            this.lblPallets.Name = "lblPallets";
-            this.lblPallets.Size = new System.Drawing.Size(57, 24);
-            this.lblPallets.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.lblPallets.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPallets.TabIndex = 31;
-            this.lblPallets.Values.Text = "Pallets";
-            // 
-            // txtPallets
-            // 
-            this.txtPallets.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPallets.Location = new System.Drawing.Point(350, 134);
-            this.txtPallets.Name = "txtPallets";
-            this.txtPallets.Size = new System.Drawing.Size(40, 48);
-            this.txtPallets.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
-            this.txtPallets.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPallets.TabIndex = 32;
-            this.txtPallets.Values.Text = "0";
+            this.tableLayoutPanel1.SetColumnSpan(this.kryptonPanel1, 2);
+            this.kryptonPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.kryptonPanel1.Location = new System.Drawing.Point(13, 86);
+            this.kryptonPanel1.Name = "kryptonPanel1";
+            this.kryptonPanel1.Size = new System.Drawing.Size(288, 1);
+            this.kryptonPanel1.StateCommon.Color1 = System.Drawing.Color.Thistle;
+            this.kryptonPanel1.TabIndex = 3;
             // 
             // chkbxStatus
             // 
-            this.chkbxStatus.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.chkbxStatus.AutoSize = false;
-            this.chkbxStatus.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.chkbxStatus.Location = new System.Drawing.Point(390, 14);
+            this.chkbxStatus.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.chkbxStatus.AutoSize = true;
+            this.chkbxStatus.Location = new System.Drawing.Point(286, 13);
             this.chkbxStatus.Name = "chkbxStatus";
-            this.chkbxStatus.Size = new System.Drawing.Size(18, 22);
-            this.chkbxStatus.TabIndex = 44;
-            this.chkbxStatus.Values.Text = "";
-            this.chkbxStatus.CheckedChanged += new System.EventHandler(this.chkbxStatus_CheckedChanged);
+            this.chkbxStatus.Size = new System.Drawing.Size(15, 14);
+            this.chkbxStatus.TabIndex = 0;
+            this.chkbxStatus.UseVisualStyleBackColor = true;
             // 
-            // pnlDashboard
+            // tableLayoutPanel2
             // 
-            this.pnlDashboard.BackColor = System.Drawing.Color.Transparent;
-            this.pnlDashboard.Controls.Add(this.txtStatus);
-            this.pnlDashboard.Controls.Add(this.txtPallets);
-            this.pnlDashboard.Controls.Add(this.txtPackDate);
-            this.pnlDashboard.Location = new System.Drawing.Point(3, 3);
-            this.pnlDashboard.Name = "pnlDashboard";
-            this.pnlDashboard.Size = new System.Drawing.Size(422, 316);
-            this.pnlDashboard.TabIndex = 45;
+            this.tableLayoutPanel2.ColumnCount = 2;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.Controls.Add(this.txtStatus, 1, 1);
+            this.tableLayoutPanel2.Controls.Add(this.txtPBJobNum, 0, 1);
+            this.tableLayoutPanel2.Controls.Add(this.txtPBJobName, 0, 0);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(13, 33);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 58.69565F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 41.30435F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(288, 47);
+            this.tableLayoutPanel2.TabIndex = 3;
+            // 
+            // txtStatus
+            // 
+            this.txtStatus.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.txtStatus.Location = new System.Drawing.Point(223, 30);
+            this.txtStatus.Name = "txtStatus";
+            this.txtStatus.Size = new System.Drawing.Size(62, 14);
+            this.txtStatus.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.txtStatus.TabIndex = 0;
+            this.txtStatus.Values.Text = "Not Ready";
+            // 
+            // txtPBJobNum
+            // 
+            this.txtPBJobNum.Location = new System.Drawing.Point(5, 30);
+            this.txtPBJobNum.Margin = new System.Windows.Forms.Padding(5, 3, 3, 3);
+            this.txtPBJobNum.Name = "txtPBJobNum";
+            this.txtPBJobNum.Size = new System.Drawing.Size(38, 14);
+            this.txtPBJobNum.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.txtPBJobNum.TabIndex = 1;
+            this.txtPBJobNum.Values.Text = "25367";
+            // 
+            // txtPBJobName
+            // 
+            this.txtPBJobName.Location = new System.Drawing.Point(3, 3);
+            this.txtPBJobName.Name = "txtPBJobName";
+            this.txtPBJobName.Size = new System.Drawing.Size(91, 21);
+            this.txtPBJobName.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.txtPBJobName.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPBJobName.TabIndex = 2;
+            this.txtPBJobName.Values.Text = "CAPONE";
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.ColumnCount = 2;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 63.28671F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 36.71329F));
+            this.tableLayoutPanel3.Controls.Add(this.txtTrays, 0, 3);
+            this.tableLayoutPanel3.Controls.Add(this.kryptonLabel8, 0, 2);
+            this.tableLayoutPanel3.Controls.Add(this.txtPallets, 1, 1);
+            this.tableLayoutPanel3.Controls.Add(this.txtEnvelopeQty, 0, 1);
+            this.tableLayoutPanel3.Controls.Add(this.kryptonLabel4, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.kryptonLabel5, 1, 0);
+            this.tableLayoutPanel3.Controls.Add(this.flowLayoutPanel1, 1, 3);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(13, 87);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 4;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 66.66666F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 44F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(288, 127);
+            this.tableLayoutPanel3.TabIndex = 4;
+            // 
+            // txtTrays
+            // 
+            this.txtTrays.Location = new System.Drawing.Point(3, 83);
+            this.txtTrays.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
+            this.txtTrays.Name = "txtTrays";
+            this.txtTrays.Size = new System.Drawing.Size(48, 40);
+            this.txtTrays.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.txtTrays.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtTrays.TabIndex = 5;
+            this.txtTrays.Values.Text = "54";
+            // 
+            // kryptonLabel8
+            // 
+            this.kryptonLabel8.Location = new System.Drawing.Point(10, 66);
+            this.kryptonLabel8.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
+            this.kryptonLabel8.Name = "kryptonLabel8";
+            this.kryptonLabel8.Size = new System.Drawing.Size(37, 14);
+            this.kryptonLabel8.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.kryptonLabel8.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.kryptonLabel8.TabIndex = 4;
+            this.kryptonLabel8.Values.Text = "Trays";
+            // 
+            // txtPallets
+            // 
+            this.txtPallets.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.txtPallets.Location = new System.Drawing.Point(211, 24);
+            this.txtPallets.Name = "txtPallets";
+            this.txtPallets.Size = new System.Drawing.Size(48, 36);
+            this.txtPallets.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.txtPallets.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPallets.TabIndex = 3;
+            this.txtPallets.Values.Text = "10";
+            // 
+            // txtEnvelopeQty
+            // 
+            this.txtEnvelopeQty.Location = new System.Drawing.Point(3, 24);
+            this.txtEnvelopeQty.Name = "txtEnvelopeQty";
+            this.txtEnvelopeQty.Size = new System.Drawing.Size(103, 36);
+            this.txtEnvelopeQty.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.txtEnvelopeQty.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtEnvelopeQty.TabIndex = 2;
+            this.txtEnvelopeQty.Values.Text = "16315";
+            // 
+            // kryptonLabel4
+            // 
+            this.kryptonLabel4.Location = new System.Drawing.Point(10, 3);
+            this.kryptonLabel4.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
+            this.kryptonLabel4.Name = "kryptonLabel4";
+            this.kryptonLabel4.Size = new System.Drawing.Size(88, 15);
+            this.kryptonLabel4.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.kryptonLabel4.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.kryptonLabel4.TabIndex = 0;
+            this.kryptonLabel4.Values.Text = "Envelope QTY";
+            // 
+            // kryptonLabel5
+            // 
+            this.kryptonLabel5.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.kryptonLabel5.Location = new System.Drawing.Point(212, 3);
+            this.kryptonLabel5.Margin = new System.Windows.Forms.Padding(7, 3, 3, 3);
+            this.kryptonLabel5.Name = "kryptonLabel5";
+            this.kryptonLabel5.Size = new System.Drawing.Size(50, 15);
+            this.kryptonLabel5.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.kryptonLabel5.TabIndex = 1;
+            this.kryptonLabel5.Values.Text = "Pallets";
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.Controls.Add(this.kryptonLabel10);
+            this.flowLayoutPanel1.Controls.Add(this.txtPackDate);
+            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(185, 86);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(100, 38);
+            this.flowLayoutPanel1.TabIndex = 6;
+            this.flowLayoutPanel1.WrapContents = false;
+            // 
+            // kryptonLabel10
+            // 
+            this.kryptonLabel10.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.kryptonLabel10.Location = new System.Drawing.Point(0, 0);
+            this.kryptonLabel10.Margin = new System.Windows.Forms.Padding(0, 0, 0, 5);
+            this.kryptonLabel10.Name = "kryptonLabel10";
+            this.kryptonLabel10.Size = new System.Drawing.Size(78, 15);
+            this.kryptonLabel10.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.kryptonLabel10.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.kryptonLabel10.TabIndex = 5;
+            this.kryptonLabel10.Values.Text = "Packed Date";
+            // 
+            // txtPackDate
+            // 
+            this.txtPackDate.Location = new System.Drawing.Point(0, 20);
+            this.txtPackDate.Margin = new System.Windows.Forms.Padding(0);
+            this.txtPackDate.Name = "txtPackDate";
+            this.txtPackDate.Size = new System.Drawing.Size(66, 15);
+            this.txtPackDate.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.txtPackDate.StateCommon.ShortText.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPackDate.TabIndex = 6;
+            this.txtPackDate.Values.Text = "01/01/2026";
+            // 
+            // btnView
+            // 
+            this.btnView.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnView.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            this.btnView.Location = new System.Drawing.Point(191, 227);
+            this.btnView.Margin = new System.Windows.Forms.Padding(3, 10, 10, 0);
+            this.btnView.Name = "btnView";
+            this.btnView.Size = new System.Drawing.Size(103, 28);
+            this.btnView.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(80)))), ((int)(((byte)(164)))));
+            this.btnView.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnView.StateCommon.Border.Rounding = 5F;
+            this.btnView.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.btnView.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnView.StateCommon.Content.ShortText.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnView.StateCommon.Content.ShortText.TextV = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnView.TabIndex = 5;
+            this.btnView.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.btnView.Values.Text = "View";
+            this.btnView.Click += new System.EventHandler(this.btnView_Click_1);
             // 
             // PackedRowControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.Controls.Add(this.chkbxStatus);
-            this.Controls.Add(this.btnView);
-            this.Controls.Add(this.txtPBJobNum);
-            this.Controls.Add(this.txtPBJobName);
-            this.Controls.Add(this.lblPackDate);
-            this.Controls.Add(this.lblTrays);
-            this.Controls.Add(this.txtTrays);
-            this.Controls.Add(this.lblEnvelopeQty);
-            this.Controls.Add(this.txtEnvelopeQty);
-            this.Controls.Add(this.lblPallets);
-            this.Controls.Add(this.pnlDashboard);
+            this.Controls.Add(this.kryptonGroupBox1);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "PackedRowControl";
-            this.Size = new System.Drawing.Size(430, 325);
-            this.pnlDashboard.ResumeLayout(false);
-            this.pnlDashboard.PerformLayout();
+            this.Size = new System.Drawing.Size(322, 272);
+            ((System.ComponentModel.ISupportInitialize)(this.kryptonGroupBox1.Panel)).EndInit();
+            this.kryptonGroupBox1.Panel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.kryptonGroupBox1)).EndInit();
+            this.kryptonGroupBox1.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel1)).EndInit();
+            this.tableLayoutPanel2.ResumeLayout(false);
+            this.tableLayoutPanel2.PerformLayout();
+            this.tableLayoutPanel3.ResumeLayout(false);
+            this.tableLayoutPanel3.PerformLayout();
+            this.flowLayoutPanel1.ResumeLayout(false);
+            this.flowLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button btnView;
+        private Krypton.Toolkit.KryptonGroupBox kryptonGroupBox1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private Krypton.Toolkit.KryptonPanel kryptonPanel1;
+        private System.Windows.Forms.CheckBox chkbxStatus;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private Krypton.Toolkit.KryptonLabel txtStatus;
-        private Krypton.Toolkit.KryptonLabel txtPackDate;
         private Krypton.Toolkit.KryptonLabel txtPBJobNum;
         private Krypton.Toolkit.KryptonLabel txtPBJobName;
-        private Krypton.Toolkit.KryptonLabel lblPackDate;
-        private Krypton.Toolkit.KryptonLabel lblTrays;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private Krypton.Toolkit.KryptonLabel txtTrays;
-        private Krypton.Toolkit.KryptonLabel lblEnvelopeQty;
-        private Krypton.Toolkit.KryptonLabel txtEnvelopeQty;
-        private Krypton.Toolkit.KryptonLabel lblPallets;
+        private Krypton.Toolkit.KryptonLabel kryptonLabel8;
         private Krypton.Toolkit.KryptonLabel txtPallets;
-        private Krypton.Toolkit.KryptonCheckBox chkbxStatus;
-        private System.Windows.Forms.Panel pnlDashboard;
+        private Krypton.Toolkit.KryptonLabel txtEnvelopeQty;
+        private Krypton.Toolkit.KryptonLabel kryptonLabel4;
+        private Krypton.Toolkit.KryptonLabel kryptonLabel5;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private Krypton.Toolkit.KryptonLabel kryptonLabel10;
+        private Krypton.Toolkit.KryptonLabel txtPackDate;
+        private Krypton.Toolkit.KryptonButton btnView;
     }
 }

@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Net.Http;              // ⭐ NEW
-using System.Threading.Tasks;       // ⭐ NEW
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.Packed_And_Ready;
 
@@ -15,9 +16,10 @@ namespace WindowsFormsApp1
         // Fields
         // -----------------------------
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
-        private readonly List<PickListModel> _pickLists = new List<PickListModel>();
         private ShipPalletsRowControl _shipPalletsControl;
+
         public event EventHandler ItemsChanged;
+
         // -----------------------------
         // Constructor
         // -----------------------------
@@ -25,22 +27,32 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
 
-            // UI Setup
+            // UI Setup ONLY
             ApplyTabStyles();
             WireCheckSetToNavigator();
             InitializeTitleBarButtons();
-
-            // Seed data and bind to views (UI-only for now)
-            SeedSampleData();
-            RefreshAllViews();
-
             InitializeShipPalletsBar();
-            //refresh this panel
+
+            // UI event wiring
             packedListView2.ItemsChanged += (_, __) =>
             {
                 RefreshAllViews();
             };
+
+            lvBuild.DeleteRequested += async (_, job) =>
+            {
+                try
+                {
+                    await RqliteClient.DeletePbJobAsync(job.JobId);
+                    await LoadJobsAsync();
+                }
+                catch (Exception ex)
+                {
+                    ShowDatabaseError(ex);
+                }
+            };
         }
+
         // -----------------------------
         // ⭐ rqlite Initialization
         // -----------------------------
@@ -59,19 +71,73 @@ namespace WindowsFormsApp1
         // -----------------------------
         // Form Events
         // -----------------------------
-        private async void Form1_Load(object sender, EventArgs e)   // ⭐ MODIFIED
+        private async void Form1_Load(object sender, EventArgs e)
         {
-            //// Initialize rqlite FIRST
-            //await InitializeRqliteAsync();
+            try
+            {
+                await InitializeRqliteAsync();
 
-            //// Existing logic
-            //SyncNavigatorWithCheckedTab();
+                if (!await RqliteClient.IsDatabaseAvailableAsync())
+                {
+                    ShowDatabaseOfflineMessage();
+                    return;
+                }
+
+                SyncNavigatorWithCheckedTab();
+                await LoadJobsAsync();
+            }
+            catch (Exception ex)
+            {
+                ShowDatabaseError(ex);
+            }
         }
 
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        private void ShowDatabaseOfflineMessage()
         {
-            // Intentionally left blank
+            MessageBox.Show(
+                "Database service is not running.\n\nPlease start rqlite and restart the application.",
+                "Database Offline",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning
+            );
         }
+
+        private void ShowDatabaseError(Exception ex)
+        {
+            MessageBox.Show(
+                $"Database error:\n\n{ex.Message}",
+                "Database Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+        }
+
+        private void ApplySearchFilter()
+        {
+            if (_pbJobs.Count == 0)
+                return;
+
+            var fromDate = dtPickUpFrom.Value.Date;
+            var toDate = dtPickUpTo.Value.Date.AddDays(1).AddTicks(-1);
+
+            var filtered = _pbJobs
+                .Where(job =>
+                {
+                    // Use shipped date OR packed date depending on your business rule
+                    var date = job.ShippedDate ?? job.PackDate;
+
+                    if (!date.HasValue)
+                        return false;
+
+                    return date.Value >= fromDate && date.Value <= toDate;
+                })
+                .ToList();
+
+            // Apply to the list below
+            pickedUpListView.SetItems(filtered);
+        }
+
+
 
         // -----------------------------
         // UI Styling / Wiring
@@ -113,87 +179,26 @@ namespace WindowsFormsApp1
         }
 
         // -----------------------------
-        // Data: Seeding & Refresh
+        // Data Loading (DB → UI)
         // -----------------------------
-        private void SeedSampleData()
+        private async Task LoadJobsAsync()
         {
-            var packDate = DateTime.Parse("2025-11-23");
+            _pbJobs.Clear();
 
-            var pb1 = new PbJobModel
-            {
-                JobName = "CAPONE",
-                JobNumber = 23413,
-                PackDate = packDate,
+            var jobs = await RqliteClient.LoadFullJobGraphAsync();
 
-                Pallets = new List<Pallet>
-                {
-                    new Pallet
-                    {
-                        Trays = 40,
-                        PackedTime = packDate.Date.AddHours(21).AddMinutes(30),
-                        WorkOrders = new List<WorkOrder>
-                        {
-                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-                            new WorkOrder { Code = "WO-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO-002", EnvelopeQty = 500 },
-
-                        }
-                    },
-                    new Pallet
-                    {
-                        Trays = 42,
-                        PackedTime = packDate.Date.AddHours(22).AddMinutes(30),
-                        WorkOrders = new List<WorkOrder>
-                        {
-                            new WorkOrder { Code = "WO2-001", EnvelopeQty = 1000 },
-                            new WorkOrder { Code = "WO2-002", EnvelopeQty = 500 }
-                        }
-                    },
-                    new Pallet { },
-                    new Pallet { }
-                }
-            };
-
-            var pb2 = new PbJobModel
-            {
-                JobName = "Test",
-                JobNumber = 23414,
-
-                Pallets = new List<Pallet>
-                {
-                    new Pallet(), new Pallet(), new Pallet(), new Pallet(), new Pallet()
-                }
-            };
-
-            _pbJobs.Add(pb1);
-            _pbJobs.Add(pb2);
+            _pbJobs.AddRange(jobs);
+            RefreshAllViews();
         }
 
         // -----------------------------
-        // Window Buttons
+        // View Refresh
         // -----------------------------
-
         private void RefreshAllViews()
         {
             lvBuild?.SetItems(_pbJobs);
             packedListView2?.SetItems(_pbJobs);
             pickedUpListView?.SetItems(_pbJobs);
-
         }
 
         // -----------------------------
@@ -209,13 +214,11 @@ namespace WindowsFormsApp1
             WindowState = (WindowState == FormWindowState.Maximized)
                 ? FormWindowState.Normal
                 : FormWindowState.Maximized;
-
         }
 
         // -----------------------------
-        // Other Control Events
+        // Ship Pallets Bar
         // -----------------------------
-
         private void InitializeShipPalletsBar()
         {
             if (_shipPalletsControl != null)
@@ -223,46 +226,56 @@ namespace WindowsFormsApp1
 
             _shipPalletsControl = new ShipPalletsRowControl
             {
-                Dock = DockStyle.Right,   // bottom-right inside panel
-                        
+                Dock = DockStyle.Right
             };
 
             pnlShipPallets.Controls.Add(_shipPalletsControl);
         }
 
-
+        // -----------------------------
+        // Settings
+        // -----------------------------
         private void btnSettings_Click(object sender, EventArgs e)
         {
             using (var dlg = new SettingsDialog())
             {
-                if (dlg.ShowDialog(this) == DialogResult.OK)
-                {
-                }
+                dlg.ShowDialog(this);
             }
         }
 
         // -----------------------------
         // Actions
         // -----------------------------
-        private void btnAddPBJob_Click_1(object sender, EventArgs e)
+        private async void btnAddPBJob_Click_1(object sender, EventArgs e)
         {
             using (var dlg = new CreatePBJobDialog())
             {
-                if (dlg.ShowDialog(this) == DialogResult.OK)
+                if (dlg.ShowDialog(this) != DialogResult.OK)
+                    return;
+
+                try
                 {
                     var job = new PbJobModel
                     {
-                        JobName = dlg.JobName?.ToString() ?? string.Empty,
-                        JobNumber = int.TryParse(dlg.JobNumber, out var jobNumber)
-                                        ? jobNumber
-                                        : 0,
-                        PackDate = DateTime.Today
+                        JobName = dlg.JobName ?? string.Empty,
+                        JobNumber = int.TryParse(dlg.JobNumber, out var num) ? num : 0,
+                        IsReady = false,
+                        PackDate = null
                     };
 
-                    _pbJobs.Add(job);
-                    RefreshAllViews();
+                    await RqliteClient.InsertPbJobAsync(job);
+                    await LoadJobsAsync();
+                }
+                catch (Exception ex)
+                {
+                    ShowDatabaseError(ex);
                 }
             }
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            ApplySearchFilter();
         }
     }
 }

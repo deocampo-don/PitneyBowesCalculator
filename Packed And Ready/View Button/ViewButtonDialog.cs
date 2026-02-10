@@ -38,8 +38,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             _job = job;
 
             LoadHeaderInfo();
-            palletNumListViewList1.SetItems(_job);
-            palletNumListViewList1.PalletClicked += OnPalletClicked;
+            lvPallet.SetItems(_job);
+            lvPallet.PalletClicked += OnPalletClicked;
 
             pnlHeader.MouseDown += pnlHeader_MouseDown;
             this.Paint += ViewButtonDialog_Paint;
@@ -48,7 +48,14 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             CSSDesign.MakeRounded(btnPrintPallets, 10);
             CSSDesign.AddPanelBorder(pnlDashboard, Color.Silver, 1);
             CSSDesign.AddPanelBorder(pnlDetails, Color.Silver, 1);
+
+            //onload select first item
+
         }
+
+
+        // inside lvPallet UserControl
+     
 
         /* -------------------------------------------------------------
          * HEADER
@@ -88,8 +95,11 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
             txtEnvelopeQty.Text = pallet.PalletEnvelopeQty.ToString("N0");
             txtScannedWO.Text = pallet.PalletScannedWO.ToString("N0");
-            txtTrayCount.Text = pallet.Trays.ToString("N0");
-            txtPackedTime.Text = pallet.PackedTime.ToString("hh:mm tt");
+            txtTrayCount.Text = pallet.TrayCount.ToString("N0");
+            txtPackedTime.Text = pallet.PackedTime.HasValue
+    ? pallet.PackedTime.Value.ToString("hh:mm tt")
+    : string.Empty;
+
         }
 
         /* -------------------------------------------------------------
@@ -99,7 +109,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
         private void btnRemovePallets_Click(object sender, EventArgs e)
         {
-            var selected = palletNumListViewList1.GetSelectedIndices();
+            var selected = lvPallet.GetSelectedIndices();
             if (selected.Count == 0)
             {
                 MessageBox.Show("Please select at least one pallet using the checkbox to remove.");
@@ -120,9 +130,9 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             DataChanged = true;
 
             // Refresh dialog UI
-            palletNumListViewList1.RefreshItems(_job);
+            lvPallet.RefreshItems(_job);
             LoadDashboard(null);
-            palletDetailsListView1.SetItems(null);
+            lvPalletDetails.SetItems(null);
 
         }
 
@@ -139,7 +149,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
             var pallet = _job.Pallets[index];
             LoadDashboard(pallet);
-            palletDetailsListView1.SetItems(pallet.WorkOrders);
+            lvPalletDetails.SetItems(pallet.WorkOrders);
         }
 
         /* -------------------------------------------------------------
@@ -169,5 +179,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         {
             this.Close();
         }
+
+   
     }
 }

@@ -17,16 +17,32 @@ namespace WindowsFormsApp1
     {
 
         private PbJobModel _model;
+        public event EventHandler<PbJobModel> DeleteRequested;
+
         public PalletRowControl()
         {
             InitializeComponent();
+            InitializeContextMenu();
 
         }
-        
+
+        private void InitializeContextMenu()
+        {
+            var menu = new ContextMenuStrip();
+
+            var deleteItem = new ToolStripMenuItem("Delete PB Job");
+            deleteItem.Click += DeletePbJob_Click;
+
+            menu.Items.Add(deleteItem);
+
+            // Apply to the whole row
+            this.ContextMenuStrip = menu;
+        }
 
 
-// ----- Your palette -----
-private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
+
+        // ----- Your palette -----
+        private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
     private static readonly Color Green2 = Color.FromArgb(39, 174, 96);
     private static readonly Color Purple1 = Color.FromArgb(110, 74, 191);
     private static readonly Color Purple2 = Color.FromArgb(110, 74, 191);
@@ -151,7 +167,6 @@ private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
         private void btnAddPallet_Click(object sender, EventArgs e)
         {
 
-
             var pallet = GetCurrentlySelectedPallet();
             if (pallet == null)
             {
@@ -163,6 +178,7 @@ private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
             {
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {
+                    
                     // Refresh UI
                     //LoadDashboard(pallet);
                    // palletDetailsListView1.SetItems(pallet.WorkOrders);
@@ -199,6 +215,25 @@ private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
 
         }
 
+        private void DeletePbJob_Click(object sender, EventArgs e)
+        {
+            if (_model == null)
+                return;
+
+            var confirm = MessageBox.Show(
+                $"Delete PB Job \"{_model.JobName}\"?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (confirm != DialogResult.Yes)
+                return;
+
+            DeleteRequested?.Invoke(this, _model);
+        }
+
+
+
 
         public void Bind(PbJobModel model)
         {
@@ -229,6 +264,7 @@ private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
             using (var dlg = new PackPalletDIalog())
             {
                 dlg.ShowDialog(this); // modal, centered to parent
+
             }
         }
 

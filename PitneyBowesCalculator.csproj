@@ -115,8 +115,6 @@
     <Compile Include="Dialogs\SettingsDialog.Designer.cs">
       <DependentUpon>SettingsDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\PackedReady.cs" />
-    <Compile Include="Models\pickListModel.cs" />
     <Compile Include="Packed And Ready\PackedListView.cs">
       <SubType>UserControl</SubType>
     </Compile>

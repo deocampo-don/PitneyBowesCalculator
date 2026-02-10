@@ -30,8 +30,8 @@
         {
             this.btnPalletNum = new System.Windows.Forms.Button();
             this.pnlMain = new System.Windows.Forms.Panel();
-            this.chkBox = new Krypton.Toolkit.KryptonCheckBox();
             this.flowPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.chkBox = new System.Windows.Forms.CheckBox();
             this.pnlMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -41,9 +41,10 @@
             this.btnPalletNum.FlatAppearance.BorderSize = 0;
             this.btnPalletNum.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPalletNum.ForeColor = System.Drawing.Color.Black;
-            this.btnPalletNum.Location = new System.Drawing.Point(3, 3);
+            this.btnPalletNum.Location = new System.Drawing.Point(2, 2);
+            this.btnPalletNum.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnPalletNum.Name = "btnPalletNum";
-            this.btnPalletNum.Size = new System.Drawing.Size(232, 24);
+            this.btnPalletNum.Size = new System.Drawing.Size(174, 20);
             this.btnPalletNum.TabIndex = 0;
             this.btnPalletNum.Text = "Pallet #";
             this.btnPalletNum.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -56,37 +57,39 @@
             this.pnlMain.Controls.Add(this.chkBox);
             this.pnlMain.Controls.Add(this.btnPalletNum);
             this.pnlMain.Location = new System.Drawing.Point(0, 0);
+            this.pnlMain.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(238, 29);
+            this.pnlMain.Size = new System.Drawing.Size(178, 24);
             this.pnlMain.TabIndex = 1;
-            // 
-            // chkBox
-            // 
-            this.chkBox.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.chkBox.AutoSize = false;
-            this.chkBox.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.chkBox.Location = new System.Drawing.Point(43, 5);
-            this.chkBox.Name = "chkBox";
-            this.chkBox.Size = new System.Drawing.Size(17, 19);
-            this.chkBox.StateCommon.DrawFocus = Krypton.Toolkit.InheritBool.True;
-            this.chkBox.TabIndex = 3;
-            this.chkBox.Values.Text = "";
             // 
             // flowPanel
             // 
             this.flowPanel.Location = new System.Drawing.Point(0, 0);
+            this.flowPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.flowPanel.Name = "flowPanel";
-            this.flowPanel.Size = new System.Drawing.Size(238, 29);
+            this.flowPanel.Size = new System.Drawing.Size(178, 24);
             this.flowPanel.TabIndex = 2;
+            // 
+            // chkBox
+            // 
+            this.chkBox.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkBox.BackColor = System.Drawing.Color.Transparent;
+            this.chkBox.Location = new System.Drawing.Point(43, 2);
+            this.chkBox.Name = "chkBox";
+            this.chkBox.Padding = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.chkBox.Size = new System.Drawing.Size(21, 18);
+            this.chkBox.TabIndex = 1;
+            this.chkBox.UseVisualStyleBackColor = false;
             // 
             // PalletNumListRowControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.pnlMain);
             this.Controls.Add(this.flowPanel);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "PalletNumListRowControl";
-            this.Size = new System.Drawing.Size(238, 29);
+            this.Size = new System.Drawing.Size(178, 24);
             this.pnlMain.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -97,6 +100,6 @@
         private System.Windows.Forms.Button btnPalletNum;
         private System.Windows.Forms.Panel pnlMain;
         private System.Windows.Forms.FlowLayoutPanel flowPanel;
-        private Krypton.Toolkit.KryptonCheckBox chkBox;
+        private System.Windows.Forms.CheckBox chkBox;
     }
 }

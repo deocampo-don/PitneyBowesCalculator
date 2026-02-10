@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.Models;
+using WindowsFormsApp1.Packed_And_Ready.View_Button;
 
 namespace WindowsFormsApp1.Picked_Up
 {
@@ -16,6 +17,9 @@ namespace WindowsFormsApp1.Picked_Up
     {
 
         private PbJobModel _model;
+        public event EventHandler ViewClicked;
+        public event EventHandler ViewDialogClosed;
+        private PbJobModel _modelpbjob;
         public PickedUpRowControl()
         {
             InitializeComponent();
@@ -26,6 +30,7 @@ namespace WindowsFormsApp1.Picked_Up
         public void Bind(PbJobModel model)
         {
             _model = model;
+            _modelpbjob = model;
 
             lblPBNameCode.Text = model.JobNumber + " " + model.JobName;
 
@@ -35,9 +40,21 @@ namespace WindowsFormsApp1.Picked_Up
             lblShipTime.Text = model.PackDate.ToString();
         }
 
-        private void tableLayoutPanel2_Paint(object sender, PaintEventArgs e)
+        private void btnView_Click(object sender, EventArgs e)
         {
+            ViewClicked?.Invoke(this, EventArgs.Empty);
 
+            Form parentForm = this.FindForm();
+            using (var dlg = new ViewButtonDialog(_modelpbjob))
+            {
+                dlg.ShowDialog(parentForm);
+
+                // ✅ Notify parent ONLY if data changed
+                if (dlg.DataChanged)
+                {
+                    ViewDialogClosed?.Invoke(this, EventArgs.Empty);
+                }
+            }
         }
     }
 }

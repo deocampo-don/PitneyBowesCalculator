@@ -97,11 +97,13 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             {
                 btnPalletNum.BackColor = Color.FromArgb(103, 80, 164); // Violet
                 btnPalletNum.ForeColor = Color.White;
+                chkBox.BackColor = Color.FromArgb(103, 80, 164);
             }
             else
             {
                 btnPalletNum.BackColor = Color.White;
                 btnPalletNum.ForeColor = Color.Black;
+                chkBox.BackColor = Color.White;
             }
 
         }

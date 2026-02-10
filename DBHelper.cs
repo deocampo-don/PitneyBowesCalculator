@@ -35,11 +35,7 @@ public static class RqliteClient
     {
         public bool Success { get; set; }
         public List<Dictionary<string, object>> Records { get; set; }
-
-        public RqliteResult()
-        {
-            Records = new List<Dictionary<string, object>>();
-        }
+            = new List<Dictionary<string, object>>();
     }
 
     // ======================
@@ -47,17 +43,17 @@ public static class RqliteClient
     // ======================
     private static string FormatValue(object value)
     {
-        if (value == null) return "NULL";
-        if (value is string) return "'" + value.ToString().Replace("'", "''") + "'";
-        if (value is bool) return ((bool)value) ? "1" : "0";
-        if (value is DateTime)
-            return "'" + ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss") + "'";
+        if (value == null || value == DBNull.Value) return "NULL";
+        if (value is string s) return "'" + s.Replace("'", "''") + "'";
+        if (value is bool b) return b ? "1" : "0";
+        if (value is DateTime dt)
+            return "'" + dt.ToString("yyyy-MM-dd HH:mm:ss") + "'";
         return value.ToString();
     }
 
     private static async Task<RqliteWriteResult> ExecuteAsync(string sql)
     {
-        var json = JsonConvert.SerializeObject(new string[] { sql });
+        var json = JsonConvert.SerializeObject(new[] { sql });
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var response = await httpClient.PostAsync(
@@ -78,12 +74,11 @@ public static class RqliteClient
         }
 
         var result = JsonConvert.DeserializeObject<WriteResponse>(body);
+
         return new RqliteWriteResult
         {
             Success = true,
-            RowsAffected = result != null && result.results != null
-                ? result.results.Sum(r => r.rows_affected)
-                : 0
+            RowsAffected = result?.results?.Sum(r => r.rows_affected) ?? 0
         };
     }
 
@@ -91,10 +86,22 @@ public static class RqliteClient
         string table,
         Dictionary<string, string> columns)
     {
-        var cols = string.Join(", ", columns.Select(
-            c => "\"" + c.Key + "\" " + c.Value));
+        var cols = string.Join(", ",
+            columns.Select(c => $"\"{c.Key}\" {c.Value}")
+        );
+
         return ExecuteAsync(
-            "CREATE TABLE IF NOT EXISTS \"" + table + "\" (" + cols + ")"
+            $"CREATE TABLE IF NOT EXISTS \"{table}\" ({cols})"
+        );
+    }
+
+    public static Task<RqliteWriteResult> CreateIndexAsync(
+        string indexName,
+        string table,
+        string column)
+    {
+        return ExecuteAsync(
+            $"CREATE INDEX IF NOT EXISTS {indexName} ON \"{table}\"(\"{column}\")"
         );
     }
 
@@ -102,17 +109,18 @@ public static class RqliteClient
         string table,
         Dictionary<string, object> data)
     {
-        var cols = string.Join(", ", data.Keys.Select(k => "\"" + k + "\""));
+        var cols = string.Join(", ", data.Keys.Select(k => $"\"{k}\""));
         var vals = string.Join(", ", data.Values.Select(FormatValue));
+
         return ExecuteAsync(
-            "INSERT INTO \"" + table + "\" (" + cols + ") VALUES (" + vals + ")"
+            $"INSERT INTO \"{table}\" ({cols}) VALUES ({vals})"
         );
     }
 
-    public static async Task<RqliteResult> SelectAsync(string table, string where)
+    public static async Task<RqliteResult> SelectAsync(string table, string where = "")
     {
-        var sql = "SELECT * FROM \"" + table + "\" " + where;
-        var json = JsonConvert.SerializeObject(new string[] { sql });
+        var sql = $"SELECT * FROM \"{table}\" {where}";
+        var json = JsonConvert.SerializeObject(new[] { sql });
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var response = await httpClient.PostAsync(
@@ -125,20 +133,38 @@ public static class RqliteClient
 
         var rows = new List<Dictionary<string, object>>();
 
-        if (result != null && result.results != null && result.results.Count > 0)
+        if (result?.results?.Count > 0)
         {
-            var cols = result.results[0].columns;
-            foreach (var row in result.results[0].values)
+            var r = result.results[0];
+
+            // 🔑 rqlite returns columns but NULL values when no rows exist
+            if (r.values != null)
             {
-                var dict = new Dictionary<string, object>();
-                for (int i = 0; i < cols.Length; i++)
-                    dict[cols[i]] = row[i];
-                rows.Add(dict);
+                for (int i = 0; i < r.values.Length; i++)
+                {
+                    var dict = new Dictionary<string, object>();
+                    for (int c = 0; c < r.columns.Length; c++)
+                        dict[r.columns[c]] = r.values[i][c];
+                    rows.Add(dict);
+                }
             }
         }
 
+
         return new RqliteResult { Success = true, Records = rows };
     }
+
+    public static async Task DeletePbJobAsync(int jobId)
+    {
+        // Delete child tables FIRST (important)
+        await ExecuteAsync($"DELETE FROM {TablePalletWorkOrders} WHERE PalletId IN " +
+                           $"(SELECT PalletId FROM {TablePallets} WHERE JobId = {jobId})");
+
+        await ExecuteAsync($"DELETE FROM {TablePallets} WHERE JobId = {jobId}");
+
+        await ExecuteAsync($"DELETE FROM {TableJobs} WHERE JobId = {jobId}");
+    }
+
 
     // ======================
     // SCHEMA CREATION
@@ -150,8 +176,9 @@ public static class RqliteClient
             { "JobId", "INTEGER PRIMARY KEY AUTOINCREMENT" },
             { "JobName", "VARCHAR(100) NOT NULL" },
             { "JobNumber", "INTEGER NOT NULL" },
-            { "PalletCount", "INTEGER NOT NULL" },
-            { "isReady", "INTEGER NOT NULL" }
+            { "IsReady", "INTEGER NOT NULL" },
+            { "PackedDate", "DATETIME" },
+            { "ShippedDate", "DATETIME" }
         });
 
         await CreateTableAsync(TablePallets, new Dictionary<string, string>
@@ -159,19 +186,151 @@ public static class RqliteClient
             { "PalletId", "INTEGER PRIMARY KEY AUTOINCREMENT" },
             { "JobId", "INTEGER NOT NULL" },
             { "PalletNumber", "INTEGER NOT NULL" },
-            { "PackedTime", "DATETIME NOT NULL" },
-            { "TrayCount", "INTEGER NOT NULL" },
-            { "ScannedWo", "INTEGER NOT NULL" }
+            { "PackedTime", "DATETIME" },
+            { "TrayCount", "INTEGER NOT NULL" }
         });
 
         await CreateTableAsync(TablePalletWorkOrders, new Dictionary<string, string>
         {
             { "PalletWorkOrderId", "INTEGER PRIMARY KEY AUTOINCREMENT" },
             { "PalletId", "INTEGER NOT NULL" },
-            { "Code", "VARCHAR(50) NOT NULL" },
+            { "WoCode", "VARCHAR(50) NOT NULL" },
             { "Quantity", "INTEGER NOT NULL" }
         });
+
+        await CreateIndexAsync("idx_pallets_jobid", TablePallets, "JobId");
+        await CreateIndexAsync("idx_pwo_palletid", TablePalletWorkOrders, "PalletId");
     }
+
+    // ======================
+    // WRITE OPERATIONS
+    // ======================
+    public static async Task<int> InsertPbJobAsync(PbJobModel job)
+    {
+        var data = new Dictionary<string, object>
+        {
+            { "JobName", job.JobName },
+            { "JobNumber", job.JobNumber },
+            { "IsReady", job.IsReady },
+            { "PackedDate", DBNull.Value },
+            { "ShippedDate", DBNull.Value }
+        };
+
+        await InsertAsync(TableJobs, data);
+
+        var result = await SelectAsync(
+            "sqlite_sequence",
+            "WHERE name = 'PBJobs'"
+        );
+
+        return result.Records.Count > 0
+            ? Convert.ToInt32(result.Records[0]["seq"])
+            : 0;
+    }
+
+    // ======================
+    // READ OPERATIONS (⭐ ADDED)
+    // ======================
+    public static async Task<List<PbJobModel>> LoadJobsAsync()
+    {
+        var result = await SelectAsync(TableJobs);
+        var jobs = new List<PbJobModel>();
+
+        foreach (var row in result.Records)
+        {
+            jobs.Add(new PbJobModel
+            {
+                JobId = Convert.ToInt32(row["JobId"]),
+                JobName = row["JobName"].ToString(),
+                JobNumber = Convert.ToInt32(row["JobNumber"]),
+                IsReady = Convert.ToInt32(row["IsReady"]) == 1,
+                PackDate = row["PackedDate"] == null ? (DateTime?)null : DateTime.Parse(row["PackedDate"].ToString()),
+                ShippedDate = row["ShippedDate"] == null ? (DateTime?)null : DateTime.Parse(row["ShippedDate"].ToString()),
+                Pallets = new List<Pallet>()
+            });
+        }
+
+        return jobs;
+    }
+
+    public static async Task<List<Pallet>> LoadPalletsAsync(int jobId)
+    {
+        var result = await SelectAsync(TablePallets, $"WHERE JobId = {jobId}");
+        var pallets = new List<Pallet>();
+
+        foreach (var row in result.Records)
+        {
+            pallets.Add(new Pallet
+            {
+                PalletId = Convert.ToInt32(row["PalletId"]),
+                JobId = jobId,
+                PalletNumber = Convert.ToInt32(row["PalletNumber"]),
+                TrayCount = Convert.ToInt32(row["TrayCount"]),
+                PackedTime = row["PackedTime"] == null ? (DateTime?)null : DateTime.Parse(row["PackedTime"].ToString()),
+                WorkOrders = new List<WorkOrder>()
+            });
+        }
+
+        return pallets;
+    }
+
+    public static async Task<List<WorkOrder>> LoadWorkOrdersAsync(int palletId)
+    {
+        var result = await SelectAsync(TablePalletWorkOrders, $"WHERE PalletId = {palletId}");
+        var workOrders = new List<WorkOrder>();
+
+        foreach (var row in result.Records)
+        {
+            workOrders.Add(new WorkOrder(
+                row["WoCode"].ToString(),
+                Convert.ToInt32(row["Quantity"])
+            )
+            {
+                PalletId = palletId,
+                PalletWorkOrderId = Convert.ToInt32(row["PalletWorkOrderId"])
+            });
+        }
+
+        return workOrders;
+    }
+
+    public static async Task<List<PbJobModel>> LoadFullJobGraphAsync()
+    {
+        var jobs = await LoadJobsAsync();
+
+        foreach (var job in jobs)
+        {
+            job.Pallets = await LoadPalletsAsync(job.JobId);
+
+            foreach (var pallet in job.Pallets)
+            {
+                pallet.WorkOrders = await LoadWorkOrdersAsync(pallet.PalletId);
+            }
+        }
+
+        return jobs;
+    }
+
+    public static async Task<bool> IsDatabaseAvailableAsync()
+    {
+        try
+        {
+            using (var cts = new System.Threading.CancellationTokenSource(1000))
+            {
+                var response = await httpClient.GetAsync(
+                    DefaultEndPoint + "/status",
+                    cts.Token
+                );
+
+                return response.IsSuccessStatusCode;
+            }
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
 
     // ======================
     // RESPONSE DTOs

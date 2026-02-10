@@ -40,28 +40,31 @@
             this.packedFlowRow.Controls.Add(this.packedScrollHost);
             this.packedFlowRow.Dock = System.Windows.Forms.DockStyle.Fill;
             this.packedFlowRow.Location = new System.Drawing.Point(0, 0);
+            this.packedFlowRow.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.packedFlowRow.Name = "packedFlowRow";
-            this.packedFlowRow.Size = new System.Drawing.Size(616, 429);
+            this.packedFlowRow.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
+            this.packedFlowRow.Size = new System.Drawing.Size(462, 349);
             this.packedFlowRow.TabIndex = 0;
             // 
             // packedScrollHost
             // 
             this.packedScrollHost.AutoScroll = true;
             this.packedScrollHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packedScrollHost.Location = new System.Drawing.Point(5, 5);
-            this.packedScrollHost.Margin = new System.Windows.Forms.Padding(5);
+            this.packedScrollHost.Location = new System.Drawing.Point(14, 4);
+            this.packedScrollHost.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.packedScrollHost.Name = "packedScrollHost";
-            this.packedScrollHost.Size = new System.Drawing.Size(576, 0);
+            this.packedScrollHost.Size = new System.Drawing.Size(432, 0);
             this.packedScrollHost.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.packedScrollHost.TabIndex = 0;
             // 
             // PackedListView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.packedFlowRow);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "PackedListView";
-            this.Size = new System.Drawing.Size(616, 429);
+            this.Size = new System.Drawing.Size(462, 349);
             this.packedFlowRow.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.packedScrollHost)).EndInit();
             this.ResumeLayout(false);

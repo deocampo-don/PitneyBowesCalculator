@@ -20,7 +20,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             _workorder = workorder;
 
             // ✅ Display WO Code
-            txtWOName.Text = _workorder.Code ?? string.Empty;
+            txtWOName.Text = _workorder.WoCode ?? string.Empty;
 
             // ✅ Display Envelope Qty (formatted)
             txtValue.Text = _workorder.EnvelopeQty.ToString("N0");
