@@ -11,7 +11,8 @@ namespace WindowsFormsApp1.Packed_And_Ready
         {
             InitializeComponent();
         }
-        public event EventHandler ItemsChanged;
+        public event EventHandler<PbJobModel> PackedDataChanged;
+
         public void SetItems(IEnumerable<PbJobModel> items)
         {
             packedFlowRow.SuspendLayout();
@@ -20,20 +21,45 @@ namespace WindowsFormsApp1.Packed_And_Ready
             var list = items.ToList();
             for (int i = 0; i < list.Count; i++)
             {
+                var job = list[i]; // capture properly
+
                 var row = new PackedRowControl();
-                row.Bind(list[i]);
+                row.Bind(job);
                 AddRow(row);
 
                 row.ViewDialogClosed += (_, __) =>
                 {
-                    ItemsChanged?.Invoke(this, EventArgs.Empty);
+                    PackedDataChanged?.Invoke(this, job);
                 };
-
-
             }
 
 
-            packedFlowRow.ResumeLayout();
+
+            packedFlowRow.ResumeLayout(); 
+        }
+   
+
+        private void ResizeCards()
+        {
+            if (packedFlowRow.Controls.Count == 0)
+                return;
+
+            int scrollbarWidth = SystemInformation.VerticalScrollBarWidth;
+
+            bool hasScrollbar = packedFlowRow.VerticalScroll.Visible;
+
+            int availableWidth = packedFlowRow.ClientSize.Width
+                                 - (hasScrollbar ? scrollbarWidth : 0);
+
+            int cardsPerRow = 3;
+            int spacing = 20;
+
+            int cardWidth = (availableWidth / cardsPerRow) - spacing;
+
+            foreach (Control c in packedFlowRow.Controls)
+            {
+                c.Width = cardWidth;
+            }
         }
 
 
@@ -56,5 +82,30 @@ namespace WindowsFormsApp1.Packed_And_Ready
             row.Margin = new Padding(5, 5, 5, 5);
             packedFlowRow.Controls.Add(row);
         }
+
+        public List<PbJobModel> GetReadyJobs()
+        {
+            return packedFlowRow.Controls
+                .OfType<PackedRowControl>()
+                .Where(r => r.IsReady())
+                .Select(r => r.GetModel())
+                .ToList();
+        }
+
+        public void SetAllSelected(bool isSelected)
+        {
+            foreach (Control c in packedFlowRow.Controls)
+            {
+                if (c is PackedRowControl row)
+                {
+                    row.SetChecked(isSelected);
+                }
+            }
+        }
+
+
+
+
+
     }
 }

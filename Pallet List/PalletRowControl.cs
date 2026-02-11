@@ -8,6 +8,9 @@ using System.Windows.Forms;
 using WindowsFormsApp1.Dialogs;
 using WindowsFormsApp1.DIalogs;
 using WindowsFormsApp1.Models;
+using WindowsFormsApp1.Services;
+
+
 
 namespace WindowsFormsApp1
 {
@@ -16,6 +19,8 @@ namespace WindowsFormsApp1
 
         private PbJobModel _model;
         public event EventHandler<PbJobModel> DeleteRequested;
+        public event EventHandler<PbJobModel> PalletChanged;
+
 
         public PalletRowControl()
         {
@@ -106,35 +111,7 @@ namespace WindowsFormsApp1
             btn.StateDisabled.Content.ShortText.Color2 = fore;
         }
 
-        private void UpdateButtonsByCounts(int? envelopeQty, int? scannedWO)
-        {
-            int env = envelopeQty ?? 0;
-            int swo = scannedWO ?? 0;
-
-            bool hasActivity = (env > 0) || (swo > 0);
-
-            if (hasActivity)
-            {
-                // Primary: Add To Pallet (purple)
-                StylePrimaryEnabled(btnAddPallet, "Add To Pallet", Purple1, Purple2, Purple2, Color.White);
-
-                // Pack: enabled (blue)
-                StylePrimaryEnabled(btnPackPallet, "Pack Pallet", Blue1, Blue2, Blue1, Color.White);
-
-                // View: enabled (white w/ grey border)
-                StyleNeutralEnabled(btnView, "View", Color.White, Color.White, Grey, Color.Black);
-            }
-            else
-            {
-                // Primary: New Pallet (green)
-                StylePrimaryEnabled(btnAddPallet, "New Pallet", Green1, Green2, Green2, Color.White);
-
-                // Pack/View: disabled greys
-                StyleDisabled(btnPackPallet, "Pack Pallet", Grey, Grey, Color.White);
-                StyleDisabled(btnView, "View", Grey, Grey, Color.White);
-            }
-        }
-
+      
 
 
         private void PanelTableLayout_Paint(object sender, PaintEventArgs e)
@@ -158,28 +135,88 @@ namespace WindowsFormsApp1
 
 
 
+        private void UpdateButtonsState()
+        {
+            if (_model == null)
+                return;
 
+            // 🔎 Get ONLY the current working pallet (unpacked one)
+            var activePallet = _model.Pallets
+                .FirstOrDefault(p => p.PackedTime == null);
+
+            bool hasActive = activePallet != null;
+            bool activeHasData = hasActive &&
+                                 (activePallet.PalletEnvelopeQty > 0 ||
+                                  activePallet.PalletScannedWO > 0);
+
+            // -------------------------
+            // Add / Pack logic
+            // -------------------------
+            if (hasActive)
+            {
+                // Continue adding to existing pallet
+                StylePrimaryEnabled(btnAddPallet, "Add To Pallet",
+                    Purple1, Purple2, Purple2, Color.White);
+
+                if (activeHasData)
+                    StylePrimaryEnabled(btnPackPallet, "Pack Pallet",
+                        Blue1, Blue2, Blue1, Color.White);
+                else
+                    StyleDisabled(btnPackPallet, "Pack Pallet",
+                        Grey, Grey, Color.White);
+            }
+            else
+            {
+                // All pallets packed → new pallet allowed
+                StylePrimaryEnabled(btnAddPallet, "New Pallet",
+                    Green1, Green2, Green2, Color.White);
+
+                StyleDisabled(btnPackPallet, "Pack Pallet",
+                    Grey, Grey, Color.White);
+            }
+
+            // -------------------------
+            // View logic (ONLY current pallet matters)
+            // -------------------------
+            if (activeHasData)
+                StyleNeutralEnabled(btnView, "View",
+                    Color.White, Color.White, Grey, Color.Black);
+            else
+                StyleDisabled(btnView, "View",
+                    Grey, Grey, Color.White);
+        }
 
 
 
 
         private void kryptonButton3_Click(object sender, EventArgs e)
         {
-            var items = new List<WorkOrderItem>
-    {
-        new WorkOrderItem { Code = "CXXX26010101PER0001", Quantity = 150 },
-        new WorkOrderItem { Code = "CXXX26010101PER0002", Quantity = 1500 },
-        new WorkOrderItem { Code = "CXXX26020103PER0001", Quantity = 1500 },
-    };
+            if (_model == null)
+                return;
+
+            var activePallet = _model.Pallets
+                .FirstOrDefault(p => p.PackedTime == null);
+
+            if (activePallet == null)
+            {
+                MessageBox.Show("No active pallet.");
+                return;
+            }
 
             using (var dlg = new ViewWOListDialog())
             {
-                dlg.SetItems(items);
+                dlg.SetItems(activePallet.WorkOrders);
 
-                if (dlg.ShowDialog(this) == DialogResult.OK)
+                dlg.ShowDialog(this);
+
+                // 🔥 After dialog closes, sync in-memory model
+                if (dlg.DeletedItems != null && dlg.DeletedItems.Any())
                 {
-                    var selected = items.Where(x => x.IsSelected).ToList();
-                    // Use selected items
+                    foreach (var deleted in dlg.DeletedItems)
+                        activePallet.WorkOrders.Remove(deleted);
+
+                    UpdateButtonsState();
+                    PalletChanged?.Invoke(this, _model);
                 }
             }
         }
@@ -216,18 +253,21 @@ namespace WindowsFormsApp1
             lblPbJobName.Text = model.JobName;
             lblAxRef.Text = model.JobNumber.ToString();
 
-            lblEnvelopeQty.Text =
-                $"Envelope Qty: {model.TotalEnvelopeOfJob:N0}";
+            var activePallet = model.GetActivePallet();
 
-            lblScannedWOs.Text =
-                $"Scanned Work Orders: {model.TotalScannedWOOfJob:N0}";
+            int envelopeQty = activePallet?.PalletEnvelopeQty ?? 0;
+            int scannedWO = activePallet?.PalletScannedWO ?? 0;
+
+            lblEnvelopeQty.Text = $"Envelope Qty: {envelopeQty:N0}";
+            lblScannedWOs.Text = $"Scanned Work Orders: {scannedWO:N0}";
+
 
             // ✅ Disable Pack Pallet for new jobs
             //  btnPackPallet.Enabled = model.TotalScannedWOOfJob > 0;
 
 
             // 🔑 Apply the new rule here
-            UpdateButtonsByCounts(model?.TotalEnvelopeOfJob, model?.TotalScannedWOOfJob);
+            UpdateButtonsState();
 
         }
 
@@ -237,51 +277,87 @@ namespace WindowsFormsApp1
         // Actions
         // -----------------------------
 
-        private Pallet newPallet;
-        private void btnAddPallet_Click(object sender, EventArgs e)
+        
+        private async void btnAddPallet_Click(object sender, EventArgs e)
         {
-            bool justCreated = false;
+            if (_model == null)
+                return;
 
-            _model.Pallets ??= new List<Pallet>();
+            // 🧠 Get existing unpacked pallet OR create new one
+            var pallet = _model.GetOrCreateWorkingPallet();
 
-            if (newPallet == null || newPallet.TrayCount > 0 || newPallet.PackedTime != null)
-            {
-                newPallet = new Pallet
-                {
-                    JobId = _model.JobId,
-                    PalletNumber = _model.Pallets.Count + 1
-                };
+            bool isNewPallet = !_model.Pallets.Contains(pallet);
 
-                _model.Pallets.Add(newPallet);
-                justCreated = true; // mark as newly created
-            }
-            using (var dlg = new AddToPalletDialog(newPallet))
+            // 🔌 Choose lookup strategy
+            IWorkOrderLookup lookup = new TestWorkOrderLookup();
+
+            using (var dlg = new AddToPalletDialog(pallet, lookup))
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK)
+                    return;
+
+                if (pallet.PalletEnvelopeQty == 0 &&
+                    pallet.PalletScannedWO == 0)
                 {
-                    if (justCreated)
-                    {
-                        // Only remove if we just created this pallet
-                        _model.Pallets.Remove(newPallet);
-                        newPallet = null;
-                    }
+                    MessageBox.Show("No scanned data.");
                     return;
                 }
+            }
 
+            // ✅ If this was newly created, attach locally
+            if (isNewPallet)
+                _model.Pallets.Add(pallet);
 
-                // Refresh buttons
-                UpdateButtonsByCounts(
-                    _model.TotalEnvelopeOfJob,
-                    _model.TotalScannedWOOfJob
+            try
+            {
+                // 💾 If new pallet → save pallet first
+                if (isNewPallet)
+                {
+                    int palletId = await RqliteClient.SavePalletAsync(pallet);
+                    pallet.PalletId = palletId;
+                }
+
+                // 💾 Save work orders (always)
+                await RqliteClient.SaveWorkOrdersAsync(
+                    pallet.PalletId,
+                    pallet.WorkOrders
                 );
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving pallet: " + ex.Message);
+
+                if (isNewPallet)
+                    _model.Pallets.Remove(pallet);
+
+                return;
+            }
+
+            UpdateButtonsState();
+
+             PalletChanged?.Invoke(this, _model);
         }
-        private void btnPackPallet_Click(object sender, EventArgs e)
+        private async void btnPackPallet_Click(object sender, EventArgs e)
         {
 
-            if (newPallet == null)
+            if (_model == null)
+                return;
+
+            // 1️⃣ Get active (unpacked) pallet
+            var activePallet = _model.Pallets
+                .FirstOrDefault(p => p.PackedTime == null);
+
+            if (activePallet == null)
             {
-                MessageBox.Show("No pallet to pack.");
+                MessageBox.Show("No active pallet to pack.");
+                return;
+            }
+
+            // 2️⃣ Do not allow empty pallet
+            if (activePallet.PalletEnvelopeQty == 0 &&
+                activePallet.PalletScannedWO == 0)
+            {
+                MessageBox.Show("Cannot pack an empty pallet.");
                 return;
             }
 
@@ -290,17 +366,42 @@ namespace WindowsFormsApp1
                 if (dlg.ShowDialog(this) != DialogResult.OK)
                     return;
 
+                if (dlg.TrayCount <= 0)
+                {
+                    MessageBox.Show("Tray count must be greater than 0.");
+                    return;
+                }
 
-                newPallet.TrayCount = dlg.TrayCount;
-                newPallet.PackedTime = DateTime.Now;
-
-                // Optional: lock pallet
-                // _activePallet.IsPacked = true;
-
-                newPallet = null;
+                // 3️⃣ Apply locally first
+                activePallet.TrayCount = dlg.TrayCount;
+                activePallet.PackedTime  = DateTime.Now;
 
             }
 
+            try
+            {
+                // 4️⃣ Save to DB
+                await RqliteClient.UpdatePalletPackingAsync(
+                    activePallet.PalletId,
+                    activePallet.TrayCount,
+                    activePallet.PackedTime
+                );
+            }
+            catch (Exception ex)
+            {
+                // Rollback
+                activePallet.PackedTime = null;
+                activePallet.TrayCount = 0;
+
+                MessageBox.Show("Error saving pack data: " + ex.Message);
+                return;
+            }
+
+            // 5️⃣ Refresh UI
+            UpdateButtonsState();
+
+            // 6️⃣ Notify parent view
+            PalletChanged?.Invoke(this, _model);
 
         }
 

@@ -115,6 +115,11 @@
     <Compile Include="Dialogs\SettingsDialog.Designer.cs">
       <DependentUpon>SettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\ForDBTest\IScanResolver.cs.cs" />
+    <Compile Include="Models\ForDBTest\IWorkOrderLookup.cs" />
+    <Compile Include="Models\ForDBTest\ScanResult.cs" />
+    <Compile Include="Models\ForDBTest\TestScanResolver.cs" />
+    <Compile Include="Models\ForDBTest\TestWorkOrderLookup.cs" />
     <Compile Include="Packed And Ready\PackedListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -126,12 +131,6 @@
     </Compile>
     <Compile Include="Packed And Ready\PackedRowControl.Designer.cs">
       <DependentUpon>PackedRowControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Packed And Ready\ShipPalletsRowControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Packed And Ready\ShipPalletsRowControl.Designer.cs">
-      <DependentUpon>ShipPalletsRowControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Packed And Ready\View Button\Pallet Details List\PalletDetailsListView.cs">
       <SubType>UserControl</SubType>
@@ -194,7 +193,6 @@
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\PbJobModel.cs" />
-    <Compile Include="Models\WOItem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Pallet List\PalletListView.cs">
@@ -215,10 +213,10 @@
     <Compile Include="TestForm.Designer.cs">
       <DependentUpon>TestForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="View\ViewWOListDialog.cs">
+    <Compile Include="Dialogs\ViewWOListDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="View\ViewWOListDialog.Designer.cs">
+    <Compile Include="Dialogs\ViewWOListDialog.Designer.cs">
       <DependentUpon>ViewWOListDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="View\WorkOrderRowControl.cs">
@@ -244,9 +242,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Packed And Ready\PackedRowControl.resx">
       <DependentUpon>PackedRowControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Packed And Ready\ShipPalletsRowControl.resx">
-      <DependentUpon>ShipPalletsRowControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Packed And Ready\View Button\Pallet Details List\PalletDetailsListView.resx">
       <DependentUpon>PalletDetailsListView.cs</DependentUpon>
@@ -292,7 +287,7 @@
     <EmbeddedResource Include="TestForm.resx">
       <DependentUpon>TestForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="View\ViewWOListDialog.resx">
+    <EmbeddedResource Include="Dialogs\ViewWOListDialog.resx">
       <DependentUpon>ViewWOListDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\WorkOrderRowControl.resx">

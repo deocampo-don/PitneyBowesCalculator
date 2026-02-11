@@ -37,7 +37,7 @@ namespace WindowsFormsApp1.Picked_Up
             lblQty.Text = model.TotalEnvelopeOfJob.ToString();
             lblTrays.Text = model.TotalTraysOfJob.ToString();
             lblPallets.Text = model.Pallets.Count.ToString();
-            lblShipTime.Text = model.PackDate.ToString();
+            lblShipTime.Text = model.ShippedDate.ToString();
         }
 
         private void btnView_Click(object sender, EventArgs e)

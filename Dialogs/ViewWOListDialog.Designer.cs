@@ -52,24 +52,26 @@
             this.kryptonTableLayoutPanel1.Controls.Add(this.woScrollHost, 0, 2);
             this.kryptonTableLayoutPanel1.Controls.Add(this.tableLayoutPanel1, 0, 3);
             this.kryptonTableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonTableLayoutPanel1.Location = new System.Drawing.Point(20, 20);
+            this.kryptonTableLayoutPanel1.Location = new System.Drawing.Point(15, 16);
+            this.kryptonTableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.kryptonTableLayoutPanel1.Name = "kryptonTableLayoutPanel1";
             this.kryptonTableLayoutPanel1.RowCount = 4;
             this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 196F));
-            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 12F));
-            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.kryptonTableLayoutPanel1.Size = new System.Drawing.Size(356, 317);
+            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 159F));
+            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 10F));
+            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
+            this.kryptonTableLayoutPanel1.Size = new System.Drawing.Size(267, 258);
             this.kryptonTableLayoutPanel1.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.kryptonTableLayoutPanel1.StateCommon.Color2 = System.Drawing.Color.Transparent;
             this.kryptonTableLayoutPanel1.TabIndex = 0;
             // 
             // kryptonLabel1
             // 
-            this.kryptonLabel1.Location = new System.Drawing.Point(3, 3);
+            this.kryptonLabel1.Location = new System.Drawing.Point(2, 2);
+            this.kryptonLabel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.kryptonLabel1.Name = "kryptonLabel1";
-            this.kryptonLabel1.Size = new System.Drawing.Size(88, 30);
+            this.kryptonLabel1.Size = new System.Drawing.Size(70, 24);
             this.kryptonLabel1.StateCommon.Padding = new System.Windows.Forms.Padding(0);
             this.kryptonLabel1.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.kryptonLabel1.TabIndex = 0;
@@ -77,9 +79,10 @@
             // 
             // kryptonLabel2
             // 
-            this.kryptonLabel2.Location = new System.Drawing.Point(3, 39);
+            this.kryptonLabel2.Location = new System.Drawing.Point(2, 30);
+            this.kryptonLabel2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.kryptonLabel2.Name = "kryptonLabel2";
-            this.kryptonLabel2.Size = new System.Drawing.Size(53, 24);
+            this.kryptonLabel2.Size = new System.Drawing.Size(44, 20);
             this.kryptonLabel2.TabIndex = 1;
             this.kryptonLabel2.Values.Text = "25034";
             // 
@@ -88,9 +91,10 @@
             this.woScrollHost.AutoScroll = true;
             this.woScrollHost.Controls.Add(this.woFlowRows);
             this.woScrollHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.woScrollHost.Location = new System.Drawing.Point(3, 69);
+            this.woScrollHost.Location = new System.Drawing.Point(2, 54);
+            this.woScrollHost.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.woScrollHost.Name = "woScrollHost";
-            this.woScrollHost.Size = new System.Drawing.Size(350, 190);
+            this.woScrollHost.Size = new System.Drawing.Size(263, 155);
             this.woScrollHost.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.woScrollHost.TabIndex = 2;
             // 
@@ -101,8 +105,9 @@
             this.woFlowRows.Dock = System.Windows.Forms.DockStyle.Top;
             this.woFlowRows.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.woFlowRows.Location = new System.Drawing.Point(0, 0);
+            this.woFlowRows.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.woFlowRows.Name = "woFlowRows";
-            this.woFlowRows.Size = new System.Drawing.Size(350, 0);
+            this.woFlowRows.Size = new System.Drawing.Size(263, 0);
             this.woFlowRows.TabIndex = 0;
             this.woFlowRows.WrapContents = false;
             // 
@@ -114,20 +119,22 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.Controls.Add(this.btnCancelWo, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.btnClearWo, 1, 0);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(105, 265);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(79, 214);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(248, 49);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(186, 40);
             this.tableLayoutPanel1.TabIndex = 3;
             // 
             // btnCancelWo
             // 
             this.btnCancelWo.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.btnCancelWo.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnCancelWo.Location = new System.Drawing.Point(3, 5);
+            this.btnCancelWo.Location = new System.Drawing.Point(2, 4);
+            this.btnCancelWo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnCancelWo.Name = "btnCancelWo";
-            this.btnCancelWo.Size = new System.Drawing.Size(87, 38);
+            this.btnCancelWo.Size = new System.Drawing.Size(65, 31);
             this.btnCancelWo.StateCommon.Back.Color1 = System.Drawing.Color.White;
             this.btnCancelWo.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
             | Krypton.Toolkit.PaletteDrawBorders.Left) 
@@ -147,9 +154,10 @@
             // 
             this.btnClearWo.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
             this.btnClearWo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnClearWo.Location = new System.Drawing.Point(96, 3);
+            this.btnClearWo.Location = new System.Drawing.Point(71, 2);
+            this.btnClearWo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnClearWo.Name = "btnClearWo";
-            this.btnClearWo.Size = new System.Drawing.Size(149, 43);
+            this.btnClearWo.Size = new System.Drawing.Size(113, 36);
             this.btnClearWo.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
             this.btnClearWo.StateCommon.Back.Color2 = System.Drawing.Color.Transparent;
             this.btnClearWo.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
@@ -166,17 +174,17 @@
             // 
             // ViewWOListDialog
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(396, 357);
+            this.ClientSize = new System.Drawing.Size(297, 290);
             this.Controls.Add(this.kryptonTableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "ViewWOListDialog";
-            this.Padding = new System.Windows.Forms.Padding(20);
+            this.Padding = new System.Windows.Forms.Padding(15, 16, 15, 16);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ViewWOListDialog";
-            this.Load += new System.EventHandler(this.ViewWOListDialog_Load);
             this.kryptonTableLayoutPanel1.ResumeLayout(false);
             this.kryptonTableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.woScrollHost)).EndInit();

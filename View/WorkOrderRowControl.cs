@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.Models;
 
@@ -13,30 +6,28 @@ namespace WindowsFormsApp1
 {
     public partial class WorkOrderRowControl : UserControl
     {
+        private WorkOrder _model;
 
-        private WorkOrderItem _item;
         public WorkOrderRowControl()
         {
             InitializeComponent();
         }
 
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-        {
+        // Expose selected state (UI only)
+        public bool IsSelected => cbWO.Checked;
 
-        }
+        // Expose the bound WorkOrder
+        public WorkOrder BoundItem => _model;
 
-        public void Bind(WorkOrderItem item)
+        public void Bind(WorkOrder model)
         {
-            _item = item;
-            lblWOname.Text = item.Code;
-            lblWOqty.Text = item.Quantity.ToString();
-            cbWO.Checked = item.IsSelected;
-        }
+            _model = model;
 
-        private void cbWO_CheckedChanged(object sender, EventArgs e)
-        {
-            if (_item != null)
-                _item.IsSelected = cbWO.Checked;
+            lblWOname.Text = model.WoCode;
+            lblWOqty.Text = model.EnvelopeQty.ToString("N0");
+
+            // Reset checkbox every time dialog loads
+            cbWO.Checked = false;
         }
 
         public bool ShowDivider
@@ -44,9 +35,10 @@ namespace WindowsFormsApp1
             set => pnlDivider.Visible = value;
         }
 
-        private void WorkOrderRowControl_Load(object sender, EventArgs e)
+        public void ClearSelection()
         {
-
+            cbWO.Checked = false;
         }
+
     }
 }

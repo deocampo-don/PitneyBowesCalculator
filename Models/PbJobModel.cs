@@ -76,6 +76,32 @@ public class PbJobModel
                 ?? DateTime.Today;
         }
     }
+
+    public Pallet GetOrCreateWorkingPallet()
+    {
+        // If there is an unpacked pallet, use it
+        var existing = Pallets
+            .FirstOrDefault(p => p.PackedTime == null);
+
+        if (existing != null)
+            return existing;
+
+        // Otherwise create new pallet
+        var newPallet = new Pallet
+        {
+            JobId = this.JobId,
+            PalletNumber = Pallets.Count + 1
+        };
+
+        return newPallet;
+    }
+
+    public Pallet GetActivePallet()
+    {
+        return Pallets
+            .FirstOrDefault(p => p.PackedTime == null);
+    }
+
 }
 
 #endregion
@@ -97,20 +123,24 @@ public class Pallet
     // ===== Aggregates =====
     public List<WorkOrder> WorkOrders { get; set; }
 
+
     public Pallet()
     {
-        PackedTime = DateTime.Today.AddHours(21).AddMinutes(30);
+        PackedTime = null;
         TrayCount = 0;
         WorkOrders = new List<WorkOrder>();
+
     }
 
     public int PalletScannedWO
     {
         get
         {
-            return WorkOrders.Sum(w => w.ScannedWorkOrders);
+            return WorkOrders?.Count ?? 0;
         }
     }
+
+  
 
     public int PalletEnvelopeQty
     {
@@ -119,7 +149,11 @@ public class Pallet
             return WorkOrders.Sum(w => w.EnvelopeQty);
         }
     }
+
+ 
+
 }
+
 
 #endregion
 

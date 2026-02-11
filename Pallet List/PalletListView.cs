@@ -13,6 +13,7 @@ namespace WindowsFormsApp1
     public partial class PalletListView : UserControl
     {
         public event EventHandler<PbJobModel> DeleteRequested;
+        public event EventHandler<PbJobModel> PalletChanged;
 
         public PalletListView()
         {
@@ -32,10 +33,16 @@ namespace WindowsFormsApp1
                 var row = new PalletRowControl();
                 row.Bind(list[i]);
 
-                // 🔑 WIRE DELETE HERE
+                // 🔑 Forward Delete event
                 row.DeleteRequested += (_, job) =>
                 {
                     DeleteRequested?.Invoke(this, job);
+                };
+
+                // 🔔 Forward PalletChanged event
+                row.PalletChanged += (_, job) =>
+                {
+                    PalletChanged?.Invoke(this, job);
                 };
 
                 flowRows.Controls.Add(row);

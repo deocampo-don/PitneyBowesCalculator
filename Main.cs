@@ -16,7 +16,7 @@ namespace WindowsFormsApp1
         // Fields
         // -----------------------------
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
-        private ShipPalletsRowControl _shipPalletsControl;
+        
 
         public event EventHandler ItemsChanged;
 
@@ -31,13 +31,11 @@ namespace WindowsFormsApp1
             ApplyTabStyles();
             WireCheckSetToNavigator();
             InitializeTitleBarButtons();
-            InitializeShipPalletsBar();
+           
 
             // UI event wiring
-            packedListView2.ItemsChanged += (_, __) =>
-            {
-                RefreshAllViews();
-            };
+            packedListView2.PackedDataChanged += PackedListView2_PackedDataChanged;
+            lvBuild.PalletChanged += PalletListView_PalletChanged;
 
             lvBuild.DeleteRequested += async (_, job) =>
             {
@@ -90,6 +88,15 @@ namespace WindowsFormsApp1
             {
                 ShowDatabaseError(ex);
             }
+        }
+        private void PalletListView_PalletChanged(object sender, PbJobModel job)
+        {
+            RefreshAllViews();
+        }
+
+        private void PackedListView2_PackedDataChanged(object sender, PbJobModel job)
+        {
+            RefreshAllViews();
         }
 
         private void ShowDatabaseOfflineMessage()
@@ -198,7 +205,11 @@ namespace WindowsFormsApp1
         {
             lvBuild?.SetItems(_pbJobs);
             packedListView2?.SetItems(_pbJobs);
-            pickedUpListView?.SetItems(_pbJobs);
+            var shippedJobs = _pbJobs
+        .Where(j => j.ShippedDate.HasValue)
+        .ToList();
+
+            pickedUpListView?.SetItems(shippedJobs);
         }
 
         // -----------------------------
@@ -219,18 +230,7 @@ namespace WindowsFormsApp1
         // -----------------------------
         // Ship Pallets Bar
         // -----------------------------
-        private void InitializeShipPalletsBar()
-        {
-            if (_shipPalletsControl != null)
-                return;
 
-            _shipPalletsControl = new ShipPalletsRowControl
-            {
-                Dock = DockStyle.Right
-            };
-
-            pnlShipPallets.Controls.Add(_shipPalletsControl);
-        }
 
         // -----------------------------
         // Settings
@@ -276,6 +276,59 @@ namespace WindowsFormsApp1
         private void btnSearch_Click(object sender, EventArgs e)
         {
             ApplySearchFilter();
+        }
+
+        private async void btnShipPallets_Click(object sender, EventArgs e)
+        {
+            var selectedRows = packedListView2.Controls
+         .OfType<PackedRowControl>()
+         .Where(r => r.IsSelected())
+         .ToList();
+
+            if (!selectedRows.Any())
+            {
+                MessageBox.Show("No jobs selected.");
+                return;
+            }
+
+            var confirm = MessageBox.Show(
+                $"Ship {selectedRows.Count} job(s)?",
+                "Confirm Shipment",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirm != DialogResult.Yes)
+                return;
+
+            try
+            {
+                foreach (var row in selectedRows)
+                {
+                    var job = row.GetModel();
+
+                    job.IsReady = true;
+                    job.ShippedDate = DateTime.Now;
+
+                    await RqliteClient.UpdateJobReadyAsync(job.JobId, true);
+                    await RqliteClient.UpdateJobShippedDateAsync(
+                        job.JobId,
+                        job.ShippedDate.Value
+                    );
+                }
+
+                await LoadJobsAsync();
+            }
+            catch (Exception ex)
+            {
+                ShowDatabaseError(ex);
+            }
+        }
+
+        private void chkbxSelectAll_CheckedChanged(object sender, EventArgs e)
+        {
+            packedListView2.SetAllSelected(
+      chkbxSelectAll.Checked
+  );
         }
     }
 }

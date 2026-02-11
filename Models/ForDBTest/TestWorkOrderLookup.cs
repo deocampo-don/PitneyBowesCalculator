@@ -1,0 +1,20 @@
+﻿using System.Threading.Tasks;
+
+namespace WindowsFormsApp1.Services
+{
+    public class TestWorkOrderLookup : IWorkOrderLookup
+    {
+        public Task<int> GetEnvelopeQtyAsync(string rawInput)
+        {
+            var parts = rawInput.Split('|');
+
+            if (parts.Length != 2)
+                return Task.FromResult(0);
+
+            if (!int.TryParse(parts[1], out int qty))
+                return Task.FromResult(0);
+
+            return Task.FromResult(qty);
+        }
+    }
+}

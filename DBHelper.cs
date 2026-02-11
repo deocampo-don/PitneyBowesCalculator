@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using System.Windows.Forms;
 
 public static class RqliteClient
 {
@@ -154,6 +155,39 @@ public static class RqliteClient
         return new RqliteResult { Success = true, Records = rows };
     }
 
+    public static async Task UpdateJobShippedDateAsync(int jobId, DateTime shippedDate)
+    {
+        string sql = $@"
+        UPDATE {TableJobs}
+        SET ShippedDate = '{shippedDate:yyyy-MM-dd HH:mm:ss}'
+        WHERE JobId = {jobId}";
+
+        await ExecuteAsync(sql);
+    }
+    public static async Task UpdateJobReadyAsync(int jobId, bool isReady)
+    {
+        string sql = $@"
+        UPDATE {TableJobs}
+        SET IsReady = {(isReady ? 1 : 0)}
+        WHERE JobId = {jobId}";
+
+        await ExecuteAsync(sql);
+    }
+
+    public static async Task DeleteWorkOrdersAsync(IEnumerable<int> palletWorkOrderIds)
+    {
+        if (palletWorkOrderIds == null || !palletWorkOrderIds.Any())
+            return;
+
+        var idList = string.Join(",", palletWorkOrderIds);
+
+        string sql = $"DELETE FROM {TablePalletWorkOrders} " +
+                     $"WHERE PalletWorkOrderId IN ({idList})";
+
+        await ExecuteAsync(sql);
+    }
+
+
     public static async Task DeletePbJobAsync(int jobId)
     {
         // Delete child tables FIRST (important)
@@ -164,6 +198,19 @@ public static class RqliteClient
 
         await ExecuteAsync($"DELETE FROM {TableJobs} WHERE JobId = {jobId}");
     }
+    public static async Task UpdatePalletPackingAsync(
+    int palletId,
+    int trayCount,
+    DateTime? packedTime)
+{
+    string sql = $@"
+        UPDATE Pallets
+        SET TrayCount = {trayCount},
+            PackedTime = {FormatValue(packedTime)}
+        WHERE PalletId = {palletId}";
+
+    await ExecuteAsync(sql);
+}
 
 
     // ======================
@@ -250,7 +297,11 @@ public static class RqliteClient
             });
         }
 
+        var shippedCount = jobs.Count(j => j.ShippedDate.HasValue);
+
         return jobs;
+
+
     }
 
     public static async Task<List<Pallet>> LoadPalletsAsync(int jobId)
@@ -310,6 +361,45 @@ public static class RqliteClient
 
         return jobs;
     }
+
+    public static async Task<int> SavePalletAsync(Pallet pallet)
+    {
+        var data = new Dictionary<string, object>
+    {
+        { "JobId", pallet.JobId },
+        { "PalletNumber", pallet.PalletNumber },
+        { "PackedTime", pallet.PackedTime ?? (object)DBNull.Value },
+        { "TrayCount", pallet.TrayCount }
+    };
+
+        await InsertAsync(TablePallets, data);
+
+        // Get last inserted id
+        var result = await SelectAsync(
+            "sqlite_sequence",
+            "WHERE name = 'Pallets'"
+        );
+
+        return result.Records.Count > 0
+            ? Convert.ToInt32(result.Records[0]["seq"])
+            : 0;
+    }
+
+    public static async Task SaveWorkOrdersAsync(int palletId, List<WorkOrder> workOrders)
+    {
+        foreach (var wo in workOrders)
+        {
+            var data = new Dictionary<string, object>
+        {
+            { "PalletId", palletId },
+            { "WoCode", wo.WoCode },
+            { "Quantity", wo.EnvelopeQty }
+        };
+
+            await InsertAsync(TablePalletWorkOrders, data);
+        }
+    }
+
 
     public static async Task<bool> IsDatabaseAvailableAsync()
     {

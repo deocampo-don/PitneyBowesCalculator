@@ -54,22 +54,42 @@ namespace WindowsFormsApp1.Packed_And_Ready
 
             _modelpbjob = job;
 
-            // Job identity
             txtPBJobName.Text = job.JobName ?? string.Empty;
             txtPBJobNum.Text = job.JobNumber.ToString();
 
-            // Job totals (computed in the model)
             txtEnvelopeQty.Text = job.TotalEnvelopeOfJob.ToString();
             txtPallets.Text = (job.Pallets?.Count ?? 0).ToString();
             txtTrays.Text = job.TotalTraysOfJob.ToString();
 
-            // Job-level date
-            var hasPackedPallet = job.Pallets?.Any(p => p != null /* optionally: && p.WorkOrders?.Any() == true */) == true;
+            bool isShipped = job.ShippedDate.HasValue;
 
-            txtPackDate.Text =
-                hasPackedPallet
-                    ? job.EffectivePackDate.ToString("MM/dd/yyyy")
-                    : "--/--/----";
+            if (isShipped)
+            {
+                chkbxStatus.Checked = true;
+                chkbxStatus.Enabled = false;
+
+                txtStatus.Text = "Shipped";
+                txtStatus.StateCommon.ShortText.Color1 =
+                    ColorTranslator.FromHtml("#007AFF"); // blue
+            }
+            else
+            {
+                chkbxStatus.Enabled = true;
+                chkbxStatus.Checked = job.IsReady;
+
+                if (job.IsReady)
+                {
+                    txtStatus.Text = "Ready to Ship";
+                    txtStatus.StateCommon.ShortText.Color1 =
+                        ColorTranslator.FromHtml("#34C759");
+                }
+                else
+                {
+                    txtStatus.Text = "Not Ready";
+                    txtStatus.StateCommon.ShortText.Color1 =
+                        ColorTranslator.FromHtml("#FF383C");
+                }
+            }
 
 
         }
@@ -134,20 +154,47 @@ namespace WindowsFormsApp1.Packed_And_Ready
             }
         }
 
-        private void chkbxStatus_CheckedChanged(object sender, EventArgs e)
+        private async void chkbxStatus_CheckedChanged(object sender, EventArgs e)
         {
+            if (_modelpbjob == null)
+                return;
+
+            if (_modelpbjob.ShippedDate.HasValue)
+                return;
+
             if (chkbxStatus.Checked)
             {
                 txtStatus.Text = "Ready to Ship";
                 txtStatus.StateCommon.ShortText.Color1 =
-                    ColorTranslator.FromHtml("#34C759"); // green
+                    ColorTranslator.FromHtml("#34C759");
             }
             else
             {
                 txtStatus.Text = "Not Ready";
                 txtStatus.StateCommon.ShortText.Color1 =
-                    ColorTranslator.FromHtml("#FF383C"); // red
+                    ColorTranslator.FromHtml("#FF383C");
             }
+        }
+
+        public bool IsSelected()
+        {
+            return chkbxStatus.Checked && !_modelpbjob.ShippedDate.HasValue;
+        }
+        public void SetChecked(bool value)
+        {
+            if (_modelpbjob.ShippedDate.HasValue)
+                return;
+
+            chkbxStatus.Checked = value;
+        }
+        public bool IsReady()
+        {
+            return chkbxStatus.Checked;
+        }
+
+        public PbJobModel GetModel()
+        {
+            return _modelpbjob;
         }
     }
 }
