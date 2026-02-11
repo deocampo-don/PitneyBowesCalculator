@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.btnShipPallets = new System.Windows.Forms.Button();
-            this.chkbxSelectAll = new Krypton.Toolkit.KryptonCheckBox();
             this.lblSelectAll = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.chkbxSelectAll = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -54,14 +54,6 @@
             this.btnShipPallets.UseVisualStyleBackColor = false;
             this.btnShipPallets.Click += new System.EventHandler(this.btnShipPallets_Click);
             // 
-            // chkbxSelectAll
-            // 
-            this.chkbxSelectAll.Location = new System.Drawing.Point(30, 29);
-            this.chkbxSelectAll.Name = "chkbxSelectAll";
-            this.chkbxSelectAll.Size = new System.Drawing.Size(22, 16);
-            this.chkbxSelectAll.TabIndex = 46;
-            this.chkbxSelectAll.Values.Text = "";
-            // 
             // lblSelectAll
             // 
             this.lblSelectAll.AutoSize = true;
@@ -77,22 +69,33 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Transparent;
+            this.panel1.Controls.Add(this.chkbxSelectAll);
             this.panel1.Controls.Add(this.btnShipPallets);
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(346, 67);
             this.panel1.TabIndex = 49;
             // 
+            // chkbxSelectAll
+            // 
+            this.chkbxSelectAll.AutoSize = true;
+            this.chkbxSelectAll.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.chkbxSelectAll.Location = new System.Drawing.Point(31, 29);
+            this.chkbxSelectAll.Name = "chkbxSelectAll";
+            this.chkbxSelectAll.Size = new System.Drawing.Size(18, 17);
+            this.chkbxSelectAll.TabIndex = 45;
+            this.chkbxSelectAll.UseVisualStyleBackColor = true;
+            // 
             // ShipPalletsRowControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.lblSelectAll);
-            this.Controls.Add(this.chkbxSelectAll);
             this.Controls.Add(this.panel1);
             this.Name = "ShipPalletsRowControl";
             this.Size = new System.Drawing.Size(352, 73);
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -101,8 +104,8 @@
         #endregion
 
         private System.Windows.Forms.Button btnShipPallets;
-        private Krypton.Toolkit.KryptonCheckBox chkbxSelectAll;
         private System.Windows.Forms.Label lblSelectAll;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.CheckBox chkbxSelectAll;
     }
 }

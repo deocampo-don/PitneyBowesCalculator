@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -109,6 +110,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
         private void btnRemovePallets_Click(object sender, EventArgs e)
         {
+
+           
             var selected = lvPallet.GetSelectedIndices();
             if (selected.Count == 0)
             {
@@ -134,6 +137,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             LoadDashboard(null);
             lvPalletDetails.SetItems(null);
 
+
+          //  UpdateButtonsByCounts(model?.Totalpallet, model?.TotalScannedWOOfJob);
         }
 
 
@@ -142,6 +147,12 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
          * PALLET CLICK
          * ------------------------------------------------------------- */
 
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+
+            lvPallet.SelectFirstPallet();
+        }
         private void OnPalletClicked(int index)
         {
             if (index < 0 || index >= _job.Pallets.Count)

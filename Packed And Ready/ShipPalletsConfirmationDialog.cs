@@ -62,12 +62,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             this.Close();
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
-        {
-            this.DialogResult = DialogResult.Cancel;  // ✅ also cancel
-            this.Close();
-        }
-
+   
         private void btnExit_Click_1(object sender, EventArgs e)
         {
             this.Close();

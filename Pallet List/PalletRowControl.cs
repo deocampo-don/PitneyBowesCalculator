@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using WindowsFormsApp1.Dialogs;
 using WindowsFormsApp1.DIalogs;
 using WindowsFormsApp1.Models;
-using WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details;
 
 namespace WindowsFormsApp1
 {
@@ -43,70 +41,70 @@ namespace WindowsFormsApp1
 
         // ----- Your palette -----
         private static readonly Color Green1 = Color.FromArgb(46, 204, 113);
-    private static readonly Color Green2 = Color.FromArgb(39, 174, 96);
-    private static readonly Color Purple1 = Color.FromArgb(110, 74, 191);
-    private static readonly Color Purple2 = Color.FromArgb(110, 74, 191);
-    private static readonly Color Blue1 = Color.FromArgb(0, 136, 255);
-    private static readonly Color Blue2 = Color.FromArgb(52, 152, 219);
-    private static readonly Color Grey = Color.FromArgb(189, 195, 199);
+        private static readonly Color Green2 = Color.FromArgb(39, 174, 96);
+        private static readonly Color Purple1 = Color.FromArgb(110, 74, 191);
+        private static readonly Color Purple2 = Color.FromArgb(110, 74, 191);
+        private static readonly Color Blue1 = Color.FromArgb(0, 136, 255);
+        private static readonly Color Blue2 = Color.FromArgb(52, 152, 219);
+        private static readonly Color Grey = Color.FromArgb(189, 195, 199);
 
-    private static void StylePrimaryEnabled(KryptonButton btn,
-        string text, Color back1, Color back2, Color border, Color fore)
-    {
-        if (btn is null) return;
+        private static void StylePrimaryEnabled(KryptonButton btn,
+            string text, Color back1, Color back2, Color border, Color fore)
+        {
+            if (btn is null) return;
 
-        btn.Values.Text = text;
-        btn.Enabled = true;
+            btn.Values.Text = text;
+            btn.Enabled = true;
 
-        btn.StateCommon.Back.Color1 = back1;
-        btn.StateCommon.Back.Color2 = back2;
-        btn.StateCommon.Back.ColorStyle = PaletteColorStyle.Linear;
+            btn.StateCommon.Back.Color1 = back1;
+            btn.StateCommon.Back.Color2 = back2;
+            btn.StateCommon.Back.ColorStyle = PaletteColorStyle.Linear;
 
-        btn.StateCommon.Border.Color1 = border;
-        btn.StateCommon.Border.Color2 = border;
-        btn.StateCommon.Border.DrawBorders = PaletteDrawBorders.All;
+            btn.StateCommon.Border.Color1 = border;
+            btn.StateCommon.Border.Color2 = border;
+            btn.StateCommon.Border.DrawBorders = PaletteDrawBorders.All;
 
-        btn.StateCommon.Content.ShortText.Color1 = fore;
-        btn.StateCommon.Content.ShortText.Color2 = fore;
-    }
+            btn.StateCommon.Content.ShortText.Color1 = fore;
+            btn.StateCommon.Content.ShortText.Color2 = fore;
+        }
 
-    private static void StyleNeutralEnabled(KryptonButton btn,
-        string text, Color back1, Color back2, Color border, Color fore)
-    {
-        if (btn is null) return;
+        private static void StyleNeutralEnabled(KryptonButton btn,
+            string text, Color back1, Color back2, Color border, Color fore)
+        {
+            if (btn is null) return;
 
-        btn.Values.Text = text;
-        btn.Enabled = true;
+            btn.Values.Text = text;
+            btn.Enabled = true;
 
-        btn.StateCommon.Back.Color1 = back1;
-        btn.StateCommon.Back.Color2 = back2;
+            btn.StateCommon.Back.Color1 = back1;
+            btn.StateCommon.Back.Color2 = back2;
 
-        btn.StateCommon.Border.Color1 = border;
-        btn.StateCommon.Border.Color2 = border;
-        btn.StateCommon.Border.DrawBorders = PaletteDrawBorders.All;
+            btn.StateCommon.Border.Color1 = border;
+            btn.StateCommon.Border.Color2 = border;
+            btn.StateCommon.Border.DrawBorders = PaletteDrawBorders.All;
 
-        btn.StateCommon.Content.ShortText.Color1 = fore;
-        btn.StateCommon.Content.ShortText.Color2 = fore;
-    }
+            btn.StateCommon.Content.ShortText.Color1 = fore;
+            btn.StateCommon.Content.ShortText.Color2 = fore;
+        }
 
-    private static void StyleDisabled(KryptonButton btn,
-        string text, Color back, Color border, Color fore)
-    {
-        if (btn is null) return;
+        private static void StyleDisabled(KryptonButton btn,
+            string text, Color back, Color border, Color fore)
+        {
+            if (btn is null) return;
 
-        btn.Values.Text = text;
-        btn.Enabled = false;
+            btn.Values.Text = text;
+            btn.Enabled = false;
 
-        btn.StateDisabled.Back.Color1 = back;
-        btn.StateDisabled.Back.Color2 = back;
+            btn.StateDisabled.Back.Color1 = back;
+            btn.StateDisabled.Back.Color2 = back;
 
-        btn.StateDisabled.Border.Color1 = border;
-        btn.StateDisabled.Border.Color2 = border;
-        btn.StateDisabled.Border.DrawBorders = PaletteDrawBorders.All;
+            btn.StateDisabled.Border.Color1 = border;
+            btn.StateDisabled.Border.Color2 = border;
+            btn.StateDisabled.Border.DrawBorders = PaletteDrawBorders.All;
 
-        btn.StateDisabled.Content.ShortText.Color1 = fore;
-        btn.StateDisabled.Content.ShortText.Color2 = fore;
-    }
+            btn.StateDisabled.Content.ShortText.Color1 = fore;
+            btn.StateDisabled.Content.ShortText.Color2 = fore;
+        }
 
         private void UpdateButtonsByCounts(int? envelopeQty, int? scannedWO)
         {
@@ -160,34 +158,10 @@ namespace WindowsFormsApp1
 
 
 
-        private Pallet GetCurrentlySelectedPallet()
-        {
-            return _model?.Pallets?.FirstOrDefault();
-        }
-        private void btnAddPallet_Click(object sender, EventArgs e)
-        {
-
-            var pallet = GetCurrentlySelectedPallet();
-            if (pallet == null)
-            {
-                MessageBox.Show("Please select a pallet first.");
-                return;
-            }
-
-            using (var dlg = new AddToPalletDialog(pallet))
-            {
-                if (dlg.ShowDialog(this) == DialogResult.OK)
-                {
-                    
-                    // Refresh UI
-                    //LoadDashboard(pallet);
-                   // palletDetailsListView1.SetItems(pallet.WorkOrders);
-                }
-            }
-        }
 
 
-        
+
+
 
         private void kryptonButton3_Click(object sender, EventArgs e)
         {
@@ -259,16 +233,76 @@ namespace WindowsFormsApp1
 
 
 
-        private void btnPackPallet_Click(object sender, EventArgs e)
-        {
-            using (var dlg = new PackPalletDIalog())
-            {
-                dlg.ShowDialog(this); // modal, centered to parent
+        // -----------------------------
+        // Actions
+        // -----------------------------
 
+        private Pallet newPallet;
+        private void btnAddPallet_Click(object sender, EventArgs e)
+        {
+            bool justCreated = false;
+
+            _model.Pallets ??= new List<Pallet>();
+
+            if (newPallet == null || newPallet.TrayCount > 0 || newPallet.PackedTime != null)
+            {
+                newPallet = new Pallet
+                {
+                    JobId = _model.JobId,
+                    PalletNumber = _model.Pallets.Count + 1
+                };
+
+                _model.Pallets.Add(newPallet);
+                justCreated = true; // mark as newly created
+            }
+            using (var dlg = new AddToPalletDialog(newPallet))
+            {
+                if (dlg.ShowDialog(this) != DialogResult.OK)
+                {
+                    if (justCreated)
+                    {
+                        // Only remove if we just created this pallet
+                        _model.Pallets.Remove(newPallet);
+                        newPallet = null;
+                    }
+                    return;
+                }
+
+
+                // Refresh buttons
+                UpdateButtonsByCounts(
+                    _model.TotalEnvelopeOfJob,
+                    _model.TotalScannedWOOfJob
+                );
             }
         }
+        private void btnPackPallet_Click(object sender, EventArgs e)
+        {
 
+            if (newPallet == null)
+            {
+                MessageBox.Show("No pallet to pack.");
+                return;
+            }
+
+            using (var dlg = new PackPalletDIalog())
+            {
+                if (dlg.ShowDialog(this) != DialogResult.OK)
+                    return;
+
+
+                newPallet.TrayCount = dlg.TrayCount;
+                newPallet.PackedTime = DateTime.Now;
+
+                // Optional: lock pallet
+                // _activePallet.IsPacked = true;
+
+                newPallet = null;
+
+            }
+
+
+        }
 
     }
-
 }

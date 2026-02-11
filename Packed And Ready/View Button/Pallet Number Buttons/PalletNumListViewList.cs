@@ -123,9 +123,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                 .ToList();
         }
 
-        /// <summary>
-        /// Clears all checkbox selections.
-        /// </summary>
+        
         public void ClearSelection()
         {
             foreach (var row in _rows)
@@ -136,10 +134,28 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         /* -------------------------------------------------------------
          * VISUAL SELECTION (CLICKED PALLET)
          * ------------------------------------------------------------- */
+        //select first pallet as default
+        public void SelectFirstPallet()
+        {
+            if (_rows.Count == 0)
+                return;
 
-        /// <summary>
-        /// Highlights the selected pallet row.
-        /// </summary>
+            HighlightRow(0);
+            PalletClicked?.Invoke(0); // load details panel
+        }
+
+        public void SelectPallet(int index)
+        {
+            if (index < 0 || index >= _rows.Count) return;
+            HighlightRow(index);
+            PalletClicked?.Invoke(index);
+        }
+
+        public void SelectLastPallet()
+        {
+            if (_rows.Count == 0) return;
+            SelectPallet(_rows.Count - 1);
+        }
         private void HighlightRow(int palletIndex)
         {
             foreach (var row in _rows)

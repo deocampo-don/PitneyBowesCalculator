@@ -19,7 +19,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
         private PbJobModel _modelpbjob;
 
       
-        private Pallet _modelpallet;
+
 
         public event EventHandler ViewClicked;
 
@@ -114,21 +114,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
         /// <summary>
         /// Toggles status text and color based on checkbox.
         /// </summary>
-        private void chkbxStatus_CheckedChanged(object sender, EventArgs e)
-        {
-            if (chkbxStatus.Checked)
-            {
-                txtStatus.Text = "Ready to Ship";
-                txtStatus.StateCommon.ShortText.Color1 =
-                    ColorTranslator.FromHtml("#34C759"); // green
-            }
-            else
-            {
-                txtStatus.Text = "Not Ready";
-                txtStatus.StateCommon.ShortText.Color1 =
-                    ColorTranslator.FromHtml("#FF383C"); // red
-            }
-        }
+    
 
         private void btnView_Click_1(object sender, EventArgs e)
         {
@@ -145,6 +131,22 @@ namespace WindowsFormsApp1.Packed_And_Ready
                 {
                     ViewDialogClosed?.Invoke(this, EventArgs.Empty);
                 }
+            }
+        }
+
+        private void chkbxStatus_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkbxStatus.Checked)
+            {
+                txtStatus.Text = "Ready to Ship";
+                txtStatus.StateCommon.ShortText.Color1 =
+                    ColorTranslator.FromHtml("#34C759"); // green
+            }
+            else
+            {
+                txtStatus.Text = "Not Ready";
+                txtStatus.StateCommon.ShortText.Color1 =
+                    ColorTranslator.FromHtml("#FF383C"); // red
             }
         }
     }
