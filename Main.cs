@@ -204,11 +204,15 @@ namespace WindowsFormsApp1
         private void RefreshAllViews()
         {
             lvBuild?.SetItems(_pbJobs);
-            packedListView2?.SetItems(_pbJobs);
+            
             var shippedJobs = _pbJobs
         .Where(j => j.ShippedDate.HasValue)
         .ToList();
-
+            var notShippedJobs = _pbJobs
+        .Where(j => !j.ShippedDate.HasValue)
+        .ToList();
+            packedListView2?.SetItems(notShippedJobs);
+            lvBuild?.SetItems(notShippedJobs);
             pickedUpListView?.SetItems(shippedJobs);
         }
 
@@ -280,19 +284,16 @@ namespace WindowsFormsApp1
 
         private async void btnShipPallets_Click(object sender, EventArgs e)
         {
-            var selectedRows = packedListView2.Controls
-         .OfType<PackedRowControl>()
-         .Where(r => r.IsSelected())
-         .ToList();
+            var selectedJobs = packedListView2.GetReadyJobs();
 
-            if (!selectedRows.Any())
+            if (!selectedJobs.Any())
             {
                 MessageBox.Show("No jobs selected.");
                 return;
             }
 
             var confirm = MessageBox.Show(
-                $"Ship {selectedRows.Count} job(s)?",
+                $"Ship {selectedJobs.Count} job(s)?",
                 "Confirm Shipment",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
@@ -302,18 +303,15 @@ namespace WindowsFormsApp1
 
             try
             {
-                foreach (var row in selectedRows)
+                foreach (var job in selectedJobs)
                 {
-                    var job = row.GetModel();
-
                     job.IsReady = true;
                     job.ShippedDate = DateTime.Now;
 
                     await RqliteClient.UpdateJobReadyAsync(job.JobId, true);
                     await RqliteClient.UpdateJobShippedDateAsync(
                         job.JobId,
-                        job.ShippedDate.Value
-                    );
+                        job.ShippedDate.Value);
                 }
 
                 await LoadJobsAsync();
@@ -330,5 +328,7 @@ namespace WindowsFormsApp1
       chkbxSelectAll.Checked
   );
         }
+
+    
     }
 }
