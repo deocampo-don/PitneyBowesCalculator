@@ -35,9 +35,10 @@ namespace WindowsFormsApp1.Packed_And_Ready
         public PackedRowControl()
         {
             InitializeComponent();
+            chkbxStatus.Checked = true;
 
             // Style enhancements for cleaner UI
-            
+
         }
 
 

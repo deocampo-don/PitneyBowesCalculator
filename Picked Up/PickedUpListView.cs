@@ -44,6 +44,7 @@ namespace WindowsFormsApp1.Picked_Up
             row.Bind(job);
 
             pickflowRows.Controls.Add(row);
+            BeginInvoke(new Action(ResizeRowsToHost));
         }
 
 
@@ -63,6 +64,7 @@ namespace WindowsFormsApp1.Picked_Up
             }
 
             pickflowRows.ResumeLayout();
+            BeginInvoke(new Action(ResizeRowsToHost));
         }
 
         //public void AddRow(PickedUpRowControl row)

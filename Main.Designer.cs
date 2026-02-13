@@ -136,7 +136,7 @@ namespace WindowsFormsApp1
             this.pnlHeader.Controls.Add(this.flowLayoutPanel1);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
-            this.pnlHeader.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlHeader.Margin = new System.Windows.Forms.Padding(2);
             this.pnlHeader.Name = "pnlHeader";
             this.pnlHeader.Size = new System.Drawing.Size(1097, 39);
             this.pnlHeader.StateCommon.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(83)))), ((int)(((byte)(239)))));
@@ -151,7 +151,7 @@ namespace WindowsFormsApp1
             this.flowLayoutPanel1.Controls.Add(this.btnClose);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Right;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(986, 0);
-            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(111, 39);
             this.flowLayoutPanel1.TabIndex = 4;
@@ -206,7 +206,7 @@ namespace WindowsFormsApp1
             this.pnlTitle.Controls.Add(this.label1, 0, 0);
             this.pnlTitle.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlTitle.Location = new System.Drawing.Point(0, 39);
-            this.pnlTitle.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlTitle.Margin = new System.Windows.Forms.Padding(2);
             this.pnlTitle.Name = "pnlTitle";
             this.pnlTitle.RowCount = 1;
             this.pnlTitle.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -230,9 +230,9 @@ namespace WindowsFormsApp1
             this.kryptonPanel1.Controls.Add(this.gbRoundedParent);
             this.kryptonPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.kryptonPanel1.Location = new System.Drawing.Point(0, 92);
-            this.kryptonPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonPanel1.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonPanel1.Name = "kryptonPanel1";
-            this.kryptonPanel1.Padding = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.kryptonPanel1.Padding = new System.Windows.Forms.Padding(8);
             this.kryptonPanel1.Size = new System.Drawing.Size(1097, 512);
             this.kryptonPanel1.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.kryptonPanel1.StateCommon.Color2 = System.Drawing.Color.Transparent;
@@ -242,7 +242,7 @@ namespace WindowsFormsApp1
             // 
             this.gbRoundedParent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gbRoundedParent.Location = new System.Drawing.Point(8, 8);
-            this.gbRoundedParent.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.gbRoundedParent.Margin = new System.Windows.Forms.Padding(8);
             // 
             // gbRoundedParent.Panel
             // 
@@ -280,7 +280,7 @@ namespace WindowsFormsApp1
             this.nvNavigator.Dock = System.Windows.Forms.DockStyle.Fill;
             this.nvNavigator.Location = new System.Drawing.Point(14, 48);
             this.nvNavigator.Margin = new System.Windows.Forms.Padding(0);
-            this.nvNavigator.NavigatorMode = Krypton.Navigator.NavigatorMode.BarRibbonTabGroup;
+            this.nvNavigator.NavigatorMode = Krypton.Navigator.NavigatorMode.Panel;
             this.nvNavigator.Owner = null;
             this.nvNavigator.PageBackStyle = Krypton.Toolkit.PaletteBackStyle.PanelClient;
             this.nvNavigator.Pages.AddRange(new Krypton.Navigator.KryptonPage[] {
@@ -314,7 +314,7 @@ namespace WindowsFormsApp1
             this.pnlBottom.Controls.Add(this.tlpAddPbJob);
             this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlBottom.Location = new System.Drawing.Point(0, 320);
-            this.pnlBottom.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlBottom.Margin = new System.Windows.Forms.Padding(2);
             this.pnlBottom.Name = "pnlBottom";
             this.pnlBottom.Size = new System.Drawing.Size(1043, 61);
             this.pnlBottom.StateCommon.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(249)))), ((int)(((byte)(249)))), ((int)(((byte)(249)))));
@@ -327,7 +327,7 @@ namespace WindowsFormsApp1
             this.tlpAddPbJob.Controls.Add(this.btnAddPBJob, 0, 0);
             this.tlpAddPbJob.Dock = System.Windows.Forms.DockStyle.Right;
             this.tlpAddPbJob.Location = new System.Drawing.Point(876, 0);
-            this.tlpAddPbJob.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tlpAddPbJob.Margin = new System.Windows.Forms.Padding(2);
             this.tlpAddPbJob.Name = "tlpAddPbJob";
             this.tlpAddPbJob.RowCount = 1;
             this.tlpAddPbJob.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -361,7 +361,7 @@ namespace WindowsFormsApp1
             this.lvBuild.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
             this.lvBuild.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lvBuild.Location = new System.Drawing.Point(0, 0);
-            this.lvBuild.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.lvBuild.Margin = new System.Windows.Forms.Padding(5);
             this.lvBuild.Name = "lvBuild";
             this.lvBuild.Padding = new System.Windows.Forms.Padding(0, 0, 0, 65);
             this.lvBuild.Size = new System.Drawing.Size(1043, 381);
@@ -374,10 +374,10 @@ namespace WindowsFormsApp1
             this.pgPacked.Controls.Add(this.packedListView2);
             this.pgPacked.Flags = 65534;
             this.pgPacked.LastVisibleSet = true;
-            this.pgPacked.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pgPacked.Margin = new System.Windows.Forms.Padding(2);
             this.pgPacked.MinimumSize = new System.Drawing.Size(112, 41);
             this.pgPacked.Name = "pgPacked";
-            this.pgPacked.Size = new System.Drawing.Size(1041, 377);
+            this.pgPacked.Size = new System.Drawing.Size(1043, 406);
             this.pgPacked.Text = "kryptonPage2";
             this.pgPacked.ToolTipTitle = "Page ToolTip";
             this.pgPacked.UniqueName = "78120dba424747da8ffc132c067ceb97";
@@ -386,10 +386,10 @@ namespace WindowsFormsApp1
             // 
             this.pnlShipPallets.Controls.Add(this.panel1);
             this.pnlShipPallets.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlShipPallets.Location = new System.Drawing.Point(0, 316);
-            this.pnlShipPallets.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlShipPallets.Location = new System.Drawing.Point(0, 345);
+            this.pnlShipPallets.Margin = new System.Windows.Forms.Padding(2);
             this.pnlShipPallets.Name = "pnlShipPallets";
-            this.pnlShipPallets.Size = new System.Drawing.Size(1041, 61);
+            this.pnlShipPallets.Size = new System.Drawing.Size(1043, 61);
             this.pnlShipPallets.StateCommon.Color1 = System.Drawing.Color.White;
             this.pnlShipPallets.TabIndex = 7;
             // 
@@ -399,8 +399,8 @@ namespace WindowsFormsApp1
             this.panel1.Controls.Add(this.chkbxSelectAll);
             this.panel1.Controls.Add(this.btnShipPallets);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(781, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.panel1.Location = new System.Drawing.Point(783, 0);
+            this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(260, 61);
             this.panel1.TabIndex = 50;
@@ -410,7 +410,7 @@ namespace WindowsFormsApp1
             this.chkbxSelectAll.AutoSize = true;
             this.chkbxSelectAll.Cursor = System.Windows.Forms.Cursors.Hand;
             this.chkbxSelectAll.Location = new System.Drawing.Point(23, 24);
-            this.chkbxSelectAll.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.chkbxSelectAll.Margin = new System.Windows.Forms.Padding(2);
             this.chkbxSelectAll.Name = "chkbxSelectAll";
             this.chkbxSelectAll.Size = new System.Drawing.Size(70, 17);
             this.chkbxSelectAll.TabIndex = 45;
@@ -430,7 +430,7 @@ namespace WindowsFormsApp1
             this.btnShipPallets.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnShipPallets.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
             this.btnShipPallets.Location = new System.Drawing.Point(107, 10);
-            this.btnShipPallets.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnShipPallets.Margin = new System.Windows.Forms.Padding(2);
             this.btnShipPallets.Name = "btnShipPallets";
             this.btnShipPallets.Size = new System.Drawing.Size(137, 41);
             this.btnShipPallets.TabIndex = 44;
@@ -442,10 +442,10 @@ namespace WindowsFormsApp1
             // 
             this.packedListView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.packedListView2.Location = new System.Drawing.Point(0, 0);
-            this.packedListView2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.packedListView2.Margin = new System.Windows.Forms.Padding(2);
             this.packedListView2.Name = "packedListView2";
             this.packedListView2.Padding = new System.Windows.Forms.Padding(0, 0, 0, 65);
-            this.packedListView2.Size = new System.Drawing.Size(1041, 377);
+            this.packedListView2.Size = new System.Drawing.Size(1043, 406);
             this.packedListView2.TabIndex = 1;
             // 
             // pgPicked
@@ -454,7 +454,7 @@ namespace WindowsFormsApp1
             this.pgPicked.Controls.Add(this.kryptonPanel2);
             this.pgPicked.Flags = 65534;
             this.pgPicked.LastVisibleSet = true;
-            this.pgPicked.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pgPicked.Margin = new System.Windows.Forms.Padding(2);
             this.pgPicked.MinimumSize = new System.Drawing.Size(112, 41);
             this.pgPicked.Name = "pgPicked";
             this.pgPicked.Size = new System.Drawing.Size(1025, 401);
@@ -469,7 +469,7 @@ namespace WindowsFormsApp1
             this.kryptonPanel2.Controls.Add(this.tableLayoutPanel1);
             this.kryptonPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.kryptonPanel2.Location = new System.Drawing.Point(0, 0);
-            this.kryptonPanel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.kryptonPanel2.Margin = new System.Windows.Forms.Padding(4);
             this.kryptonPanel2.Name = "kryptonPanel2";
             this.kryptonPanel2.Size = new System.Drawing.Size(1025, 401);
             this.kryptonPanel2.StateCommon.Color1 = System.Drawing.Color.White;
@@ -489,7 +489,7 @@ namespace WindowsFormsApp1
             this.kryptonPanel6.Controls.Add(this.tableLayoutPanel2);
             this.kryptonPanel6.Dock = System.Windows.Forms.DockStyle.Top;
             this.kryptonPanel6.Location = new System.Drawing.Point(0, 55);
-            this.kryptonPanel6.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonPanel6.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonPanel6.Name = "kryptonPanel6";
             this.kryptonPanel6.Size = new System.Drawing.Size(1025, 26);
             this.kryptonPanel6.TabIndex = 1;
@@ -524,7 +524,7 @@ namespace WindowsFormsApp1
             // 
             this.kryptonLabel6.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.kryptonLabel6.Location = new System.Drawing.Point(526, 2);
-            this.kryptonLabel6.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonLabel6.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonLabel6.Name = "kryptonLabel6";
             this.kryptonLabel6.Size = new System.Drawing.Size(60, 22);
             this.kryptonLabel6.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
@@ -536,7 +536,7 @@ namespace WindowsFormsApp1
             // 
             this.kryptonLabel4.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.kryptonLabel4.Location = new System.Drawing.Point(247, 2);
-            this.kryptonLabel4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonLabel4.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonLabel4.Name = "kryptonLabel4";
             this.kryptonLabel4.Size = new System.Drawing.Size(111, 22);
             this.kryptonLabel4.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
@@ -548,7 +548,7 @@ namespace WindowsFormsApp1
             // 
             this.kryptonCheckBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.kryptonCheckBox1.Location = new System.Drawing.Point(26, 6);
-            this.kryptonCheckBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonCheckBox1.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonCheckBox1.Name = "kryptonCheckBox1";
             this.kryptonCheckBox1.Size = new System.Drawing.Size(19, 13);
             this.kryptonCheckBox1.TabIndex = 0;
@@ -558,7 +558,7 @@ namespace WindowsFormsApp1
             // 
             this.kryptonLabel3.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.kryptonLabel3.Location = new System.Drawing.Point(74, 2);
-            this.kryptonLabel3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonLabel3.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonLabel3.Name = "kryptonLabel3";
             this.kryptonLabel3.Size = new System.Drawing.Size(62, 22);
             this.kryptonLabel3.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
@@ -570,7 +570,7 @@ namespace WindowsFormsApp1
             // 
             this.kryptonLabel5.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.kryptonLabel5.Location = new System.Drawing.Point(396, 2);
-            this.kryptonLabel5.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonLabel5.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonLabel5.Name = "kryptonLabel5";
             this.kryptonLabel5.Size = new System.Drawing.Size(51, 22);
             this.kryptonLabel5.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
@@ -582,7 +582,7 @@ namespace WindowsFormsApp1
             // 
             this.kryptonLabel7.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.kryptonLabel7.Location = new System.Drawing.Point(666, 2);
-            this.kryptonLabel7.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonLabel7.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonLabel7.Name = "kryptonLabel7";
             this.kryptonLabel7.Size = new System.Drawing.Size(142, 22);
             this.kryptonLabel7.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
@@ -604,7 +604,7 @@ namespace WindowsFormsApp1
             this.tableLayoutPanel1.Controls.Add(this.kryptonPanel3, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.tableLayoutPanel1.RowCount = 1;
@@ -617,7 +617,7 @@ namespace WindowsFormsApp1
             this.kryptonButton2.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.kryptonButton2.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
             this.kryptonButton2.Location = new System.Drawing.Point(702, 4);
-            this.kryptonButton2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonButton2.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonButton2.Name = "kryptonButton2";
             this.kryptonButton2.Size = new System.Drawing.Size(151, 46);
             this.kryptonButton2.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
@@ -639,7 +639,7 @@ namespace WindowsFormsApp1
             this.kryptonButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.kryptonButton1.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
             this.kryptonButton1.Location = new System.Drawing.Point(857, 4);
-            this.kryptonButton1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonButton1.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonButton1.Name = "kryptonButton1";
             this.kryptonButton1.Size = new System.Drawing.Size(166, 46);
             this.kryptonButton1.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
@@ -660,7 +660,7 @@ namespace WindowsFormsApp1
             this.btnSearch.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.btnSearch.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
             this.btnSearch.Location = new System.Drawing.Point(591, 4);
-            this.btnSearch.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnSearch.Margin = new System.Windows.Forms.Padding(2);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(107, 46);
             this.btnSearch.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
@@ -682,7 +682,7 @@ namespace WindowsFormsApp1
             this.kryptonPanel3.Controls.Add(this.kryptonTableLayoutPanel2);
             this.kryptonPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.kryptonPanel3.Location = new System.Drawing.Point(2, 2);
-            this.kryptonPanel3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonPanel3.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonPanel3.Name = "kryptonPanel3";
             this.kryptonPanel3.Size = new System.Drawing.Size(585, 51);
             this.kryptonPanel3.StateCommon.Color1 = System.Drawing.Color.Transparent;
@@ -699,7 +699,7 @@ namespace WindowsFormsApp1
             this.kryptonTableLayoutPanel2.Controls.Add(this.kryptonPanel4, 2, 0);
             this.kryptonTableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.kryptonTableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
-            this.kryptonTableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonTableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonTableLayoutPanel2.Name = "kryptonTableLayoutPanel2";
             this.kryptonTableLayoutPanel2.RowCount = 1;
             this.kryptonTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -712,9 +712,9 @@ namespace WindowsFormsApp1
             this.kryptonPanel5.Controls.Add(this.kryptonLabel2);
             this.kryptonPanel5.Controls.Add(this.dtPickUpFrom);
             this.kryptonPanel5.Location = new System.Drawing.Point(2, 2);
-            this.kryptonPanel5.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonPanel5.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonPanel5.Name = "kryptonPanel5";
-            this.kryptonPanel5.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.kryptonPanel5.Padding = new System.Windows.Forms.Padding(4);
             this.kryptonPanel5.Size = new System.Drawing.Size(237, 46);
             this.kryptonPanel5.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.kryptonPanel5.TabIndex = 1;
@@ -736,7 +736,7 @@ namespace WindowsFormsApp1
             this.dtPickUpFrom.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dtPickUpFrom.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.dtPickUpFrom.Location = new System.Drawing.Point(4, 4);
-            this.dtPickUpFrom.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dtPickUpFrom.Margin = new System.Windows.Forms.Padding(2);
             this.dtPickUpFrom.Name = "dtPickUpFrom";
             this.dtPickUpFrom.Size = new System.Drawing.Size(229, 36);
             this.dtPickUpFrom.TabIndex = 0;
@@ -746,9 +746,9 @@ namespace WindowsFormsApp1
             this.kryptonPanel4.Controls.Add(this.kryptonLabel1);
             this.kryptonPanel4.Controls.Add(this.dtPickUpTo);
             this.kryptonPanel4.Location = new System.Drawing.Point(296, 2);
-            this.kryptonPanel4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonPanel4.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonPanel4.Name = "kryptonPanel4";
-            this.kryptonPanel4.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.kryptonPanel4.Padding = new System.Windows.Forms.Padding(4);
             this.kryptonPanel4.Size = new System.Drawing.Size(238, 46);
             this.kryptonPanel4.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.kryptonPanel4.TabIndex = 0;
@@ -770,7 +770,7 @@ namespace WindowsFormsApp1
             this.dtPickUpTo.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dtPickUpTo.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.dtPickUpTo.Location = new System.Drawing.Point(4, 4);
-            this.dtPickUpTo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dtPickUpTo.Margin = new System.Windows.Forms.Padding(2);
             this.dtPickUpTo.Name = "dtPickUpTo";
             this.dtPickUpTo.Size = new System.Drawing.Size(230, 36);
             this.dtPickUpTo.TabIndex = 0;
@@ -801,7 +801,7 @@ namespace WindowsFormsApp1
             this.kryptonTableLayoutPanel1.Controls.Add(this.kcbPackedReady, 1, 0);
             this.kryptonTableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.kryptonTableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.kryptonTableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kryptonTableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonTableLayoutPanel1.Name = "kryptonTableLayoutPanel1";
             this.kryptonTableLayoutPanel1.RowCount = 1;
             this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -813,7 +813,7 @@ namespace WindowsFormsApp1
             // kcbBuildPallets
             // 
             this.kcbBuildPallets.Location = new System.Drawing.Point(2, 2);
-            this.kcbBuildPallets.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kcbBuildPallets.Margin = new System.Windows.Forms.Padding(2);
             this.kcbBuildPallets.Name = "kcbBuildPallets";
             this.kcbBuildPallets.Size = new System.Drawing.Size(163, 39);
             this.kcbBuildPallets.StateCommon.Content.Padding = new System.Windows.Forms.Padding(1, -1, 1, -1);
@@ -827,7 +827,7 @@ namespace WindowsFormsApp1
             // kcbPickedUp
             // 
             this.kcbPickedUp.Location = new System.Drawing.Point(362, 2);
-            this.kcbPickedUp.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kcbPickedUp.Margin = new System.Windows.Forms.Padding(2);
             this.kcbPickedUp.Name = "kcbPickedUp";
             this.kcbPickedUp.Size = new System.Drawing.Size(119, 39);
             this.kcbPickedUp.StateCommon.Content.Padding = new System.Windows.Forms.Padding(1, -1, 1, -1);
@@ -841,7 +841,7 @@ namespace WindowsFormsApp1
             // kcbPackedReady
             // 
             this.kcbPackedReady.Location = new System.Drawing.Point(169, 2);
-            this.kcbPackedReady.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.kcbPackedReady.Margin = new System.Windows.Forms.Padding(2);
             this.kcbPackedReady.Name = "kcbPackedReady";
             this.kcbPackedReady.Size = new System.Drawing.Size(189, 39);
             this.kcbPackedReady.StateCommon.Content.Padding = new System.Windows.Forms.Padding(1, -1, 1, -1);
@@ -857,7 +857,7 @@ namespace WindowsFormsApp1
             this.pnlSettings.Controls.Add(this.btnSettings);
             this.pnlSettings.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlSettings.Location = new System.Drawing.Point(0, 0);
-            this.pnlSettings.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlSettings.Margin = new System.Windows.Forms.Padding(2);
             this.pnlSettings.Name = "pnlSettings";
             this.pnlSettings.Padding = new System.Windows.Forms.Padding(0, 4, 4, 4);
             this.pnlSettings.Size = new System.Drawing.Size(1071, 32);
@@ -889,7 +889,7 @@ namespace WindowsFormsApp1
             this.Controls.Add(this.pnlTitle);
             this.Controls.Add(this.pnlHeader);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "iu8";

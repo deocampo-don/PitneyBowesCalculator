@@ -459,7 +459,7 @@ namespace WindowsFormsApp1
                     {
                         JobName = dlg.JobName ?? string.Empty,
                         JobNumber = int.TryParse(dlg.JobNumber, out var num) ? num : 0,
-                        IsReady = false,
+                        IsReady = true,
                         PackDate = null
                     };
 

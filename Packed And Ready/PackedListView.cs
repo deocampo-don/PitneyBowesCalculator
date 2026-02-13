@@ -11,6 +11,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
         public PackedListView()
         {
             InitializeComponent();
+
         }
         public event EventHandler<PbJobModel> PackedDataChanged;
 

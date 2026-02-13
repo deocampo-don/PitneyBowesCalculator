@@ -19,6 +19,7 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
             scrollHost.Resize += (_, __) => ResizeRowsToHost();
+            
 
         }
 
@@ -53,6 +54,7 @@ namespace WindowsFormsApp1
                 PalletChanged?.Invoke(this, j);
 
             flowRows.Controls.Add(row);
+            BeginInvoke(new Action(ResizeRowsToHost));
         }
 
 
