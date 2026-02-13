@@ -68,16 +68,23 @@ namespace WindowsFormsApp1
         // -----------------------------
         private async Task InitializeRqliteAsync()
         {
-
             if (RqliteClient.httpClient == null)
             {
-                RqliteClient.httpClient = new HttpClient();
-                RqliteClient.DefaultEndPoint = "http://127.0.0.1:4001";
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback =
+                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+
+                RqliteClient.httpClient = new HttpClient(handler);
+
+                // 🔴 Use HTTPS and your server IP
+                RqliteClient.DefaultEndPoint = "https://10.32.101.160:4001";
             }
 
-            // Safe to call every run
             await RqliteClient.CreatePbSchemaAsync();
         }
+
         private void StartBackgroundPolling()
         {
             _pollTimer = new System.Windows.Forms.Timer();
