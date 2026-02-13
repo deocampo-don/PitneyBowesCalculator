@@ -159,58 +159,159 @@ public static class RqliteClient
     {
         string sql = $@"
         UPDATE {TableJobs}
-        SET ShippedDate = '{shippedDate:yyyy-MM-dd HH:mm:ss}'
+        SET ShippedDate = '{shippedDate:yyyy-MM-dd HH:mm:ss}',
+            LastUpdated = CURRENT_TIMESTAMP
         WHERE JobId = {jobId}";
 
         await ExecuteAsync(sql);
     }
+    public static async Task<List<(int JobId, DateTime? LastUpdated)>>
+      LoadJobUpdateInfoAsync()
+    {
+        var sql = $"SELECT JobId, LastUpdated FROM {TableJobs}";
+        var json = JsonConvert.SerializeObject(new[] { sql });
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await httpClient.PostAsync(
+            DefaultEndPoint + "/db/query",
+            content
+        );
+
+        var body = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<QueryResponse>(body);
+
+        var list = new List<(int, DateTime?)>();
+
+        if (result?.results?.Count > 0)
+        {
+            var r = result.results[0];
+
+            if (r.values != null)
+            {
+                foreach (var row in r.values)
+                {
+                    int id = Convert.ToInt32(row[0]);
+
+                    DateTime? lastUpdated = null;
+                    if (row[1] != null)
+                        lastUpdated = DateTime.Parse(row[1].ToString());
+
+                    list.Add((id, lastUpdated));
+                }
+            }
+        }
+
+        return list;
+    }
+
+
     public static async Task UpdateJobReadyAsync(int jobId, bool isReady)
     {
         string sql = $@"
         UPDATE {TableJobs}
-        SET IsReady = {(isReady ? 1 : 0)}
+        SET IsReady = {(isReady ? 1 : 0)},
+            LastUpdated = CURRENT_TIMESTAMP
         WHERE JobId = {jobId}";
 
         await ExecuteAsync(sql);
     }
 
-    public static async Task DeleteWorkOrdersAsync(IEnumerable<int> palletWorkOrderIds)
+
+    public static async Task DeleteWorkOrdersAsync(
+       IEnumerable<int> palletWorkOrderIds)
     {
         if (palletWorkOrderIds == null || !palletWorkOrderIds.Any())
             return;
 
         var idList = string.Join(",", palletWorkOrderIds);
 
-        string sql = $"DELETE FROM {TablePalletWorkOrders} " +
-                     $"WHERE PalletWorkOrderId IN ({idList})";
+        string sql = $@"
+        -- update parent jobs first
+        UPDATE {TableJobs}
+        SET LastUpdated = CURRENT_TIMESTAMP
+        WHERE JobId IN (
+            SELECT DISTINCT p.JobId
+            FROM {TablePallets} p
+            JOIN {TablePalletWorkOrders} w
+                ON p.PalletId = w.PalletId
+            WHERE w.PalletWorkOrderId IN ({idList})
+        );
+
+        DELETE FROM {TablePalletWorkOrders}
+        WHERE PalletWorkOrderId IN ({idList});
+    ";
 
         await ExecuteAsync(sql);
     }
 
 
+
+
     public static async Task DeletePbJobAsync(int jobId)
     {
-        // Delete child tables FIRST (important)
-        await ExecuteAsync($"DELETE FROM {TablePalletWorkOrders} WHERE PalletId IN " +
-                           $"(SELECT PalletId FROM {TablePallets} WHERE JobId = {jobId})");
+        string sql = $@"
+        DELETE FROM {TableJobs}
+        WHERE JobId = {jobId};
+    ";
 
-        await ExecuteAsync($"DELETE FROM {TablePallets} WHERE JobId = {jobId}");
-
-        await ExecuteAsync($"DELETE FROM {TableJobs} WHERE JobId = {jobId}");
+        await ExecuteAsync(sql);
     }
+
     public static async Task UpdatePalletPackingAsync(
-    int palletId,
-    int trayCount,
-    DateTime? packedTime)
-{
-    string sql = $@"
-        UPDATE Pallets
+        int palletId,
+        int trayCount,
+        DateTime? packedTime)
+    {
+        string sql = $@"
+        UPDATE {TablePallets}
         SET TrayCount = {trayCount},
             PackedTime = {FormatValue(packedTime)}
-        WHERE PalletId = {palletId}";
+        WHERE PalletId = {palletId};
 
-    await ExecuteAsync(sql);
-}
+        UPDATE {TableJobs}
+        SET LastUpdated = CURRENT_TIMESTAMP
+        WHERE JobId = (
+            SELECT JobId FROM {TablePallets}
+            WHERE PalletId = {palletId}
+        );
+    ";
+
+        await ExecuteAsync(sql);
+    }
+
+
+
+    // ======================
+    // BATCH DELETE PALLETS (New)
+    // ======================
+    public static async Task DeletePalletsAsync(IEnumerable<int> palletIds)
+    {
+        if (palletIds == null || !palletIds.Any())
+            return;
+
+        var idList = string.Join(",", palletIds);
+
+        string sql = $@"
+        -- update parent jobs first
+        UPDATE {TableJobs}
+        SET LastUpdated = CURRENT_TIMESTAMP
+        WHERE JobId IN (
+            SELECT DISTINCT JobId
+            FROM {TablePallets}
+            WHERE PalletId IN ({idList})
+        );
+
+        DELETE FROM {TablePalletWorkOrders}
+        WHERE PalletId IN ({idList});
+
+        DELETE FROM {TablePallets}
+        WHERE PalletId IN ({idList});
+    ";
+
+        await ExecuteAsync(sql);
+    }
+
+
 
 
     // ======================
@@ -218,32 +319,36 @@ public static class RqliteClient
     // ======================
     public static async Task CreatePbSchemaAsync()
     {
+        await ExecuteAsync("PRAGMA foreign_keys = ON;");
+
         await CreateTableAsync(TableJobs, new Dictionary<string, string>
-        {
-            { "JobId", "INTEGER PRIMARY KEY AUTOINCREMENT" },
-            { "JobName", "VARCHAR(100) NOT NULL" },
-            { "JobNumber", "INTEGER NOT NULL" },
-            { "IsReady", "INTEGER NOT NULL" },
-            { "PackedDate", "DATETIME" },
-            { "ShippedDate", "DATETIME" }
-        });
+{
+    { "JobId", "INTEGER PRIMARY KEY AUTOINCREMENT" },
+    { "JobName", "VARCHAR(100) NOT NULL" },
+    { "JobNumber", "INTEGER NOT NULL" },
+    { "IsReady", "INTEGER NOT NULL" },
+    { "PackedDate", "DATETIME" },
+    { "ShippedDate", "DATETIME" },
+    { "LastUpdated", "DATETIME DEFAULT CURRENT_TIMESTAMP" } // ✅ Added
+});
 
         await CreateTableAsync(TablePallets, new Dictionary<string, string>
-        {
-            { "PalletId", "INTEGER PRIMARY KEY AUTOINCREMENT" },
-            { "JobId", "INTEGER NOT NULL" },
-            { "PalletNumber", "INTEGER NOT NULL" },
-            { "PackedTime", "DATETIME" },
-            { "TrayCount", "INTEGER NOT NULL" }
-        });
+{
+    { "PalletId", "INTEGER PRIMARY KEY AUTOINCREMENT" },
+    { "JobId", "INTEGER NOT NULL REFERENCES PBJobs(JobId) ON DELETE CASCADE" },
+    { "PalletNumber", "INTEGER NOT NULL" },
+    { "PackedTime", "DATETIME" },
+    { "TrayCount", "INTEGER NOT NULL" }
+});
 
         await CreateTableAsync(TablePalletWorkOrders, new Dictionary<string, string>
-        {
-            { "PalletWorkOrderId", "INTEGER PRIMARY KEY AUTOINCREMENT" },
-            { "PalletId", "INTEGER NOT NULL" },
-            { "WoCode", "VARCHAR(50) NOT NULL" },
-            { "Quantity", "INTEGER NOT NULL" }
-        });
+{
+    { "PalletWorkOrderId", "INTEGER PRIMARY KEY AUTOINCREMENT" },
+    { "PalletId", "INTEGER NOT NULL REFERENCES Pallets(PalletId) ON DELETE CASCADE" },
+    { "WoCode", "VARCHAR(50) NOT NULL" },
+    { "Quantity", "INTEGER NOT NULL" }
+});
+
 
         await CreateIndexAsync("idx_pallets_jobid", TablePallets, "JobId");
         await CreateIndexAsync("idx_pwo_palletid", TablePalletWorkOrders, "PalletId");
@@ -276,6 +381,27 @@ public static class RqliteClient
     }
 
     // ======================
+    // BATCH SHIP JOBS (New)
+    // ======================
+    public static async Task ShipJobsAsync(IEnumerable<int> jobIds)
+    {
+        if (jobIds == null || !jobIds.Any())
+            return;
+
+        var idList = string.Join(",", jobIds);
+
+        string sql = $@"
+        UPDATE {TableJobs}
+        SET IsReady = 1,
+            ShippedDate = CURRENT_TIMESTAMP,
+            LastUpdated = CURRENT_TIMESTAMP
+        WHERE JobId IN ({idList})";
+
+        await ExecuteAsync(sql);
+    }
+
+
+    // ======================
     // READ OPERATIONS (⭐ ADDED)
     // ======================
     public static async Task<List<PbJobModel>> LoadJobsAsync()
@@ -293,6 +419,10 @@ public static class RqliteClient
                 IsReady = Convert.ToInt32(row["IsReady"]) == 1,
                 PackDate = row["PackedDate"] == null ? (DateTime?)null : DateTime.Parse(row["PackedDate"].ToString()),
                 ShippedDate = row["ShippedDate"] == null ? (DateTime?)null : DateTime.Parse(row["ShippedDate"].ToString()),
+                LastUpdated = row["LastUpdated"] == null
+    ? (DateTime?)null
+    : DateTime.Parse(row["LastUpdated"].ToString()),
+
                 Pallets = new List<Pallet>()
             });
         }
@@ -303,6 +433,25 @@ public static class RqliteClient
 
 
     }
+
+    public static async Task<PbJobModel> LoadSingleJobGraphAsync(int jobId)
+    {
+        var jobs = await LoadJobsAsync();
+        var job = jobs.FirstOrDefault(j => j.JobId == jobId);
+
+        if (job == null)
+            return null;
+
+        job.Pallets = await LoadPalletsAsync(jobId);
+
+        foreach (var pallet in job.Pallets)
+        {
+            pallet.WorkOrders = await LoadWorkOrdersAsync(pallet.PalletId);
+        }
+
+        return job;
+    }
+
 
     public static async Task<List<Pallet>> LoadPalletsAsync(int jobId)
     {
@@ -349,32 +498,87 @@ public static class RqliteClient
     {
         var jobs = await LoadJobsAsync();
 
+        if (!jobs.Any())
+            return jobs;
+
+        var jobIds = string.Join(",", jobs.Select(j => j.JobId));
+
+        var palletResult = await SelectAsync(
+            TablePallets,
+            $"WHERE JobId IN ({jobIds})");
+
+        var allPallets = palletResult.Records.Select(row => new Pallet
+        {
+            PalletId = Convert.ToInt32(row["PalletId"]),
+            JobId = Convert.ToInt32(row["JobId"]),
+            PalletNumber = Convert.ToInt32(row["PalletNumber"]),
+            TrayCount = Convert.ToInt32(row["TrayCount"]),
+            PackedTime = row["PackedTime"] == null ? (DateTime?)null : DateTime.Parse(row["PackedTime"].ToString()),
+            WorkOrders = new List<WorkOrder>()
+        }).ToList();
+
+        if (allPallets.Any())
+        {
+            var palletIds = string.Join(",", allPallets.Select(p => p.PalletId));
+
+            var woResult = await SelectAsync(
+                TablePalletWorkOrders,
+                $"WHERE PalletId IN ({palletIds})");
+
+            var allWorkOrders = woResult.Records.Select(row => new WorkOrder(
+                row["WoCode"].ToString(),
+                Convert.ToInt32(row["Quantity"]))
+            {
+                PalletId = Convert.ToInt32(row["PalletId"]),
+                PalletWorkOrderId = Convert.ToInt32(row["PalletWorkOrderId"])
+            }).ToList();
+
+            var woLookup = allWorkOrders
+                .GroupBy(w => w.PalletId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var pallet in allPallets)
+            {
+                if (woLookup.ContainsKey(pallet.PalletId))
+                    pallet.WorkOrders = woLookup[pallet.PalletId];
+            }
+        }
+
+        var palletLookup = allPallets
+            .GroupBy(p => p.JobId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
         foreach (var job in jobs)
         {
-            job.Pallets = await LoadPalletsAsync(job.JobId);
-
-            foreach (var pallet in job.Pallets)
-            {
-                pallet.WorkOrders = await LoadWorkOrdersAsync(pallet.PalletId);
-            }
+            if (palletLookup.ContainsKey(job.JobId))
+                job.Pallets = palletLookup[job.JobId];
+            else
+                job.Pallets = new List<Pallet>();
         }
 
         return jobs;
     }
 
+
     public static async Task<int> SavePalletAsync(Pallet pallet)
     {
-        var data = new Dictionary<string, object>
-    {
-        { "JobId", pallet.JobId },
-        { "PalletNumber", pallet.PalletNumber },
-        { "PackedTime", pallet.PackedTime ?? (object)DBNull.Value },
-        { "TrayCount", pallet.TrayCount }
-    };
+        var sql = $@"
+        INSERT INTO {TablePallets}
+        (JobId, PalletNumber, PackedTime, TrayCount)
+        VALUES (
+            {pallet.JobId},
+            {pallet.PalletNumber},
+            {FormatValue(pallet.PackedTime)},
+            {pallet.TrayCount}
+        );
 
-        await InsertAsync(TablePallets, data);
+        UPDATE {TableJobs}
+        SET LastUpdated = CURRENT_TIMESTAMP
+        WHERE JobId = {pallet.JobId};
+    ";
 
-        // Get last inserted id
+        await ExecuteAsync(sql);
+
         var result = await SelectAsync(
             "sqlite_sequence",
             "WHERE name = 'Pallets'"
@@ -385,20 +589,42 @@ public static class RqliteClient
             : 0;
     }
 
-    public static async Task SaveWorkOrdersAsync(int palletId, List<WorkOrder> workOrders)
+
+    public static async Task SaveWorkOrdersAsync(
+      int palletId,
+      List<WorkOrder> workOrders)
     {
+        if (workOrders == null || !workOrders.Any())
+            return;
+
+        var sqlBuilder = new StringBuilder();
+
         foreach (var wo in workOrders)
         {
-            var data = new Dictionary<string, object>
-        {
-            { "PalletId", palletId },
-            { "WoCode", wo.WoCode },
-            { "Quantity", wo.EnvelopeQty }
-        };
-
-            await InsertAsync(TablePalletWorkOrders, data);
+            sqlBuilder.AppendLine($@"
+            INSERT INTO {TablePalletWorkOrders}
+            (PalletId, WoCode, Quantity)
+            VALUES (
+                {palletId},
+                '{wo.WoCode.Replace("'", "''")}',
+                {wo.EnvelopeQty}
+            );
+        ");
         }
+
+        // 🔥 update parent job timestamp
+        sqlBuilder.AppendLine($@"
+        UPDATE {TableJobs}
+        SET LastUpdated = CURRENT_TIMESTAMP
+        WHERE JobId = (
+            SELECT JobId FROM {TablePallets}
+            WHERE PalletId = {palletId}
+        );
+    ");
+
+        await ExecuteAsync(sqlBuilder.ToString());
     }
+
 
 
     public static async Task<bool> IsDatabaseAvailableAsync()

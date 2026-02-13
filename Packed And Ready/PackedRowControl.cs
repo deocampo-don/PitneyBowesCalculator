@@ -18,7 +18,8 @@ namespace WindowsFormsApp1.Packed_And_Ready
       
         private PbJobModel _modelpbjob;
 
-      
+
+        public PbJobModel BoundJob { get; private set; }
 
 
         public event EventHandler ViewClicked;
@@ -51,7 +52,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
         {
             if (job == null)
                 return;
-
+            BoundJob = job;
             _modelpbjob = job;
 
             txtPBJobName.Text = job.JobName ?? string.Empty;

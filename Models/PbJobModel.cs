@@ -18,6 +18,8 @@ public class PbJobModel
     public DateTime? PackDate { get; set; }   // nullable
 
     public DateTime? ShippedDate { get; set; }
+    public DateTime? LastUpdated { get; set; }
+
 
     // ===== Aggregates =====
     public List<Pallet> Pallets { get; set; }

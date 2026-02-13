@@ -18,8 +18,43 @@ namespace WindowsFormsApp1
         public PalletListView()
         {
             InitializeComponent();
+            scrollHost.Resize += (_, __) => ResizeRowsToHost();
 
         }
+
+        public void RefreshItem(PbJobModel job)
+        {
+            var row = flowRows.Controls
+          .OfType<PalletRowControl>()
+          .FirstOrDefault(r => r.BoundJob?.JobId == job.JobId);
+
+            if (row != null)
+                row.Bind(job);
+        }
+
+        public void RemoveItem(int jobId)
+        {
+            var row = flowRows.Controls
+                .OfType<PalletRowControl>()
+                .FirstOrDefault(r => r.BoundJob.JobId == jobId);
+
+            if (row != null)
+                flowRows.Controls.Remove(row);
+        }
+        public void AddItem(PbJobModel job)
+        {
+            var row = new PalletRowControl();
+            row.Bind(job);
+
+            row.DeleteRequested += (_, j) =>
+                DeleteRequested?.Invoke(this, j);
+
+            row.PalletChanged += (_, j) =>
+                PalletChanged?.Invoke(this, j);
+
+            flowRows.Controls.Add(row);
+        }
+
 
         public void SetItems(IEnumerable<PbJobModel> items)
         {
@@ -49,20 +84,26 @@ namespace WindowsFormsApp1
             }
 
             flowRows.ResumeLayout();
+            BeginInvoke(new Action(ResizeRowsToHost));
+        
         }
 
-        public void AddRow(PalletRowControl row)
-        {
-            row.Width = scrollHost.ClientSize.Width - 25; // leave room for scrollbar
-            row.Margin = new Padding(12, 10, 12, 0);
-            flowRows.Controls.Add(row);
-        }
+   
 
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
+            ResizeRowsToHost();
+        }
+
+        public void ResizeRowsToHost()
+        {
+            int width = scrollHost.ClientSize.Width;
+
             foreach (Control c in flowRows.Controls)
-                c.Width = scrollHost.ClientSize.Width - 25;
+            {
+                c.Width = width-5; // small margin
+            }
         }
 
         private void scrollHost_Paint(object sender, PaintEventArgs e)

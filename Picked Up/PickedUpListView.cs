@@ -16,6 +16,36 @@ namespace WindowsFormsApp1.Picked_Up
         {
             InitializeComponent();
         }
+        public event EventHandler<PbJobModel> PalletChanged;
+
+        public void RefreshItem(PbJobModel job)
+        {
+            var row = pickflowRows.Controls
+                .OfType<PickedUpRowControl>()
+                .FirstOrDefault(r => r.BoundJob.JobId == job.JobId);
+
+            if (row != null)
+                row.Bind(job);
+        }
+
+        public void RemoveItem(int jobId)
+        {
+            var row = pickflowRows.Controls
+                .OfType<PickedUpRowControl>()
+                .FirstOrDefault(r => r.BoundJob.JobId == jobId);
+
+            if (row != null)
+                pickflowRows.Controls.Remove(row);
+        }
+
+        public void AddItem(PbJobModel job)
+        {
+            var row = new PickedUpRowControl();
+            row.Bind(job);
+
+            pickflowRows.Controls.Add(row);
+        }
+
 
         public void SetItems(IEnumerable<PbJobModel> items)
         {
@@ -49,7 +79,7 @@ namespace WindowsFormsApp1.Picked_Up
         }
 
 
-        private void ResizeRowsToHost()
+        public void ResizeRowsToHost()
         {
             int width = pickflowRows.ClientSize.Width;
 

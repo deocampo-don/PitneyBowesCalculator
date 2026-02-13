@@ -18,6 +18,8 @@ namespace WindowsFormsApp1
     {
 
         private PbJobModel _model;
+        public PbJobModel BoundJob { get; private set; }
+
         public event EventHandler<PbJobModel> DeleteRequested;
         public event EventHandler<PbJobModel> PalletChanged;
 
@@ -26,6 +28,8 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
             InitializeContextMenu();
+            this.AutoScaleMode = AutoScaleMode.Dpi;
+
 
         }
 
@@ -42,6 +46,7 @@ namespace WindowsFormsApp1
             this.ContextMenuStrip = menu;
         }
 
+      
 
 
         // ----- Your palette -----
@@ -221,10 +226,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void PanelTableLayout_Paint_1(object sender, PaintEventArgs e)
-        {
-
-        }
+    
 
         private void DeletePbJob_Click(object sender, EventArgs e)
         {
@@ -249,6 +251,7 @@ namespace WindowsFormsApp1
         public void Bind(PbJobModel model)
         {
             _model = model;
+            BoundJob = model;   // ✅ THIS LINE WAS MISSING
 
             lblPbJobName.Text = model.JobName;
             lblAxRef.Text = model.JobNumber.ToString();
@@ -261,14 +264,7 @@ namespace WindowsFormsApp1
             lblEnvelopeQty.Text = $"Envelope Qty: {envelopeQty:N0}";
             lblScannedWOs.Text = $"Scanned Work Orders: {scannedWO:N0}";
 
-
-            // ✅ Disable Pack Pallet for new jobs
-            //  btnPackPallet.Enabled = model.TotalScannedWOOfJob > 0;
-
-
-            // 🔑 Apply the new rule here
             UpdateButtonsState();
-
         }
 
 

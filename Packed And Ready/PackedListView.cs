@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using WindowsFormsApp1.Picked_Up;
 
 namespace WindowsFormsApp1.Packed_And_Ready
 {
@@ -104,6 +105,37 @@ namespace WindowsFormsApp1.Packed_And_Ready
         }
 
 
+        public void RefreshItem(PbJobModel job)
+        {
+            var row = packedFlowRow.Controls
+                .OfType<PackedRowControl>()
+                .FirstOrDefault(r => r.BoundJob?.JobId == job.JobId);
+
+            if (row != null)
+                row.Bind(job);
+        }
+        public void RemoveItem(int jobId)
+        {
+            var row = packedFlowRow.Controls
+                .OfType<PackedRowControl>()
+                .FirstOrDefault(r => r.BoundJob.JobId == jobId);
+
+            if (row != null)
+                packedFlowRow.Controls.Remove(row);
+        }
+
+        public void AddItem(PbJobModel job)
+        {
+            var row = new PackedRowControl();
+            row.Bind(job);
+
+            row.ViewDialogClosed += (_, __) =>
+            {
+                PackedDataChanged?.Invoke(this, job);
+            };
+
+            packedFlowRow.Controls.Add(row);
+        }
 
 
 

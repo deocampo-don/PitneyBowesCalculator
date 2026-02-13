@@ -20,6 +20,8 @@ namespace WindowsFormsApp1.Picked_Up
         public event EventHandler ViewClicked;
         public event EventHandler ViewDialogClosed;
         private PbJobModel _modelpbjob;
+
+        public PbJobModel BoundJob { get; private set; }
         public PickedUpRowControl()
         {
             InitializeComponent();
@@ -31,6 +33,7 @@ namespace WindowsFormsApp1.Picked_Up
         {
             _model = model;
             _modelpbjob = model;
+            BoundJob = model;
 
             lblPBNameCode.Text = model.JobNumber + " " + model.JobName;
 

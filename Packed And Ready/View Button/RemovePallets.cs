@@ -37,8 +37,6 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             {
                 ReleaseCapture();
                 SendMessage(Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
-
-          
             }
         }
 
@@ -62,5 +60,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         {
             this.Close();
         }
+
+     
     }
 }

@@ -108,12 +108,12 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
          * ------------------------------------------------------------- */
 
 
-        private void btnRemovePallets_Click(object sender, EventArgs e)
+        private async void btnRemovePallets_Click(object sender, EventArgs e)
         {
 
-           
-            var selected = lvPallet.GetSelectedIndices();
-            if (selected.Count == 0)
+            var selectedIndices = lvPallet.GetSelectedIndices();
+
+            if (selectedIndices == null || selectedIndices.Count == 0)
             {
                 MessageBox.Show("Please select at least one pallet using the checkbox to remove.");
                 return;
@@ -125,20 +125,42 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                     return;
             }
 
+            try
+            {
+                // Get pallet IDs from selected rows
+                var palletIds = selectedIndices
+                    .Select(i => _job.Pallets[i].PalletId)
+                    .Where(id => id > 0) // safety
+                    .ToList();
 
-            foreach (var idx in selected.OrderByDescending(i => i))
-                _job.Pallets.RemoveAt(idx);
+                if (!palletIds.Any())
+                {
+                    MessageBox.Show("Invalid pallet selection.");
+                    return;
+                }
 
-            // ✅ MARK DATA AS CHANGED
-            DataChanged = true;
+                // 🔥 Delete from database (workorders + pallets)
+                await RqliteClient.DeletePalletsAsync(palletIds);
 
-            // Refresh dialog UI
-            lvPallet.RefreshItems(_job);
-            LoadDashboard(null);
-            lvPalletDetails.SetItems(null);
+                // Remove from memory (reverse order to prevent index shift)
+                foreach (var index in selectedIndices.OrderByDescending(i => i))
+                {
+                    _job.Pallets.RemoveAt(index);
+                }
 
+                DataChanged = true;
 
-          //  UpdateButtonsByCounts(model?.Totalpallet, model?.TotalScannedWOOfJob);
+                // Refresh UI
+                lvPallet.RefreshItems(_job);
+                LoadDashboard(null);
+                lvPalletDetails.SetItems(null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error deleting pallets:\n\n" + ex.Message);
+            }
+
+            //  UpdateButtonsByCounts(model?.Totalpallet, model?.TotalScannedWOOfJob);
         }
 
 
