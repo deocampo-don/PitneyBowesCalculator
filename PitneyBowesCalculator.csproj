@@ -15,6 +15,7 @@
     <PackageReference Include="Krypton.Toolkit" Version="100.26.1.19" />
     <PackageReference Include="Krypton.Toolkit.Suite.Extended.Panels" Version="105.26.1.19" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="SimpleFreePdfPrinter" Version="1.7.48" />
   </ItemGroup>
 
 </Project>
