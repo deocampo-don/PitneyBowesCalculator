@@ -30,927 +30,911 @@ namespace WindowsFormsApp1
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.pnlHeader = new Krypton.Toolkit.KryptonPanel();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnMinimize = new Krypton.Toolkit.KryptonButton();
-            this.btnMaximize = new Krypton.Toolkit.KryptonButton();
-            this.btnClose = new Krypton.Toolkit.KryptonButton();
-            this.pnlTitle = new System.Windows.Forms.TableLayoutPanel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.kryptonCheckSet1 = new Krypton.Toolkit.KryptonCheckSet(this.components);
-            this.kryptonPanel1 = new Krypton.Toolkit.KryptonPanel();
-            this.gbRoundedParent = new Krypton.Toolkit.KryptonGroupBox();
-            this.pnlNavigator = new Krypton.Toolkit.KryptonPanel();
-            this.nvNavigator = new Krypton.Navigator.KryptonNavigator();
-            this.pgBuild = new Krypton.Navigator.KryptonPage();
-            this.pnlBottom = new Krypton.Toolkit.KryptonPanel();
-            this.tlpAddPbJob = new System.Windows.Forms.TableLayoutPanel();
-            this.btnAddPBJob = new Krypton.Toolkit.KryptonButton();
-            this.lvBuild = new WindowsFormsApp1.PalletListView();
-            this.pgPacked = new Krypton.Navigator.KryptonPage();
-            this.pnlShipPallets = new Krypton.Toolkit.KryptonPanel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.chkbxSelectAll = new System.Windows.Forms.CheckBox();
-            this.btnShipPallets = new System.Windows.Forms.Button();
-            this.packedListView2 = new WindowsFormsApp1.Packed_And_Ready.PackedListView();
-            this.pgPicked = new Krypton.Navigator.KryptonPage();
-            this.kryptonPanel2 = new Krypton.Toolkit.KryptonPanel();
-            this.pickedUpListView = new WindowsFormsApp1.Picked_Up.PickedUpListView();
-            this.kryptonPanel6 = new Krypton.Toolkit.KryptonPanel();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.kryptonLabel6 = new Krypton.Toolkit.KryptonLabel();
-            this.kryptonLabel4 = new Krypton.Toolkit.KryptonLabel();
-            this.kryptonCheckBox1 = new Krypton.Toolkit.KryptonCheckBox();
-            this.kryptonLabel3 = new Krypton.Toolkit.KryptonLabel();
-            this.kryptonLabel5 = new Krypton.Toolkit.KryptonLabel();
-            this.kryptonLabel7 = new Krypton.Toolkit.KryptonLabel();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.kryptonButton2 = new Krypton.Toolkit.KryptonButton();
-            this.kryptonButton1 = new Krypton.Toolkit.KryptonButton();
-            this.btnSearch = new Krypton.Toolkit.KryptonButton();
-            this.kryptonPanel3 = new Krypton.Toolkit.KryptonPanel();
-            this.kryptonTableLayoutPanel2 = new Krypton.Toolkit.KryptonTableLayoutPanel();
-            this.kryptonPanel5 = new Krypton.Toolkit.KryptonPanel();
-            this.kryptonLabel2 = new Krypton.Toolkit.KryptonLabel();
-            this.dtPickUpFrom = new System.Windows.Forms.DateTimePicker();
-            this.kryptonPanel4 = new Krypton.Toolkit.KryptonPanel();
-            this.kryptonLabel1 = new Krypton.Toolkit.KryptonLabel();
-            this.dtPickUpTo = new System.Windows.Forms.DateTimePicker();
-            this.pnlButtonHeaders = new Krypton.Toolkit.KryptonPanel();
-            this.kryptonTableLayoutPanel1 = new Krypton.Toolkit.KryptonTableLayoutPanel();
-            this.kcbBuildPallets = new Krypton.Toolkit.KryptonCheckButton();
-            this.kcbPickedUp = new Krypton.Toolkit.KryptonCheckButton();
-            this.kcbPackedReady = new Krypton.Toolkit.KryptonCheckButton();
-            this.pnlSettings = new Krypton.Toolkit.KryptonPanel();
-            this.btnSettings = new Krypton.Toolkit.KryptonButton();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
-            this.pnlHeader.SuspendLayout();
-            this.flowLayoutPanel1.SuspendLayout();
-            this.pnlTitle.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonCheckSet1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel1)).BeginInit();
-            this.kryptonPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gbRoundedParent)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gbRoundedParent.Panel)).BeginInit();
-            this.gbRoundedParent.Panel.SuspendLayout();
-            this.gbRoundedParent.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlNavigator)).BeginInit();
-            this.pnlNavigator.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nvNavigator)).BeginInit();
-            this.nvNavigator.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pgBuild)).BeginInit();
-            this.pgBuild.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlBottom)).BeginInit();
-            this.pnlBottom.SuspendLayout();
-            this.tlpAddPbJob.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pgPacked)).BeginInit();
-            this.pgPacked.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlShipPallets)).BeginInit();
-            this.pnlShipPallets.SuspendLayout();
-            this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pgPicked)).BeginInit();
-            this.pgPicked.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel2)).BeginInit();
-            this.kryptonPanel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel6)).BeginInit();
-            this.kryptonPanel6.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel3)).BeginInit();
-            this.kryptonPanel3.SuspendLayout();
-            this.kryptonTableLayoutPanel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel5)).BeginInit();
-            this.kryptonPanel5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel4)).BeginInit();
-            this.kryptonPanel4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlButtonHeaders)).BeginInit();
-            this.pnlButtonHeaders.SuspendLayout();
-            this.kryptonTableLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlSettings)).BeginInit();
-            this.pnlSettings.SuspendLayout();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            pnlHeader = new Krypton.Toolkit.KryptonPanel();
+            flowLayoutPanel1 = new FlowLayoutPanel();
+            btnMinimize = new Krypton.Toolkit.KryptonButton();
+            btnMaximize = new Krypton.Toolkit.KryptonButton();
+            btnClose = new Krypton.Toolkit.KryptonButton();
+            pnlTitle = new TableLayoutPanel();
+            label1 = new Label();
+            kryptonCheckSet1 = new Krypton.Toolkit.KryptonCheckSet(components);
+            kryptonPanel1 = new Krypton.Toolkit.KryptonPanel();
+            gbRoundedParent = new Krypton.Toolkit.KryptonGroupBox();
+            pnlNavigator = new Krypton.Toolkit.KryptonPanel();
+            nvNavigator = new Krypton.Navigator.KryptonNavigator();
+            pgBuild = new Krypton.Navigator.KryptonPage();
+            pnlBottom = new Krypton.Toolkit.KryptonPanel();
+            tlpAddPbJob = new TableLayoutPanel();
+            btnAddPBJob = new Krypton.Toolkit.KryptonButton();
+            lvBuild = new PalletListView();
+            pgPacked = new Krypton.Navigator.KryptonPage();
+            pnlShipPallets = new Krypton.Toolkit.KryptonPanel();
+            panel1 = new Panel();
+            chkbxSelectAll = new CheckBox();
+            btnShipPallets = new Button();
+            packedListView2 = new WindowsFormsApp1.Packed_And_Ready.PackedListView();
+            pgPicked = new Krypton.Navigator.KryptonPage();
+            kryptonPanel2 = new Krypton.Toolkit.KryptonPanel();
+            pickedUpListView = new WindowsFormsApp1.Picked_Up.PickedUpListView();
+            kryptonPanel6 = new Krypton.Toolkit.KryptonPanel();
+            tableLayoutPanel2 = new TableLayoutPanel();
+            kryptonLabel6 = new Krypton.Toolkit.KryptonLabel();
+            kryptonLabel4 = new Krypton.Toolkit.KryptonLabel();
+            kryptonCheckBox1 = new Krypton.Toolkit.KryptonCheckBox();
+            kryptonLabel3 = new Krypton.Toolkit.KryptonLabel();
+            kryptonLabel5 = new Krypton.Toolkit.KryptonLabel();
+            kryptonLabel7 = new Krypton.Toolkit.KryptonLabel();
+            tableLayoutPanel1 = new TableLayoutPanel();
+            kryptonButton2 = new Krypton.Toolkit.KryptonButton();
+            kryptonButton1 = new Krypton.Toolkit.KryptonButton();
+            btnSearch = new Krypton.Toolkit.KryptonButton();
+            kryptonPanel3 = new Krypton.Toolkit.KryptonPanel();
+            kryptonTableLayoutPanel2 = new Krypton.Toolkit.KryptonTableLayoutPanel();
+            kryptonPanel5 = new Krypton.Toolkit.KryptonPanel();
+            kryptonLabel2 = new Krypton.Toolkit.KryptonLabel();
+            dtPickUpFrom = new DateTimePicker();
+            kryptonPanel4 = new Krypton.Toolkit.KryptonPanel();
+            kryptonLabel1 = new Krypton.Toolkit.KryptonLabel();
+            dtPickUpTo = new DateTimePicker();
+            pnlButtonHeaders = new Krypton.Toolkit.KryptonPanel();
+            kryptonTableLayoutPanel1 = new Krypton.Toolkit.KryptonTableLayoutPanel();
+            kcbBuildPallets = new Krypton.Toolkit.KryptonCheckButton();
+            kcbPickedUp = new Krypton.Toolkit.KryptonCheckButton();
+            kcbPackedReady = new Krypton.Toolkit.KryptonCheckButton();
+            pnlSettings = new Krypton.Toolkit.KryptonPanel();
+            btnSettings = new Krypton.Toolkit.KryptonButton();
+            ((System.ComponentModel.ISupportInitialize)pnlHeader).BeginInit();
+            pnlHeader.SuspendLayout();
+            flowLayoutPanel1.SuspendLayout();
+            pnlTitle.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)kryptonCheckSet1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel1).BeginInit();
+            kryptonPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)gbRoundedParent).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)gbRoundedParent.Panel).BeginInit();
+            gbRoundedParent.Panel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pnlNavigator).BeginInit();
+            pnlNavigator.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nvNavigator).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pgBuild).BeginInit();
+            pgBuild.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pnlBottom).BeginInit();
+            pnlBottom.SuspendLayout();
+            tlpAddPbJob.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pgPacked).BeginInit();
+            pgPacked.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pnlShipPallets).BeginInit();
+            pnlShipPallets.SuspendLayout();
+            panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pgPicked).BeginInit();
+            pgPicked.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel2).BeginInit();
+            kryptonPanel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel6).BeginInit();
+            kryptonPanel6.SuspendLayout();
+            tableLayoutPanel2.SuspendLayout();
+            tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel3).BeginInit();
+            kryptonPanel3.SuspendLayout();
+            kryptonTableLayoutPanel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel5).BeginInit();
+            kryptonPanel5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel4).BeginInit();
+            kryptonPanel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pnlButtonHeaders).BeginInit();
+            pnlButtonHeaders.SuspendLayout();
+            kryptonTableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pnlSettings).BeginInit();
+            pnlSettings.SuspendLayout();
+            SuspendLayout();
             // 
             // pnlHeader
             // 
-            this.pnlHeader.Controls.Add(this.flowLayoutPanel1);
-            this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
-            this.pnlHeader.Margin = new System.Windows.Forms.Padding(2);
-            this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(1097, 39);
-            this.pnlHeader.StateCommon.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(83)))), ((int)(((byte)(239)))));
-            this.pnlHeader.StateCommon.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(83)))), ((int)(((byte)(239)))));
-            this.pnlHeader.TabIndex = 0;
+            pnlHeader.Controls.Add(flowLayoutPanel1);
+            pnlHeader.Dock = DockStyle.Top;
+            pnlHeader.Location = new Point(0, 0);
+            pnlHeader.Margin = new Padding(3, 2, 3, 2);
+            pnlHeader.Name = "pnlHeader";
+            pnlHeader.Size = new Size(1463, 60);
+            pnlHeader.StateCommon.Color1 = Color.FromArgb(94, 83, 239);
+            pnlHeader.StateCommon.Color2 = Color.FromArgb(94, 83, 239);
+            pnlHeader.TabIndex = 0;
             // 
             // flowLayoutPanel1
             // 
-            this.flowLayoutPanel1.BackColor = System.Drawing.Color.Transparent;
-            this.flowLayoutPanel1.Controls.Add(this.btnMinimize);
-            this.flowLayoutPanel1.Controls.Add(this.btnMaximize);
-            this.flowLayoutPanel1.Controls.Add(this.btnClose);
-            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(986, 0);
-            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(111, 39);
-            this.flowLayoutPanel1.TabIndex = 4;
-            this.flowLayoutPanel1.WrapContents = false;
+            flowLayoutPanel1.BackColor = Color.Transparent;
+            flowLayoutPanel1.Controls.Add(btnMinimize);
+            flowLayoutPanel1.Controls.Add(btnMaximize);
+            flowLayoutPanel1.Controls.Add(btnClose);
+            flowLayoutPanel1.Dock = DockStyle.Right;
+            flowLayoutPanel1.Location = new Point(1315, 0);
+            flowLayoutPanel1.Margin = new Padding(3, 2, 3, 2);
+            flowLayoutPanel1.Name = "flowLayoutPanel1";
+            flowLayoutPanel1.Size = new Size(148, 60);
+            flowLayoutPanel1.TabIndex = 4;
+            flowLayoutPanel1.WrapContents = false;
             // 
             // btnMinimize
             // 
-            this.btnMinimize.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnMinimize.Location = new System.Drawing.Point(8, 4);
-            this.btnMinimize.Margin = new System.Windows.Forms.Padding(8, 4, 8, 4);
-            this.btnMinimize.Name = "btnMinimize";
-            this.btnMinimize.Size = new System.Drawing.Size(19, 20);
-            this.btnMinimize.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
-            this.btnMinimize.TabIndex = 5;
-            this.btnMinimize.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.btnMinimize.Values.Image = global::WindowsFormsApp1.Properties.Resources.minimize_img;
-            this.btnMinimize.Values.Text = "";
-            this.btnMinimize.Click += new System.EventHandler(this.btnMinimize_Click_1);
+            btnMinimize.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            btnMinimize.Location = new Point(11, 6);
+            btnMinimize.Margin = new Padding(11, 6, 11, 6);
+            btnMinimize.Name = "btnMinimize";
+            btnMinimize.Size = new Size(25, 31);
+            btnMinimize.StateCommon.Back.Color1 = Color.Transparent;
+            btnMinimize.TabIndex = 5;
+            btnMinimize.Values.DropDownArrowColor = Color.Empty;
+            btnMinimize.Values.Image = Properties.Resources.minimize_img;
+            btnMinimize.Values.Text = "";
+            btnMinimize.Click += btnMinimize_Click_1;
             // 
             // btnMaximize
             // 
-            this.btnMaximize.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnMaximize.Location = new System.Drawing.Point(43, 4);
-            this.btnMaximize.Margin = new System.Windows.Forms.Padding(8, 4, 8, 4);
-            this.btnMaximize.Name = "btnMaximize";
-            this.btnMaximize.Size = new System.Drawing.Size(19, 20);
-            this.btnMaximize.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
-            this.btnMaximize.TabIndex = 5;
-            this.btnMaximize.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.btnMaximize.Values.Image = global::WindowsFormsApp1.Properties.Resources.maximize_img32;
-            this.btnMaximize.Values.Text = "";
-            this.btnMaximize.Click += new System.EventHandler(this.btnMaximize_Click_1);
+            btnMaximize.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            btnMaximize.Location = new Point(58, 6);
+            btnMaximize.Margin = new Padding(11, 6, 11, 6);
+            btnMaximize.Name = "btnMaximize";
+            btnMaximize.Size = new Size(25, 31);
+            btnMaximize.StateCommon.Back.Color1 = Color.Transparent;
+            btnMaximize.TabIndex = 5;
+            btnMaximize.Values.DropDownArrowColor = Color.Empty;
+            btnMaximize.Values.Image = Properties.Resources.maximize_img32;
+            btnMaximize.Values.Text = "";
+            btnMaximize.Click += btnMaximize_Click_1;
             // 
             // btnClose
             // 
-            this.btnClose.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnClose.Location = new System.Drawing.Point(78, 4);
-            this.btnClose.Margin = new System.Windows.Forms.Padding(8, 4, 8, 4);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(19, 20);
-            this.btnClose.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
-            this.btnClose.TabIndex = 5;
-            this.btnClose.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.btnClose.Values.Image = global::WindowsFormsApp1.Properties.Resources.close_img;
-            this.btnClose.Values.Text = "";
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            btnClose.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            btnClose.Location = new Point(105, 6);
+            btnClose.Margin = new Padding(11, 6, 11, 6);
+            btnClose.Name = "btnClose";
+            btnClose.Size = new Size(25, 31);
+            btnClose.StateCommon.Back.Color1 = Color.Transparent;
+            btnClose.TabIndex = 5;
+            btnClose.Values.DropDownArrowColor = Color.Empty;
+            btnClose.Values.Image = Properties.Resources.close_img;
+            btnClose.Values.Text = "";
+            btnClose.Click += btnClose_Click;
             // 
             // pnlTitle
             // 
-            this.pnlTitle.ColumnCount = 1;
-            this.pnlTitle.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.pnlTitle.Controls.Add(this.label1, 0, 0);
-            this.pnlTitle.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlTitle.Location = new System.Drawing.Point(0, 39);
-            this.pnlTitle.Margin = new System.Windows.Forms.Padding(2);
-            this.pnlTitle.Name = "pnlTitle";
-            this.pnlTitle.RowCount = 1;
-            this.pnlTitle.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.pnlTitle.Size = new System.Drawing.Size(1097, 53);
-            this.pnlTitle.TabIndex = 3;
+            pnlTitle.ColumnCount = 1;
+            pnlTitle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            pnlTitle.Controls.Add(label1, 0, 0);
+            pnlTitle.Dock = DockStyle.Top;
+            pnlTitle.Location = new Point(0, 60);
+            pnlTitle.Margin = new Padding(3, 2, 3, 2);
+            pnlTitle.Name = "pnlTitle";
+            pnlTitle.RowCount = 1;
+            pnlTitle.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            pnlTitle.Size = new Size(1463, 81);
+            pnlTitle.TabIndex = 3;
             // 
             // label1
             // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(331, 11);
-            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(434, 31);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "PITNEY BOWES CALCULATOR";
+            label1.Anchor = AnchorStyles.None;
+            label1.AutoSize = true;
+            label1.Font = new Font("Microsoft Sans Serif", 19.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label1.Location = new Point(471, 21);
+            label1.Name = "label1";
+            label1.Size = new Size(521, 38);
+            label1.TabIndex = 0;
+            label1.Text = "PITNEY BOWES CALCULATOR";
             // 
             // kryptonPanel1
             // 
-            this.kryptonPanel1.Controls.Add(this.gbRoundedParent);
-            this.kryptonPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonPanel1.Location = new System.Drawing.Point(0, 92);
-            this.kryptonPanel1.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonPanel1.Name = "kryptonPanel1";
-            this.kryptonPanel1.Padding = new System.Windows.Forms.Padding(8);
-            this.kryptonPanel1.Size = new System.Drawing.Size(1097, 512);
-            this.kryptonPanel1.StateCommon.Color1 = System.Drawing.Color.Transparent;
-            this.kryptonPanel1.StateCommon.Color2 = System.Drawing.Color.Transparent;
-            this.kryptonPanel1.TabIndex = 4;
+            kryptonPanel1.Controls.Add(gbRoundedParent);
+            kryptonPanel1.Dock = DockStyle.Fill;
+            kryptonPanel1.Location = new Point(0, 141);
+            kryptonPanel1.Margin = new Padding(3, 2, 3, 2);
+            kryptonPanel1.Name = "kryptonPanel1";
+            kryptonPanel1.Padding = new Padding(11, 12, 11, 12);
+            kryptonPanel1.Size = new Size(1463, 788);
+            kryptonPanel1.StateCommon.Color1 = Color.Transparent;
+            kryptonPanel1.StateCommon.Color2 = Color.Transparent;
+            kryptonPanel1.TabIndex = 4;
             // 
             // gbRoundedParent
             // 
-            this.gbRoundedParent.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbRoundedParent.Location = new System.Drawing.Point(8, 8);
-            this.gbRoundedParent.Margin = new System.Windows.Forms.Padding(8);
+            gbRoundedParent.Dock = DockStyle.Fill;
+            gbRoundedParent.Location = new Point(11, 12);
+            gbRoundedParent.Margin = new Padding(11, 12, 11, 12);
             // 
-            // gbRoundedParent.Panel
             // 
-            this.gbRoundedParent.Panel.Controls.Add(this.pnlNavigator);
-            this.gbRoundedParent.Panel.Controls.Add(this.pnlSettings);
-            this.gbRoundedParent.Panel.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
-            this.gbRoundedParent.Size = new System.Drawing.Size(1081, 496);
-            this.gbRoundedParent.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
-            this.gbRoundedParent.StateCommon.Back.Color2 = System.Drawing.Color.Transparent;
-            this.gbRoundedParent.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(83)))), ((int)(((byte)(239)))));
-            this.gbRoundedParent.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(83)))), ((int)(((byte)(239)))));
-            this.gbRoundedParent.StateCommon.Border.Draw = Krypton.Toolkit.InheritBool.True;
-            this.gbRoundedParent.StateCommon.Border.Rounding = 10F;
-            this.gbRoundedParent.StateCommon.Border.Width = 2;
-            this.gbRoundedParent.TabIndex = 5;
-            this.gbRoundedParent.Values.Heading = "";
+            // 
+            gbRoundedParent.Panel.Controls.Add(pnlNavigator);
+            gbRoundedParent.Panel.Controls.Add(pnlSettings);
+            gbRoundedParent.Panel.Margin = new Padding(7, 9, 7, 9);
+            gbRoundedParent.Size = new Size(1441, 764);
+            gbRoundedParent.StateCommon.Back.Color1 = Color.Transparent;
+            gbRoundedParent.StateCommon.Back.Color2 = Color.Transparent;
+            gbRoundedParent.StateCommon.Border.Color1 = Color.FromArgb(148, 83, 239);
+            gbRoundedParent.StateCommon.Border.Color2 = Color.FromArgb(148, 83, 239);
+            gbRoundedParent.StateCommon.Border.Draw = Krypton.Toolkit.InheritBool.True;
+            gbRoundedParent.StateCommon.Border.Rounding = 10F;
+            gbRoundedParent.StateCommon.Border.Width = 2;
+            gbRoundedParent.TabIndex = 5;
+            gbRoundedParent.Values.Heading = "";
             // 
             // pnlNavigator
             // 
-            this.pnlNavigator.Controls.Add(this.nvNavigator);
-            this.pnlNavigator.Controls.Add(this.pnlButtonHeaders);
-            this.pnlNavigator.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlNavigator.Location = new System.Drawing.Point(0, 32);
-            this.pnlNavigator.Margin = new System.Windows.Forms.Padding(11, 0, 0, 0);
-            this.pnlNavigator.Name = "pnlNavigator";
-            this.pnlNavigator.Padding = new System.Windows.Forms.Padding(14, 0, 14, 0);
-            this.pnlNavigator.Size = new System.Drawing.Size(1071, 454);
-            this.pnlNavigator.StateCommon.Color1 = System.Drawing.Color.Transparent;
-            this.pnlNavigator.StateCommon.Color2 = System.Drawing.Color.Transparent;
-            this.pnlNavigator.TabIndex = 2;
+            pnlNavigator.Controls.Add(nvNavigator);
+            pnlNavigator.Controls.Add(pnlButtonHeaders);
+            pnlNavigator.Dock = DockStyle.Fill;
+            pnlNavigator.Location = new Point(0, 49);
+            pnlNavigator.Margin = new Padding(15, 0, 0, 0);
+            pnlNavigator.Name = "pnlNavigator";
+            pnlNavigator.Padding = new Padding(19, 0, 19, 0);
+            pnlNavigator.Size = new Size(1431, 705);
+            pnlNavigator.StateCommon.Color1 = Color.Transparent;
+            pnlNavigator.StateCommon.Color2 = Color.Transparent;
+            pnlNavigator.TabIndex = 2;
             // 
             // nvNavigator
             // 
-            this.nvNavigator.ControlKryptonFormFeatures = false;
-            this.nvNavigator.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.nvNavigator.Location = new System.Drawing.Point(14, 48);
-            this.nvNavigator.Margin = new System.Windows.Forms.Padding(0);
-            this.nvNavigator.NavigatorMode = Krypton.Navigator.NavigatorMode.Panel;
-            this.nvNavigator.Owner = null;
-            this.nvNavigator.PageBackStyle = Krypton.Toolkit.PaletteBackStyle.PanelClient;
-            this.nvNavigator.Pages.AddRange(new Krypton.Navigator.KryptonPage[] {
-            this.pgBuild,
-            this.pgPacked,
-            this.pgPicked});
-            this.nvNavigator.SelectedIndex = 1;
-            this.nvNavigator.Size = new System.Drawing.Size(1043, 406);
-            this.nvNavigator.StateCommon.Page.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.nvNavigator.StateCommon.Page.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.nvNavigator.TabIndex = 1;
-            this.nvNavigator.Text = "kryptonNavigator1";
+            nvNavigator.ControlKryptonFormFeatures = false;
+            nvNavigator.Dock = DockStyle.Fill;
+            nvNavigator.Location = new Point(19, 74);
+            nvNavigator.Margin = new Padding(0);
+            nvNavigator.NavigatorMode = Krypton.Navigator.NavigatorMode.Panel;
+            nvNavigator.Owner = null;
+            nvNavigator.PageBackStyle = Krypton.Toolkit.PaletteBackStyle.PanelClient;
+            nvNavigator.Pages.AddRange(new Krypton.Navigator.KryptonPage[] { pgBuild, pgPacked, pgPicked });
+            nvNavigator.SelectedIndex = 1;
+            nvNavigator.Size = new Size(1393, 631);
+            nvNavigator.StateCommon.Page.Color1 = Color.FromArgb(241, 241, 241);
+            nvNavigator.StateCommon.Page.Color2 = Color.FromArgb(241, 241, 241);
+            nvNavigator.TabIndex = 1;
+            nvNavigator.Text = "kryptonNavigator1";
             // 
             // pgBuild
             // 
-            this.pgBuild.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
-            this.pgBuild.Controls.Add(this.pnlBottom);
-            this.pgBuild.Controls.Add(this.lvBuild);
-            this.pgBuild.Flags = 65534;
-            this.pgBuild.LastVisibleSet = true;
-            this.pgBuild.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pgBuild.MinimumSize = new System.Drawing.Size(149, 50);
-            this.pgBuild.Name = "pgBuild";
-            this.pgBuild.Size = new System.Drawing.Size(1043, 381);
-            this.pgBuild.Text = "kryptonPage1";
-            this.pgBuild.ToolTipTitle = "Page ToolTip";
-            this.pgBuild.UniqueName = "58f450f4e63246c49cf670228f30d882";
+            pgBuild.AutoHiddenSlideSize = new Size(200, 200);
+            pgBuild.Controls.Add(pnlBottom);
+            pgBuild.Controls.Add(lvBuild);
+            pgBuild.Flags = 65534;
+            pgBuild.LastVisibleSet = true;
+            pgBuild.Margin = new Padding(4, 2, 4, 2);
+            pgBuild.MinimumSize = new Size(199, 78);
+            pgBuild.Name = "pgBuild";
+            pgBuild.Size = new Size(1391, 586);
+            pgBuild.Text = "kryptonPage1";
+            pgBuild.ToolTipTitle = "Page ToolTip";
+            pgBuild.UniqueName = "58f450f4e63246c49cf670228f30d882";
             // 
             // pnlBottom
             // 
-            this.pnlBottom.Controls.Add(this.tlpAddPbJob);
-            this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlBottom.Location = new System.Drawing.Point(0, 320);
-            this.pnlBottom.Margin = new System.Windows.Forms.Padding(2);
-            this.pnlBottom.Name = "pnlBottom";
-            this.pnlBottom.Size = new System.Drawing.Size(1043, 61);
-            this.pnlBottom.StateCommon.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(249)))), ((int)(((byte)(249)))), ((int)(((byte)(249)))));
-            this.pnlBottom.TabIndex = 6;
+            pnlBottom.Controls.Add(tlpAddPbJob);
+            pnlBottom.Dock = DockStyle.Bottom;
+            pnlBottom.Location = new Point(0, 492);
+            pnlBottom.Margin = new Padding(3, 2, 3, 2);
+            pnlBottom.Name = "pnlBottom";
+            pnlBottom.Size = new Size(1391, 94);
+            pnlBottom.StateCommon.Color1 = Color.FromArgb(249, 249, 249);
+            pnlBottom.TabIndex = 6;
             // 
             // tlpAddPbJob
             // 
-            this.tlpAddPbJob.ColumnCount = 1;
-            this.tlpAddPbJob.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlpAddPbJob.Controls.Add(this.btnAddPBJob, 0, 0);
-            this.tlpAddPbJob.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tlpAddPbJob.Location = new System.Drawing.Point(876, 0);
-            this.tlpAddPbJob.Margin = new System.Windows.Forms.Padding(2);
-            this.tlpAddPbJob.Name = "tlpAddPbJob";
-            this.tlpAddPbJob.RowCount = 1;
-            this.tlpAddPbJob.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlpAddPbJob.Size = new System.Drawing.Size(167, 61);
-            this.tlpAddPbJob.TabIndex = 0;
+            tlpAddPbJob.ColumnCount = 1;
+            tlpAddPbJob.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tlpAddPbJob.Controls.Add(btnAddPBJob, 0, 0);
+            tlpAddPbJob.Dock = DockStyle.Right;
+            tlpAddPbJob.Location = new Point(1168, 0);
+            tlpAddPbJob.Margin = new Padding(3, 2, 3, 2);
+            tlpAddPbJob.Name = "tlpAddPbJob";
+            tlpAddPbJob.RowCount = 1;
+            tlpAddPbJob.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tlpAddPbJob.Size = new Size(223, 94);
+            tlpAddPbJob.TabIndex = 0;
             // 
             // btnAddPBJob
             // 
-            this.btnAddPBJob.AutoSize = true;
-            this.btnAddPBJob.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnAddPBJob.Dock = System.Windows.Forms.DockStyle.Left;
-            this.btnAddPBJob.Location = new System.Drawing.Point(9, 10);
-            this.btnAddPBJob.Margin = new System.Windows.Forms.Padding(9, 10, 9, 10);
-            this.btnAddPBJob.Name = "btnAddPBJob";
-            this.btnAddPBJob.Size = new System.Drawing.Size(135, 41);
-            this.btnAddPBJob.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
-            this.btnAddPBJob.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
-            this.btnAddPBJob.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.btnAddPBJob.StateCommon.Border.Rounding = 5F;
-            this.btnAddPBJob.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAddPBJob.TabIndex = 0;
-            this.btnAddPBJob.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.btnAddPBJob.Values.Image = global::WindowsFormsApp1.Properties.Resources.add_img_22;
-            this.btnAddPBJob.Values.Text = "Add New PB Job";
-            this.btnAddPBJob.Click += new System.EventHandler(this.btnAddPBJob_Click);
+            btnAddPBJob.AutoSize = true;
+            btnAddPBJob.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            btnAddPBJob.Dock = DockStyle.Left;
+            btnAddPBJob.Location = new Point(12, 15);
+            btnAddPBJob.Margin = new Padding(12, 15, 12, 15);
+            btnAddPBJob.Name = "btnAddPBJob";
+            btnAddPBJob.Size = new Size(159, 64);
+            btnAddPBJob.StateCommon.Back.Color1 = Color.FromArgb(232, 222, 248);
+            btnAddPBJob.StateCommon.Border.Color1 = Color.FromArgb(232, 222, 248);
+            btnAddPBJob.StateCommon.Border.DrawBorders = Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom | Krypton.Toolkit.PaletteDrawBorders.Left | Krypton.Toolkit.PaletteDrawBorders.Right;
+            btnAddPBJob.StateCommon.Border.Rounding = 5F;
+            btnAddPBJob.StateCommon.Content.ShortText.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnAddPBJob.TabIndex = 0;
+            btnAddPBJob.Values.DropDownArrowColor = Color.Empty;
+            btnAddPBJob.Values.Image = Properties.Resources.add_img_22;
+            btnAddPBJob.Values.Text = "Add New PB Job";
+            btnAddPBJob.Click += btnAddPBJob_Click;
             // 
             // lvBuild
             // 
-            this.lvBuild.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(241)))), ((int)(((byte)(241)))));
-            this.lvBuild.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvBuild.Location = new System.Drawing.Point(0, 0);
-            this.lvBuild.Margin = new System.Windows.Forms.Padding(5);
-            this.lvBuild.Name = "lvBuild";
-            this.lvBuild.Padding = new System.Windows.Forms.Padding(0, 0, 0, 65);
-            this.lvBuild.Size = new System.Drawing.Size(1043, 381);
-            this.lvBuild.TabIndex = 0;
+            lvBuild.BackColor = Color.FromArgb(241, 241, 241);
+            lvBuild.Dock = DockStyle.Fill;
+            lvBuild.Location = new Point(0, 0);
+            lvBuild.Margin = new Padding(7, 8, 7, 8);
+            lvBuild.Name = "lvBuild";
+            lvBuild.Padding = new Padding(0, 0, 0, 100);
+            lvBuild.Size = new Size(1391, 586);
+            lvBuild.TabIndex = 0;
             // 
             // pgPacked
             // 
-            this.pgPacked.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
-            this.pgPacked.Controls.Add(this.pnlShipPallets);
-            this.pgPacked.Controls.Add(this.packedListView2);
-            this.pgPacked.Flags = 65534;
-            this.pgPacked.LastVisibleSet = true;
-            this.pgPacked.Margin = new System.Windows.Forms.Padding(2);
-            this.pgPacked.MinimumSize = new System.Drawing.Size(112, 41);
-            this.pgPacked.Name = "pgPacked";
-            this.pgPacked.Size = new System.Drawing.Size(1043, 406);
-            this.pgPacked.Text = "kryptonPage2";
-            this.pgPacked.ToolTipTitle = "Page ToolTip";
-            this.pgPacked.UniqueName = "78120dba424747da8ffc132c067ceb97";
+            pgPacked.AutoHiddenSlideSize = new Size(200, 200);
+            pgPacked.Controls.Add(pnlShipPallets);
+            pgPacked.Controls.Add(packedListView2);
+            pgPacked.Flags = 65534;
+            pgPacked.LastVisibleSet = true;
+            pgPacked.Margin = new Padding(3, 2, 3, 2);
+            pgPacked.MinimumSize = new Size(149, 62);
+            pgPacked.Name = "pgPacked";
+            pgPacked.Size = new Size(1393, 631);
+            pgPacked.Text = "kryptonPage2";
+            pgPacked.ToolTipTitle = "Page ToolTip";
+            pgPacked.UniqueName = "78120dba424747da8ffc132c067ceb97";
             // 
             // pnlShipPallets
             // 
-            this.pnlShipPallets.Controls.Add(this.panel1);
-            this.pnlShipPallets.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlShipPallets.Location = new System.Drawing.Point(0, 345);
-            this.pnlShipPallets.Margin = new System.Windows.Forms.Padding(2);
-            this.pnlShipPallets.Name = "pnlShipPallets";
-            this.pnlShipPallets.Size = new System.Drawing.Size(1043, 61);
-            this.pnlShipPallets.StateCommon.Color1 = System.Drawing.Color.White;
-            this.pnlShipPallets.TabIndex = 7;
+            pnlShipPallets.Controls.Add(panel1);
+            pnlShipPallets.Dock = DockStyle.Bottom;
+            pnlShipPallets.Location = new Point(0, 537);
+            pnlShipPallets.Margin = new Padding(3, 2, 3, 2);
+            pnlShipPallets.Name = "pnlShipPallets";
+            pnlShipPallets.Size = new Size(1393, 94);
+            pnlShipPallets.StateCommon.Color1 = Color.White;
+            pnlShipPallets.TabIndex = 7;
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.Transparent;
-            this.panel1.Controls.Add(this.chkbxSelectAll);
-            this.panel1.Controls.Add(this.btnShipPallets);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(783, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(260, 61);
-            this.panel1.TabIndex = 50;
+            panel1.BackColor = Color.Transparent;
+            panel1.Controls.Add(chkbxSelectAll);
+            panel1.Controls.Add(btnShipPallets);
+            panel1.Dock = DockStyle.Right;
+            panel1.Location = new Point(1046, 0);
+            panel1.Margin = new Padding(3, 2, 3, 2);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(347, 94);
+            panel1.TabIndex = 50;
             // 
             // chkbxSelectAll
             // 
-            this.chkbxSelectAll.AutoSize = true;
-            this.chkbxSelectAll.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.chkbxSelectAll.Location = new System.Drawing.Point(23, 24);
-            this.chkbxSelectAll.Margin = new System.Windows.Forms.Padding(2);
-            this.chkbxSelectAll.Name = "chkbxSelectAll";
-            this.chkbxSelectAll.Size = new System.Drawing.Size(70, 17);
-            this.chkbxSelectAll.TabIndex = 45;
-            this.chkbxSelectAll.Text = "Select All";
-            this.chkbxSelectAll.UseVisualStyleBackColor = true;
-            this.chkbxSelectAll.CheckedChanged += new System.EventHandler(this.chkbxSelectAll_CheckedChanged_1);
+            chkbxSelectAll.AutoSize = true;
+            chkbxSelectAll.Cursor = Cursors.Hand;
+            chkbxSelectAll.Location = new Point(31, 38);
+            chkbxSelectAll.Margin = new Padding(3, 2, 3, 2);
+            chkbxSelectAll.Name = "chkbxSelectAll";
+            chkbxSelectAll.Size = new Size(93, 24);
+            chkbxSelectAll.TabIndex = 45;
+            chkbxSelectAll.Text = "Select All";
+            chkbxSelectAll.UseVisualStyleBackColor = true;
+            chkbxSelectAll.CheckedChanged += chkbxSelectAll_CheckedChanged_1;
             // 
             // btnShipPallets
             // 
-            this.btnShipPallets.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.btnShipPallets.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
-            this.btnShipPallets.CausesValidation = false;
-            this.btnShipPallets.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnShipPallets.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(80)))), ((int)(((byte)(164)))));
-            this.btnShipPallets.FlatAppearance.BorderSize = 0;
-            this.btnShipPallets.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnShipPallets.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnShipPallets.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(64)))));
-            this.btnShipPallets.Location = new System.Drawing.Point(107, 10);
-            this.btnShipPallets.Margin = new System.Windows.Forms.Padding(2);
-            this.btnShipPallets.Name = "btnShipPallets";
-            this.btnShipPallets.Size = new System.Drawing.Size(137, 41);
-            this.btnShipPallets.TabIndex = 44;
-            this.btnShipPallets.Text = "Ship Pallets";
-            this.btnShipPallets.UseVisualStyleBackColor = false;
-            this.btnShipPallets.Click += new System.EventHandler(this.btnShipPallets_Click);
+            btnShipPallets.AccessibleRole = AccessibleRole.None;
+            btnShipPallets.BackColor = Color.FromArgb(232, 222, 248);
+            btnShipPallets.CausesValidation = false;
+            btnShipPallets.Cursor = Cursors.Hand;
+            btnShipPallets.FlatAppearance.BorderColor = Color.FromArgb(103, 80, 164);
+            btnShipPallets.FlatAppearance.BorderSize = 0;
+            btnShipPallets.FlatStyle = FlatStyle.Flat;
+            btnShipPallets.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnShipPallets.ForeColor = Color.FromArgb(0, 0, 64);
+            btnShipPallets.Location = new Point(143, 15);
+            btnShipPallets.Margin = new Padding(3, 2, 3, 2);
+            btnShipPallets.Name = "btnShipPallets";
+            btnShipPallets.Size = new Size(183, 62);
+            btnShipPallets.TabIndex = 44;
+            btnShipPallets.Text = "Ship Pallets";
+            btnShipPallets.UseVisualStyleBackColor = false;
+            btnShipPallets.Click += btnShipPallets_Click;
             // 
             // packedListView2
             // 
-            this.packedListView2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packedListView2.Location = new System.Drawing.Point(0, 0);
-            this.packedListView2.Margin = new System.Windows.Forms.Padding(2);
-            this.packedListView2.Name = "packedListView2";
-            this.packedListView2.Padding = new System.Windows.Forms.Padding(0, 0, 0, 65);
-            this.packedListView2.Size = new System.Drawing.Size(1043, 406);
-            this.packedListView2.TabIndex = 1;
+            packedListView2.Dock = DockStyle.Fill;
+            packedListView2.Location = new Point(0, 0);
+            packedListView2.Margin = new Padding(3, 2, 3, 2);
+            packedListView2.Name = "packedListView2";
+            packedListView2.Padding = new Padding(0, 0, 0, 100);
+            packedListView2.Size = new Size(1393, 631);
+            packedListView2.TabIndex = 1;
             // 
             // pgPicked
             // 
-            this.pgPicked.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
-            this.pgPicked.Controls.Add(this.kryptonPanel2);
-            this.pgPicked.Flags = 65534;
-            this.pgPicked.LastVisibleSet = true;
-            this.pgPicked.Margin = new System.Windows.Forms.Padding(2);
-            this.pgPicked.MinimumSize = new System.Drawing.Size(112, 41);
-            this.pgPicked.Name = "pgPicked";
-            this.pgPicked.Size = new System.Drawing.Size(1025, 401);
-            this.pgPicked.Text = "kryptonPage5";
-            this.pgPicked.ToolTipTitle = "Page ToolTip";
-            this.pgPicked.UniqueName = "fb4ae588bdaf4856b26cdaab046883f1";
+            pgPicked.AutoHiddenSlideSize = new Size(200, 200);
+            pgPicked.Controls.Add(kryptonPanel2);
+            pgPicked.Flags = 65534;
+            pgPicked.LastVisibleSet = true;
+            pgPicked.Margin = new Padding(3, 2, 3, 2);
+            pgPicked.MinimumSize = new Size(149, 62);
+            pgPicked.Name = "pgPicked";
+            pgPicked.Size = new Size(1367, 618);
+            pgPicked.Text = "kryptonPage5";
+            pgPicked.ToolTipTitle = "Page ToolTip";
+            pgPicked.UniqueName = "fb4ae588bdaf4856b26cdaab046883f1";
             // 
             // kryptonPanel2
             // 
-            this.kryptonPanel2.Controls.Add(this.pickedUpListView);
-            this.kryptonPanel2.Controls.Add(this.kryptonPanel6);
-            this.kryptonPanel2.Controls.Add(this.tableLayoutPanel1);
-            this.kryptonPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonPanel2.Location = new System.Drawing.Point(0, 0);
-            this.kryptonPanel2.Margin = new System.Windows.Forms.Padding(4);
-            this.kryptonPanel2.Name = "kryptonPanel2";
-            this.kryptonPanel2.Size = new System.Drawing.Size(1025, 401);
-            this.kryptonPanel2.StateCommon.Color1 = System.Drawing.Color.White;
-            this.kryptonPanel2.TabIndex = 1;
+            kryptonPanel2.Controls.Add(pickedUpListView);
+            kryptonPanel2.Controls.Add(kryptonPanel6);
+            kryptonPanel2.Controls.Add(tableLayoutPanel1);
+            kryptonPanel2.Dock = DockStyle.Fill;
+            kryptonPanel2.Location = new Point(0, 0);
+            kryptonPanel2.Margin = new Padding(5, 6, 5, 6);
+            kryptonPanel2.Name = "kryptonPanel2";
+            kryptonPanel2.Size = new Size(1367, 618);
+            kryptonPanel2.StateCommon.Color1 = Color.White;
+            kryptonPanel2.TabIndex = 1;
             // 
             // pickedUpListView
             // 
-            this.pickedUpListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pickedUpListView.Location = new System.Drawing.Point(0, 81);
-            this.pickedUpListView.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pickedUpListView.Name = "pickedUpListView";
-            this.pickedUpListView.Size = new System.Drawing.Size(1025, 320);
-            this.pickedUpListView.TabIndex = 2;
+            pickedUpListView.Dock = DockStyle.Fill;
+            pickedUpListView.Location = new Point(0, 125);
+            pickedUpListView.Margin = new Padding(4, 2, 4, 2);
+            pickedUpListView.Name = "pickedUpListView";
+            pickedUpListView.Size = new Size(1367, 493);
+            pickedUpListView.TabIndex = 2;
             // 
             // kryptonPanel6
             // 
-            this.kryptonPanel6.Controls.Add(this.tableLayoutPanel2);
-            this.kryptonPanel6.Dock = System.Windows.Forms.DockStyle.Top;
-            this.kryptonPanel6.Location = new System.Drawing.Point(0, 55);
-            this.kryptonPanel6.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonPanel6.Name = "kryptonPanel6";
-            this.kryptonPanel6.Size = new System.Drawing.Size(1025, 26);
-            this.kryptonPanel6.TabIndex = 1;
+            kryptonPanel6.Controls.Add(tableLayoutPanel2);
+            kryptonPanel6.Dock = DockStyle.Top;
+            kryptonPanel6.Location = new Point(0, 85);
+            kryptonPanel6.Margin = new Padding(3, 2, 3, 2);
+            kryptonPanel6.Name = "kryptonPanel6";
+            kryptonPanel6.Size = new Size(1367, 40);
+            kryptonPanel6.TabIndex = 1;
             // 
             // tableLayoutPanel2
             // 
-            this.tableLayoutPanel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(116)))), ((int)(((byte)(116)))));
-            this.tableLayoutPanel2.ColumnCount = 7;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7.079292F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.93831F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 14.54855F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.72873F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 13.67863F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17.60824F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17.41826F));
-            this.tableLayoutPanel2.Controls.Add(this.kryptonLabel6, 4, 0);
-            this.tableLayoutPanel2.Controls.Add(this.kryptonLabel4, 2, 0);
-            this.tableLayoutPanel2.Controls.Add(this.kryptonCheckBox1, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.kryptonLabel3, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.kryptonLabel5, 3, 0);
-            this.tableLayoutPanel2.Controls.Add(this.kryptonLabel7, 5, 0);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 1;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(1025, 26);
-            this.tableLayoutPanel2.TabIndex = 0;
+            tableLayoutPanel2.BackColor = Color.FromArgb(116, 116, 116);
+            tableLayoutPanel2.ColumnCount = 7;
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 7.079292F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.93831F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.54855F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 12.72873F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 13.67863F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17.60824F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 17.41826F));
+            tableLayoutPanel2.Controls.Add(kryptonLabel6, 4, 0);
+            tableLayoutPanel2.Controls.Add(kryptonLabel4, 2, 0);
+            tableLayoutPanel2.Controls.Add(kryptonCheckBox1, 0, 0);
+            tableLayoutPanel2.Controls.Add(kryptonLabel3, 1, 0);
+            tableLayoutPanel2.Controls.Add(kryptonLabel5, 3, 0);
+            tableLayoutPanel2.Controls.Add(kryptonLabel7, 5, 0);
+            tableLayoutPanel2.Dock = DockStyle.Fill;
+            tableLayoutPanel2.Location = new Point(0, 0);
+            tableLayoutPanel2.Margin = new Padding(0);
+            tableLayoutPanel2.Name = "tableLayoutPanel2";
+            tableLayoutPanel2.RowCount = 1;
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel2.Size = new Size(1367, 40);
+            tableLayoutPanel2.TabIndex = 0;
             // 
             // kryptonLabel6
             // 
-            this.kryptonLabel6.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.kryptonLabel6.Location = new System.Drawing.Point(526, 2);
-            this.kryptonLabel6.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonLabel6.Name = "kryptonLabel6";
-            this.kryptonLabel6.Size = new System.Drawing.Size(60, 22);
-            this.kryptonLabel6.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
-            this.kryptonLabel6.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kryptonLabel6.TabIndex = 4;
-            this.kryptonLabel6.Values.Text = "Pallets";
+            kryptonLabel6.Anchor = AnchorStyles.Left;
+            kryptonLabel6.Location = new Point(702, 2);
+            kryptonLabel6.Margin = new Padding(3, 2, 3, 2);
+            kryptonLabel6.Name = "kryptonLabel6";
+            kryptonLabel6.Size = new Size(74, 35);
+            kryptonLabel6.StateCommon.ShortText.Color1 = SystemColors.Control;
+            kryptonLabel6.StateCommon.ShortText.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            kryptonLabel6.TabIndex = 4;
+            kryptonLabel6.Values.Text = "Pallets";
             // 
             // kryptonLabel4
             // 
-            this.kryptonLabel4.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.kryptonLabel4.Location = new System.Drawing.Point(247, 2);
-            this.kryptonLabel4.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonLabel4.Name = "kryptonLabel4";
-            this.kryptonLabel4.Size = new System.Drawing.Size(111, 22);
-            this.kryptonLabel4.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
-            this.kryptonLabel4.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kryptonLabel4.TabIndex = 2;
-            this.kryptonLabel4.Values.Text = "Envelope Qty";
+            kryptonLabel4.Anchor = AnchorStyles.Left;
+            kryptonLabel4.Location = new Point(330, 2);
+            kryptonLabel4.Margin = new Padding(3, 2, 3, 2);
+            kryptonLabel4.Name = "kryptonLabel4";
+            kryptonLabel4.Size = new Size(137, 35);
+            kryptonLabel4.StateCommon.ShortText.Color1 = SystemColors.Control;
+            kryptonLabel4.StateCommon.ShortText.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            kryptonLabel4.TabIndex = 2;
+            kryptonLabel4.Values.Text = "Envelope Qty";
             // 
             // kryptonCheckBox1
             // 
-            this.kryptonCheckBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.kryptonCheckBox1.Location = new System.Drawing.Point(26, 6);
-            this.kryptonCheckBox1.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonCheckBox1.Name = "kryptonCheckBox1";
-            this.kryptonCheckBox1.Size = new System.Drawing.Size(19, 13);
-            this.kryptonCheckBox1.TabIndex = 0;
-            this.kryptonCheckBox1.Values.Text = "";
+            kryptonCheckBox1.Anchor = AnchorStyles.None;
+            kryptonCheckBox1.Location = new Point(37, 10);
+            kryptonCheckBox1.Margin = new Padding(3, 2, 3, 2);
+            kryptonCheckBox1.Name = "kryptonCheckBox1";
+            kryptonCheckBox1.Size = new Size(22, 20);
+            kryptonCheckBox1.TabIndex = 0;
+            kryptonCheckBox1.Values.Text = "";
             // 
             // kryptonLabel3
             // 
-            this.kryptonLabel3.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.kryptonLabel3.Location = new System.Drawing.Point(74, 2);
-            this.kryptonLabel3.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonLabel3.Name = "kryptonLabel3";
-            this.kryptonLabel3.Size = new System.Drawing.Size(62, 22);
-            this.kryptonLabel3.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
-            this.kryptonLabel3.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kryptonLabel3.TabIndex = 1;
-            this.kryptonLabel3.Values.Text = "PB Job";
+            kryptonLabel3.Anchor = AnchorStyles.Left;
+            kryptonLabel3.Location = new Point(99, 2);
+            kryptonLabel3.Margin = new Padding(3, 2, 3, 2);
+            kryptonLabel3.Name = "kryptonLabel3";
+            kryptonLabel3.Size = new Size(76, 35);
+            kryptonLabel3.StateCommon.ShortText.Color1 = SystemColors.Control;
+            kryptonLabel3.StateCommon.ShortText.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            kryptonLabel3.TabIndex = 1;
+            kryptonLabel3.Values.Text = "PB Job";
             // 
             // kryptonLabel5
             // 
-            this.kryptonLabel5.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.kryptonLabel5.Location = new System.Drawing.Point(396, 2);
-            this.kryptonLabel5.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonLabel5.Name = "kryptonLabel5";
-            this.kryptonLabel5.Size = new System.Drawing.Size(51, 22);
-            this.kryptonLabel5.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
-            this.kryptonLabel5.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kryptonLabel5.TabIndex = 3;
-            this.kryptonLabel5.Values.Text = "Trays";
+            kryptonLabel5.Anchor = AnchorStyles.Left;
+            kryptonLabel5.Location = new Point(528, 2);
+            kryptonLabel5.Margin = new Padding(3, 2, 3, 2);
+            kryptonLabel5.Name = "kryptonLabel5";
+            kryptonLabel5.Size = new Size(62, 35);
+            kryptonLabel5.StateCommon.ShortText.Color1 = SystemColors.Control;
+            kryptonLabel5.StateCommon.ShortText.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            kryptonLabel5.TabIndex = 3;
+            kryptonLabel5.Values.Text = "Trays";
             // 
             // kryptonLabel7
             // 
-            this.kryptonLabel7.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.kryptonLabel7.Location = new System.Drawing.Point(666, 2);
-            this.kryptonLabel7.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonLabel7.Name = "kryptonLabel7";
-            this.kryptonLabel7.Size = new System.Drawing.Size(142, 22);
-            this.kryptonLabel7.StateCommon.ShortText.Color1 = System.Drawing.SystemColors.Control;
-            this.kryptonLabel7.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kryptonLabel7.TabIndex = 5;
-            this.kryptonLabel7.Values.Text = "Ship Date && Time";
+            kryptonLabel7.Anchor = AnchorStyles.Left;
+            kryptonLabel7.Location = new Point(888, 2);
+            kryptonLabel7.Margin = new Padding(3, 2, 3, 2);
+            kryptonLabel7.Name = "kryptonLabel7";
+            kryptonLabel7.Size = new Size(176, 35);
+            kryptonLabel7.StateCommon.ShortText.Color1 = SystemColors.Control;
+            kryptonLabel7.StateCommon.ShortText.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            kryptonLabel7.TabIndex = 5;
+            kryptonLabel7.Values.Text = "Ship Date && Time";
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.ColumnCount = 5;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.Controls.Add(this.kryptonButton2, 3, 0);
-            this.tableLayoutPanel1.Controls.Add(this.kryptonButton1, 4, 0);
-            this.tableLayoutPanel1.Controls.Add(this.btnSearch, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.kryptonPanel3, 0, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.tableLayoutPanel1.RowCount = 1;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1025, 55);
-            this.tableLayoutPanel1.TabIndex = 0;
+            tableLayoutPanel1.ColumnCount = 5;
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle());
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle());
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle());
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle());
+            tableLayoutPanel1.Controls.Add(kryptonButton2, 3, 0);
+            tableLayoutPanel1.Controls.Add(kryptonButton1, 4, 0);
+            tableLayoutPanel1.Controls.Add(btnSearch, 2, 0);
+            tableLayoutPanel1.Controls.Add(kryptonPanel3, 0, 0);
+            tableLayoutPanel1.Dock = DockStyle.Top;
+            tableLayoutPanel1.Location = new Point(0, 0);
+            tableLayoutPanel1.Margin = new Padding(3, 2, 3, 2);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RightToLeft = RightToLeft.No;
+            tableLayoutPanel1.RowCount = 1;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.Size = new Size(1367, 85);
+            tableLayoutPanel1.TabIndex = 0;
             // 
             // kryptonButton2
             // 
-            this.kryptonButton2.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.kryptonButton2.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.kryptonButton2.Location = new System.Drawing.Point(702, 4);
-            this.kryptonButton2.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonButton2.Name = "kryptonButton2";
-            this.kryptonButton2.Size = new System.Drawing.Size(151, 46);
-            this.kryptonButton2.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
-            this.kryptonButton2.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonButton2.StateCommon.Border.Rounding = 5F;
-            this.kryptonButton2.StateCommon.Content.Padding = new System.Windows.Forms.Padding(10, -1, -1, -1);
-            this.kryptonButton2.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kryptonButton2.StateCommon.Content.ShortText.Image = global::WindowsFormsApp1.Properties.Resources.save_img_32;
-            this.kryptonButton2.TabIndex = 1;
-            this.kryptonButton2.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.kryptonButton2.Values.Image = global::WindowsFormsApp1.Properties.Resources.print_img_32;
-            this.kryptonButton2.Values.Text = "Print Summary";
+            kryptonButton2.Anchor = AnchorStyles.Right;
+            kryptonButton2.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            kryptonButton2.Location = new Point(936, 7);
+            kryptonButton2.Margin = new Padding(3, 2, 3, 2);
+            kryptonButton2.Name = "kryptonButton2";
+            kryptonButton2.Size = new Size(201, 71);
+            kryptonButton2.StateCommon.Back.Color1 = Color.FromArgb(232, 222, 248);
+            kryptonButton2.StateCommon.Border.DrawBorders = Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom | Krypton.Toolkit.PaletteDrawBorders.Left | Krypton.Toolkit.PaletteDrawBorders.Right;
+            kryptonButton2.StateCommon.Border.Rounding = 5F;
+            kryptonButton2.StateCommon.Content.Padding = new Padding(10, -1, -1, -1);
+            kryptonButton2.StateCommon.Content.ShortText.Font = new Font("Microsoft Sans Serif", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            kryptonButton2.StateCommon.Content.ShortText.Image = Properties.Resources.save_img_32;
+            kryptonButton2.TabIndex = 1;
+            kryptonButton2.Values.DropDownArrowColor = Color.Empty;
+            kryptonButton2.Values.Image = Properties.Resources.print_img_32;
+            kryptonButton2.Values.Text = "Print Summary";
             // 
             // kryptonButton1
             // 
-            this.kryptonButton1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.kryptonButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.kryptonButton1.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.kryptonButton1.Location = new System.Drawing.Point(857, 4);
-            this.kryptonButton1.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonButton1.Name = "kryptonButton1";
-            this.kryptonButton1.Size = new System.Drawing.Size(166, 46);
-            this.kryptonButton1.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
-            this.kryptonButton1.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.kryptonButton1.StateCommon.Border.Rounding = 5F;
-            this.kryptonButton1.StateCommon.Content.Padding = new System.Windows.Forms.Padding(10, -1, -1, -1);
-            this.kryptonButton1.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kryptonButton1.StateCommon.Content.ShortText.Image = global::WindowsFormsApp1.Properties.Resources.save_img_32;
-            this.kryptonButton1.TabIndex = 0;
-            this.kryptonButton1.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.kryptonButton1.Values.Image = global::WindowsFormsApp1.Properties.Resources.save_img_22;
-            this.kryptonButton1.Values.Text = "Generate Report";
+            kryptonButton1.Anchor = AnchorStyles.Right;
+            kryptonButton1.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            kryptonButton1.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            kryptonButton1.Location = new Point(1143, 7);
+            kryptonButton1.Margin = new Padding(3, 2, 3, 2);
+            kryptonButton1.Name = "kryptonButton1";
+            kryptonButton1.Size = new Size(221, 71);
+            kryptonButton1.StateCommon.Back.Color1 = Color.FromArgb(232, 222, 248);
+            kryptonButton1.StateCommon.Border.DrawBorders = Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom | Krypton.Toolkit.PaletteDrawBorders.Left | Krypton.Toolkit.PaletteDrawBorders.Right;
+            kryptonButton1.StateCommon.Border.Rounding = 5F;
+            kryptonButton1.StateCommon.Content.Padding = new Padding(10, -1, -1, -1);
+            kryptonButton1.StateCommon.Content.ShortText.Font = new Font("Microsoft Sans Serif", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            kryptonButton1.StateCommon.Content.ShortText.Image = Properties.Resources.save_img_32;
+            kryptonButton1.TabIndex = 0;
+            kryptonButton1.Values.DropDownArrowColor = Color.Empty;
+            kryptonButton1.Values.Image = Properties.Resources.save_img_22;
+            kryptonButton1.Values.Text = "Generate Report";
             // 
             // btnSearch
             // 
-            this.btnSearch.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.btnSearch.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnSearch.Location = new System.Drawing.Point(591, 4);
-            this.btnSearch.Margin = new System.Windows.Forms.Padding(2);
-            this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(107, 46);
-            this.btnSearch.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
-            this.btnSearch.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
-            | Krypton.Toolkit.PaletteDrawBorders.Left) 
-            | Krypton.Toolkit.PaletteDrawBorders.Right)));
-            this.btnSearch.StateCommon.Border.Rounding = 5F;
-            this.btnSearch.StateCommon.Content.Padding = new System.Windows.Forms.Padding(15, -1, -1, -1);
-            this.btnSearch.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSearch.StateCommon.Content.ShortText.Image = global::WindowsFormsApp1.Properties.Resources.save_img_32;
-            this.btnSearch.TabIndex = 2;
-            this.btnSearch.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.btnSearch.Values.Image = global::WindowsFormsApp1.Properties.Resources.search_img_32;
-            this.btnSearch.Values.Text = "Search";
-            this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
+            btnSearch.Anchor = AnchorStyles.Right;
+            btnSearch.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            btnSearch.Location = new Point(787, 7);
+            btnSearch.Margin = new Padding(3, 2, 3, 2);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(143, 71);
+            btnSearch.StateCommon.Back.Color1 = Color.FromArgb(232, 222, 248);
+            btnSearch.StateCommon.Border.DrawBorders = Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom | Krypton.Toolkit.PaletteDrawBorders.Left | Krypton.Toolkit.PaletteDrawBorders.Right;
+            btnSearch.StateCommon.Border.Rounding = 5F;
+            btnSearch.StateCommon.Content.Padding = new Padding(15, -1, -1, -1);
+            btnSearch.StateCommon.Content.ShortText.Font = new Font("Microsoft Sans Serif", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnSearch.StateCommon.Content.ShortText.Image = Properties.Resources.save_img_32;
+            btnSearch.TabIndex = 2;
+            btnSearch.Values.DropDownArrowColor = Color.Empty;
+            btnSearch.Values.Image = Properties.Resources.search_img_32;
+            btnSearch.Values.Text = "Search";
+            btnSearch.Click += btnSearch_Click;
             // 
             // kryptonPanel3
             // 
-            this.kryptonPanel3.Controls.Add(this.kryptonTableLayoutPanel2);
-            this.kryptonPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonPanel3.Location = new System.Drawing.Point(2, 2);
-            this.kryptonPanel3.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonPanel3.Name = "kryptonPanel3";
-            this.kryptonPanel3.Size = new System.Drawing.Size(585, 51);
-            this.kryptonPanel3.StateCommon.Color1 = System.Drawing.Color.Transparent;
-            this.kryptonPanel3.TabIndex = 3;
+            kryptonPanel3.Controls.Add(kryptonTableLayoutPanel2);
+            kryptonPanel3.Dock = DockStyle.Fill;
+            kryptonPanel3.Location = new Point(3, 2);
+            kryptonPanel3.Margin = new Padding(3, 2, 3, 2);
+            kryptonPanel3.Name = "kryptonPanel3";
+            kryptonPanel3.Size = new Size(778, 81);
+            kryptonPanel3.StateCommon.Color1 = Color.Transparent;
+            kryptonPanel3.TabIndex = 3;
             // 
             // kryptonTableLayoutPanel2
             // 
-            this.kryptonTableLayoutPanel2.ColumnCount = 4;
-            this.kryptonTableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 242F));
-            this.kryptonTableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 52F));
-            this.kryptonTableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 242F));
-            this.kryptonTableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 51F));
-            this.kryptonTableLayoutPanel2.Controls.Add(this.kryptonPanel5, 0, 0);
-            this.kryptonTableLayoutPanel2.Controls.Add(this.kryptonPanel4, 2, 0);
-            this.kryptonTableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonTableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
-            this.kryptonTableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonTableLayoutPanel2.Name = "kryptonTableLayoutPanel2";
-            this.kryptonTableLayoutPanel2.RowCount = 1;
-            this.kryptonTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.kryptonTableLayoutPanel2.Size = new System.Drawing.Size(585, 51);
-            this.kryptonTableLayoutPanel2.StateCommon.Color1 = System.Drawing.Color.White;
-            this.kryptonTableLayoutPanel2.TabIndex = 0;
+            kryptonTableLayoutPanel2.ColumnCount = 4;
+            kryptonTableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 323F));
+            kryptonTableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 69F));
+            kryptonTableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 323F));
+            kryptonTableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 68F));
+            kryptonTableLayoutPanel2.Controls.Add(kryptonPanel5, 0, 0);
+            kryptonTableLayoutPanel2.Controls.Add(kryptonPanel4, 2, 0);
+            kryptonTableLayoutPanel2.Dock = DockStyle.Fill;
+            kryptonTableLayoutPanel2.Location = new Point(0, 0);
+            kryptonTableLayoutPanel2.Margin = new Padding(3, 2, 3, 2);
+            kryptonTableLayoutPanel2.Name = "kryptonTableLayoutPanel2";
+            kryptonTableLayoutPanel2.RowCount = 1;
+            kryptonTableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            kryptonTableLayoutPanel2.Size = new Size(778, 81);
+            kryptonTableLayoutPanel2.StateCommon.Color1 = Color.White;
+            kryptonTableLayoutPanel2.TabIndex = 0;
             // 
             // kryptonPanel5
             // 
-            this.kryptonPanel5.Controls.Add(this.kryptonLabel2);
-            this.kryptonPanel5.Controls.Add(this.dtPickUpFrom);
-            this.kryptonPanel5.Location = new System.Drawing.Point(2, 2);
-            this.kryptonPanel5.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonPanel5.Name = "kryptonPanel5";
-            this.kryptonPanel5.Padding = new System.Windows.Forms.Padding(4);
-            this.kryptonPanel5.Size = new System.Drawing.Size(237, 46);
-            this.kryptonPanel5.StateCommon.Color1 = System.Drawing.Color.Transparent;
-            this.kryptonPanel5.TabIndex = 1;
+            kryptonPanel5.Controls.Add(kryptonLabel2);
+            kryptonPanel5.Controls.Add(dtPickUpFrom);
+            kryptonPanel5.Location = new Point(3, 2);
+            kryptonPanel5.Margin = new Padding(3, 2, 3, 2);
+            kryptonPanel5.Name = "kryptonPanel5";
+            kryptonPanel5.Padding = new Padding(5, 6, 5, 6);
+            kryptonPanel5.Size = new Size(316, 71);
+            kryptonPanel5.StateCommon.Color1 = Color.Transparent;
+            kryptonPanel5.TabIndex = 1;
             // 
             // kryptonLabel2
             // 
-            this.kryptonLabel2.Location = new System.Drawing.Point(13, 0);
-            this.kryptonLabel2.Margin = new System.Windows.Forms.Padding(0, 0, 4, 0);
-            this.kryptonLabel2.Name = "kryptonLabel2";
-            this.kryptonLabel2.Size = new System.Drawing.Size(79, 16);
-            this.kryptonLabel2.StateCommon.Padding = new System.Windows.Forms.Padding(0);
-            this.kryptonLabel2.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kryptonLabel2.TabIndex = 1;
-            this.kryptonLabel2.Values.Text = "Picked Up From";
+            kryptonLabel2.Location = new Point(17, 0);
+            kryptonLabel2.Margin = new Padding(0, 0, 5, 0);
+            kryptonLabel2.Name = "kryptonLabel2";
+            kryptonLabel2.Size = new Size(98, 24);
+            kryptonLabel2.StateCommon.Padding = new Padding(0);
+            kryptonLabel2.StateCommon.ShortText.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            kryptonLabel2.TabIndex = 1;
+            kryptonLabel2.Values.Text = "Picked Up From";
             // 
             // dtPickUpFrom
             // 
-            this.dtPickUpFrom.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dtPickUpFrom.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dtPickUpFrom.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtPickUpFrom.Location = new System.Drawing.Point(4, 4);
-            this.dtPickUpFrom.Margin = new System.Windows.Forms.Padding(2);
-            this.dtPickUpFrom.Name = "dtPickUpFrom";
-            this.dtPickUpFrom.Size = new System.Drawing.Size(229, 36);
-            this.dtPickUpFrom.TabIndex = 0;
+            dtPickUpFrom.Dock = DockStyle.Fill;
+            dtPickUpFrom.Font = new Font("Segoe UI", 16.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dtPickUpFrom.Format = DateTimePickerFormat.Short;
+            dtPickUpFrom.Location = new Point(5, 6);
+            dtPickUpFrom.Margin = new Padding(3, 2, 3, 2);
+            dtPickUpFrom.Name = "dtPickUpFrom";
+            dtPickUpFrom.Size = new Size(306, 43);
+            dtPickUpFrom.TabIndex = 0;
             // 
             // kryptonPanel4
             // 
-            this.kryptonPanel4.Controls.Add(this.kryptonLabel1);
-            this.kryptonPanel4.Controls.Add(this.dtPickUpTo);
-            this.kryptonPanel4.Location = new System.Drawing.Point(296, 2);
-            this.kryptonPanel4.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonPanel4.Name = "kryptonPanel4";
-            this.kryptonPanel4.Padding = new System.Windows.Forms.Padding(4);
-            this.kryptonPanel4.Size = new System.Drawing.Size(238, 46);
-            this.kryptonPanel4.StateCommon.Color1 = System.Drawing.Color.Transparent;
-            this.kryptonPanel4.TabIndex = 0;
+            kryptonPanel4.Controls.Add(kryptonLabel1);
+            kryptonPanel4.Controls.Add(dtPickUpTo);
+            kryptonPanel4.Location = new Point(395, 2);
+            kryptonPanel4.Margin = new Padding(3, 2, 3, 2);
+            kryptonPanel4.Name = "kryptonPanel4";
+            kryptonPanel4.Padding = new Padding(5, 6, 5, 6);
+            kryptonPanel4.Size = new Size(317, 71);
+            kryptonPanel4.StateCommon.Color1 = Color.Transparent;
+            kryptonPanel4.TabIndex = 0;
             // 
             // kryptonLabel1
             // 
-            this.kryptonLabel1.Location = new System.Drawing.Point(13, 0);
-            this.kryptonLabel1.Margin = new System.Windows.Forms.Padding(0);
-            this.kryptonLabel1.Name = "kryptonLabel1";
-            this.kryptonLabel1.Size = new System.Drawing.Size(66, 16);
-            this.kryptonLabel1.StateCommon.Padding = new System.Windows.Forms.Padding(0);
-            this.kryptonLabel1.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kryptonLabel1.TabIndex = 1;
-            this.kryptonLabel1.Values.Text = "Picked Up To";
+            kryptonLabel1.Location = new Point(17, 0);
+            kryptonLabel1.Margin = new Padding(0);
+            kryptonLabel1.Name = "kryptonLabel1";
+            kryptonLabel1.Size = new Size(83, 24);
+            kryptonLabel1.StateCommon.Padding = new Padding(0);
+            kryptonLabel1.StateCommon.ShortText.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            kryptonLabel1.TabIndex = 1;
+            kryptonLabel1.Values.Text = "Picked Up To";
             // 
             // dtPickUpTo
             // 
-            this.dtPickUpTo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dtPickUpTo.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dtPickUpTo.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtPickUpTo.Location = new System.Drawing.Point(4, 4);
-            this.dtPickUpTo.Margin = new System.Windows.Forms.Padding(2);
-            this.dtPickUpTo.Name = "dtPickUpTo";
-            this.dtPickUpTo.Size = new System.Drawing.Size(230, 36);
-            this.dtPickUpTo.TabIndex = 0;
+            dtPickUpTo.Dock = DockStyle.Fill;
+            dtPickUpTo.Font = new Font("Segoe UI", 16.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dtPickUpTo.Format = DateTimePickerFormat.Short;
+            dtPickUpTo.Location = new Point(5, 6);
+            dtPickUpTo.Margin = new Padding(3, 2, 3, 2);
+            dtPickUpTo.Name = "dtPickUpTo";
+            dtPickUpTo.Size = new Size(307, 43);
+            dtPickUpTo.TabIndex = 0;
             // 
             // pnlButtonHeaders
             // 
-            this.pnlButtonHeaders.Controls.Add(this.kryptonTableLayoutPanel1);
-            this.pnlButtonHeaders.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlButtonHeaders.Location = new System.Drawing.Point(14, 0);
-            this.pnlButtonHeaders.Margin = new System.Windows.Forms.Padding(0);
-            this.pnlButtonHeaders.Name = "pnlButtonHeaders";
-            this.pnlButtonHeaders.Padding = new System.Windows.Forms.Padding(0, 0, 0, 4);
-            this.pnlButtonHeaders.Size = new System.Drawing.Size(1043, 48);
-            this.pnlButtonHeaders.StateCommon.Color1 = System.Drawing.Color.Transparent;
-            this.pnlButtonHeaders.StateCommon.Color2 = System.Drawing.Color.Transparent;
-            this.pnlButtonHeaders.TabIndex = 0;
+            pnlButtonHeaders.Controls.Add(kryptonTableLayoutPanel1);
+            pnlButtonHeaders.Dock = DockStyle.Top;
+            pnlButtonHeaders.Location = new Point(19, 0);
+            pnlButtonHeaders.Margin = new Padding(0);
+            pnlButtonHeaders.Name = "pnlButtonHeaders";
+            pnlButtonHeaders.Padding = new Padding(0, 0, 0, 6);
+            pnlButtonHeaders.Size = new Size(1393, 74);
+            pnlButtonHeaders.StateCommon.Color1 = Color.Transparent;
+            pnlButtonHeaders.StateCommon.Color2 = Color.Transparent;
+            pnlButtonHeaders.TabIndex = 0;
             // 
             // kryptonTableLayoutPanel1
             // 
-            this.kryptonTableLayoutPanel1.AutoSize = true;
-            this.kryptonTableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.kryptonTableLayoutPanel1.ColumnCount = 3;
-            this.kryptonTableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.kryptonTableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.kryptonTableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.kryptonTableLayoutPanel1.Controls.Add(this.kcbBuildPallets, 0, 0);
-            this.kryptonTableLayoutPanel1.Controls.Add(this.kcbPickedUp, 2, 0);
-            this.kryptonTableLayoutPanel1.Controls.Add(this.kcbPackedReady, 1, 0);
-            this.kryptonTableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.kryptonTableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.kryptonTableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
-            this.kryptonTableLayoutPanel1.Name = "kryptonTableLayoutPanel1";
-            this.kryptonTableLayoutPanel1.RowCount = 1;
-            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.kryptonTableLayoutPanel1.Size = new System.Drawing.Size(483, 44);
-            this.kryptonTableLayoutPanel1.StateCommon.Color1 = System.Drawing.Color.Transparent;
-            this.kryptonTableLayoutPanel1.StateCommon.Color2 = System.Drawing.Color.Transparent;
-            this.kryptonTableLayoutPanel1.TabIndex = 0;
+            kryptonTableLayoutPanel1.AutoSize = true;
+            kryptonTableLayoutPanel1.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            kryptonTableLayoutPanel1.ColumnCount = 3;
+            kryptonTableLayoutPanel1.ColumnStyles.Add(new ColumnStyle());
+            kryptonTableLayoutPanel1.ColumnStyles.Add(new ColumnStyle());
+            kryptonTableLayoutPanel1.ColumnStyles.Add(new ColumnStyle());
+            kryptonTableLayoutPanel1.Controls.Add(kcbBuildPallets, 0, 0);
+            kryptonTableLayoutPanel1.Controls.Add(kcbPickedUp, 2, 0);
+            kryptonTableLayoutPanel1.Controls.Add(kcbPackedReady, 1, 0);
+            kryptonTableLayoutPanel1.Dock = DockStyle.Left;
+            kryptonTableLayoutPanel1.Location = new Point(0, 0);
+            kryptonTableLayoutPanel1.Margin = new Padding(3, 2, 3, 2);
+            kryptonTableLayoutPanel1.Name = "kryptonTableLayoutPanel1";
+            kryptonTableLayoutPanel1.RowCount = 1;
+            kryptonTableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            kryptonTableLayoutPanel1.Size = new Size(646, 68);
+            kryptonTableLayoutPanel1.StateCommon.Color1 = Color.Transparent;
+            kryptonTableLayoutPanel1.StateCommon.Color2 = Color.Transparent;
+            kryptonTableLayoutPanel1.TabIndex = 0;
             // 
             // kcbBuildPallets
             // 
-            this.kcbBuildPallets.Location = new System.Drawing.Point(2, 2);
-            this.kcbBuildPallets.Margin = new System.Windows.Forms.Padding(2);
-            this.kcbBuildPallets.Name = "kcbBuildPallets";
-            this.kcbBuildPallets.Size = new System.Drawing.Size(163, 39);
-            this.kcbBuildPallets.StateCommon.Content.Padding = new System.Windows.Forms.Padding(1, -1, 1, -1);
-            this.kcbBuildPallets.StateNormal.Back.Color1 = System.Drawing.SystemColors.Control;
-            this.kcbBuildPallets.StateNormal.Back.Color2 = System.Drawing.SystemColors.Control;
-            this.kcbBuildPallets.StateNormal.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 17F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.kcbBuildPallets.TabIndex = 5;
-            this.kcbBuildPallets.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.kcbBuildPallets.Values.Text = "BUILD PALLETS";
+            kcbBuildPallets.Location = new Point(3, 2);
+            kcbBuildPallets.Margin = new Padding(3, 2, 3, 2);
+            kcbBuildPallets.Name = "kcbBuildPallets";
+            kcbBuildPallets.Size = new Size(217, 60);
+            kcbBuildPallets.StateCommon.Content.Padding = new Padding(1, -1, 1, -1);
+            kcbBuildPallets.StateNormal.Back.Color1 = SystemColors.Control;
+            kcbBuildPallets.StateNormal.Back.Color2 = SystemColors.Control;
+            kcbBuildPallets.StateNormal.Content.ShortText.Font = new Font("Segoe UI Semibold", 17F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            kcbBuildPallets.TabIndex = 5;
+            kcbBuildPallets.Values.DropDownArrowColor = Color.Empty;
+            kcbBuildPallets.Values.Text = "BUILD PALLETS";
             // 
             // kcbPickedUp
             // 
-            this.kcbPickedUp.Location = new System.Drawing.Point(362, 2);
-            this.kcbPickedUp.Margin = new System.Windows.Forms.Padding(2);
-            this.kcbPickedUp.Name = "kcbPickedUp";
-            this.kcbPickedUp.Size = new System.Drawing.Size(119, 39);
-            this.kcbPickedUp.StateCommon.Content.Padding = new System.Windows.Forms.Padding(1, -1, 1, -1);
-            this.kcbPickedUp.StateNormal.Back.Color1 = System.Drawing.SystemColors.Control;
-            this.kcbPickedUp.StateNormal.Back.Color2 = System.Drawing.SystemColors.Control;
-            this.kcbPickedUp.StateNormal.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 17F, System.Drawing.FontStyle.Bold);
-            this.kcbPickedUp.TabIndex = 4;
-            this.kcbPickedUp.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.kcbPickedUp.Values.Text = "PICKED UP";
+            kcbPickedUp.Location = new Point(484, 2);
+            kcbPickedUp.Margin = new Padding(3, 2, 3, 2);
+            kcbPickedUp.Name = "kcbPickedUp";
+            kcbPickedUp.Size = new Size(159, 60);
+            kcbPickedUp.StateCommon.Content.Padding = new Padding(1, -1, 1, -1);
+            kcbPickedUp.StateNormal.Back.Color1 = SystemColors.Control;
+            kcbPickedUp.StateNormal.Back.Color2 = SystemColors.Control;
+            kcbPickedUp.StateNormal.Content.ShortText.Font = new Font("Segoe UI Semibold", 17F, FontStyle.Bold);
+            kcbPickedUp.TabIndex = 4;
+            kcbPickedUp.Values.DropDownArrowColor = Color.Empty;
+            kcbPickedUp.Values.Text = "PICKED UP";
             // 
             // kcbPackedReady
             // 
-            this.kcbPackedReady.Location = new System.Drawing.Point(169, 2);
-            this.kcbPackedReady.Margin = new System.Windows.Forms.Padding(2);
-            this.kcbPackedReady.Name = "kcbPackedReady";
-            this.kcbPackedReady.Size = new System.Drawing.Size(189, 39);
-            this.kcbPackedReady.StateCommon.Content.Padding = new System.Windows.Forms.Padding(1, -1, 1, -1);
-            this.kcbPackedReady.StateNormal.Back.Color1 = System.Drawing.SystemColors.Control;
-            this.kcbPackedReady.StateNormal.Back.Color2 = System.Drawing.SystemColors.Control;
-            this.kcbPackedReady.StateNormal.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 17F, System.Drawing.FontStyle.Bold);
-            this.kcbPackedReady.TabIndex = 3;
-            this.kcbPackedReady.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.kcbPackedReady.Values.Text = "PACKED && READY";
+            kcbPackedReady.Location = new Point(226, 2);
+            kcbPackedReady.Margin = new Padding(3, 2, 3, 2);
+            kcbPackedReady.Name = "kcbPackedReady";
+            kcbPackedReady.Size = new Size(252, 60);
+            kcbPackedReady.StateCommon.Content.Padding = new Padding(1, -1, 1, -1);
+            kcbPackedReady.StateNormal.Back.Color1 = SystemColors.Control;
+            kcbPackedReady.StateNormal.Back.Color2 = SystemColors.Control;
+            kcbPackedReady.StateNormal.Content.ShortText.Font = new Font("Segoe UI Semibold", 17F, FontStyle.Bold);
+            kcbPackedReady.TabIndex = 3;
+            kcbPackedReady.Values.DropDownArrowColor = Color.Empty;
+            kcbPackedReady.Values.Text = "PACKED && READY";
             // 
             // pnlSettings
             // 
-            this.pnlSettings.Controls.Add(this.btnSettings);
-            this.pnlSettings.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlSettings.Location = new System.Drawing.Point(0, 0);
-            this.pnlSettings.Margin = new System.Windows.Forms.Padding(2);
-            this.pnlSettings.Name = "pnlSettings";
-            this.pnlSettings.Padding = new System.Windows.Forms.Padding(0, 4, 4, 4);
-            this.pnlSettings.Size = new System.Drawing.Size(1071, 32);
-            this.pnlSettings.StateCommon.Color1 = System.Drawing.Color.Transparent;
-            this.pnlSettings.StateCommon.Color2 = System.Drawing.Color.Transparent;
-            this.pnlSettings.TabIndex = 1;
+            pnlSettings.Controls.Add(btnSettings);
+            pnlSettings.Dock = DockStyle.Top;
+            pnlSettings.Location = new Point(0, 0);
+            pnlSettings.Margin = new Padding(3, 2, 3, 2);
+            pnlSettings.Name = "pnlSettings";
+            pnlSettings.Padding = new Padding(0, 6, 5, 6);
+            pnlSettings.Size = new Size(1431, 49);
+            pnlSettings.StateCommon.Color1 = Color.Transparent;
+            pnlSettings.StateCommon.Color2 = Color.Transparent;
+            pnlSettings.TabIndex = 1;
             // 
             // btnSettings
             // 
-            this.btnSettings.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnSettings.Dock = System.Windows.Forms.DockStyle.Right;
-            this.btnSettings.Location = new System.Drawing.Point(1041, 4);
-            this.btnSettings.Margin = new System.Windows.Forms.Padding(1);
-            this.btnSettings.Name = "btnSettings";
-            this.btnSettings.Size = new System.Drawing.Size(26, 24);
-            this.btnSettings.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
-            this.btnSettings.TabIndex = 6;
-            this.btnSettings.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            this.btnSettings.Values.Image = global::WindowsFormsApp1.Properties.Resources.settings_img;
-            this.btnSettings.Values.Text = "";
+            btnSettings.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            btnSettings.Dock = DockStyle.Right;
+            btnSettings.Location = new Point(1391, 6);
+            btnSettings.Margin = new Padding(1);
+            btnSettings.Name = "btnSettings";
+            btnSettings.Size = new Size(35, 37);
+            btnSettings.StateCommon.Back.Color1 = Color.Transparent;
+            btnSettings.TabIndex = 6;
+            btnSettings.Values.DropDownArrowColor = Color.Empty;
+            btnSettings.Values.Image = Properties.Resources.settings_img;
+            btnSettings.Values.Text = "";
             // 
             // Main
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(249)))), ((int)(((byte)(249)))), ((int)(((byte)(249)))));
-            this.ClientSize = new System.Drawing.Size(1097, 604);
-            this.Controls.Add(this.kryptonPanel1);
-            this.Controls.Add(this.pnlTitle);
-            this.Controls.Add(this.pnlHeader);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(2);
-            this.Name = "Main";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "iu8";
-            this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).EndInit();
-            this.pnlHeader.ResumeLayout(false);
-            this.flowLayoutPanel1.ResumeLayout(false);
-            this.pnlTitle.ResumeLayout(false);
-            this.pnlTitle.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonCheckSet1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel1)).EndInit();
-            this.kryptonPanel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.gbRoundedParent.Panel)).EndInit();
-            this.gbRoundedParent.Panel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.gbRoundedParent)).EndInit();
-            this.gbRoundedParent.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pnlNavigator)).EndInit();
-            this.pnlNavigator.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.nvNavigator)).EndInit();
-            this.nvNavigator.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pgBuild)).EndInit();
-            this.pgBuild.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pnlBottom)).EndInit();
-            this.pnlBottom.ResumeLayout(false);
-            this.tlpAddPbJob.ResumeLayout(false);
-            this.tlpAddPbJob.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pgPacked)).EndInit();
-            this.pgPacked.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pnlShipPallets)).EndInit();
-            this.pnlShipPallets.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pgPicked)).EndInit();
-            this.pgPicked.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel2)).EndInit();
-            this.kryptonPanel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel6)).EndInit();
-            this.kryptonPanel6.ResumeLayout(false);
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
-            this.tableLayoutPanel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel3)).EndInit();
-            this.kryptonPanel3.ResumeLayout(false);
-            this.kryptonTableLayoutPanel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel5)).EndInit();
-            this.kryptonPanel5.ResumeLayout(false);
-            this.kryptonPanel5.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel4)).EndInit();
-            this.kryptonPanel4.ResumeLayout(false);
-            this.kryptonPanel4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlButtonHeaders)).EndInit();
-            this.pnlButtonHeaders.ResumeLayout(false);
-            this.pnlButtonHeaders.PerformLayout();
-            this.kryptonTableLayoutPanel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pnlSettings)).EndInit();
-            this.pnlSettings.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(249, 249, 249);
+            ClientSize = new Size(1463, 929);
+            Controls.Add(kryptonPanel1);
+            Controls.Add(pnlTitle);
+            Controls.Add(pnlHeader);
+            FormBorderStyle = FormBorderStyle.None;
+            Margin = new Padding(3, 2, 3, 2);
+            Name = "Main";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "iu8";
+            Load += Form1_Load;
+            ((System.ComponentModel.ISupportInitialize)pnlHeader).EndInit();
+            pnlHeader.ResumeLayout(false);
+            flowLayoutPanel1.ResumeLayout(false);
+            pnlTitle.ResumeLayout(false);
+            pnlTitle.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)kryptonCheckSet1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel1).EndInit();
+            kryptonPanel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)gbRoundedParent.Panel).EndInit();
+            gbRoundedParent.Panel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)gbRoundedParent).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pnlNavigator).EndInit();
+            pnlNavigator.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)nvNavigator).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pgBuild).EndInit();
+            pgBuild.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pnlBottom).EndInit();
+            pnlBottom.ResumeLayout(false);
+            tlpAddPbJob.ResumeLayout(false);
+            tlpAddPbJob.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pgPacked).EndInit();
+            pgPacked.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pnlShipPallets).EndInit();
+            pnlShipPallets.ResumeLayout(false);
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pgPicked).EndInit();
+            pgPicked.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel2).EndInit();
+            kryptonPanel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel6).EndInit();
+            kryptonPanel6.ResumeLayout(false);
+            tableLayoutPanel2.ResumeLayout(false);
+            tableLayoutPanel2.PerformLayout();
+            tableLayoutPanel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel3).EndInit();
+            kryptonPanel3.ResumeLayout(false);
+            kryptonTableLayoutPanel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel5).EndInit();
+            kryptonPanel5.ResumeLayout(false);
+            kryptonPanel5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)kryptonPanel4).EndInit();
+            kryptonPanel4.ResumeLayout(false);
+            kryptonPanel4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pnlButtonHeaders).EndInit();
+            pnlButtonHeaders.ResumeLayout(false);
+            pnlButtonHeaders.PerformLayout();
+            kryptonTableLayoutPanel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pnlSettings).EndInit();
+            pnlSettings.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
 
-    
+
 
         #endregion
         private Krypton.Toolkit.KryptonPanel pnlHeader;

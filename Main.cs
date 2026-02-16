@@ -79,7 +79,8 @@ namespace WindowsFormsApp1
                 RqliteClient.httpClient = new HttpClient(handler);
 
                 // 🔴 Use HTTPS and your server IP
-                RqliteClient.DefaultEndPoint = "https://10.32.101.160:4001";
+                //RqliteClient.DefaultEndPoint = "https://10.32.101.160:4001";
+                RqliteClient.DefaultEndPoint = "http://127.0.0.1:4001";
             }
 
             await RqliteClient.CreatePbSchemaAsync();
