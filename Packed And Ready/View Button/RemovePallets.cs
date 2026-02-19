@@ -20,8 +20,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             InitializeComponent();
             btnNo.Focus();
 
-            CSSDesign.ApplyRoundedCorners(this, 20);
-            Paint += RemovePallets_Paint;
+            //CSSDesign.ApplyRoundedCorners(this, 20);
+           // Paint += RemovePallets_Paint;
 
             pnlHeader.MouseDown += pnlHeader_MouseDown;
 

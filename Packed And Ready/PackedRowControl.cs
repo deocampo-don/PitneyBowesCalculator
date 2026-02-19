@@ -35,8 +35,8 @@ namespace WindowsFormsApp1.Packed_And_Ready
         public PackedRowControl()
         {
             InitializeComponent();
+            
             chkbxStatus.Checked = true;
-
             // Style enhancements for cleaner UI
 
         }
@@ -62,6 +62,16 @@ namespace WindowsFormsApp1.Packed_And_Ready
             txtEnvelopeQty.Text = job.TotalEnvelopeOfJob.ToString();
             txtPallets.Text = (job.Pallets?.Count ?? 0).ToString();
             txtTrays.Text = job.TotalTraysOfJob.ToString();
+
+            //FOR DATE
+            var hasPackedPallet =
+                             job.Pallets?.Any(p => p != null) == true;
+
+            txtPackDate.Text = hasPackedPallet
+                ? job.EffectivePackDate.ToString("MM/dd/yyyy")
+                : "--/--/----";
+
+
 
             bool isShipped = job.ShippedDate.HasValue;
 
@@ -101,11 +111,6 @@ namespace WindowsFormsApp1.Packed_And_Ready
         /* -------------------------------------------------------------
          * UI EVENTS
          * ------------------------------------------------------------- */
-
-        /// <summary>
-        /// Triggers callback and opens the View dialog.
-        /// </summary>
-        /// 
 
 
         public void SetReadyToShip(bool isReady)

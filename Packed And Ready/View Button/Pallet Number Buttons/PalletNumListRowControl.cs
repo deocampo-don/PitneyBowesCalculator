@@ -60,6 +60,16 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             // Display correct label
             btnPalletNum.Text = $"Pallet # {palletIndex + 1}";
 
+            
+            bool isShipped = model.ShippedDate.HasValue;
+            chkBox.Visible = !isShipped;
+
+            if (isShipped)
+            {
+                chkBox.Checked = false;   // safety
+                chkBox.Enabled = false;
+            }
+
 
         }
 

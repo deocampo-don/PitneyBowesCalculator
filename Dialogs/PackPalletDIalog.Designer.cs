@@ -43,7 +43,7 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20.97701F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 71F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 73F));
             this.tableLayoutPanel1.Controls.Add(this.btnCancel, 3, 2);
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.tbTrays, 0, 1);
@@ -64,7 +64,7 @@
             // 
             this.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.btnCancel.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnCancel.Location = new System.Drawing.Point(369, 105);
+            this.btnCancel.Location = new System.Drawing.Point(368, 105);
             this.btnCancel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(84, 36);
@@ -130,6 +130,7 @@
             this.btnOk.TabIndex = 8;
             this.btnOk.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnOk.Values.Text = "OK";
+            this.btnOk.Click += new System.EventHandler(this.btnOk_Click_1);
             // 
             // PackPalletDIalog
             // 
@@ -139,7 +140,7 @@
             this.ClientSize = new System.Drawing.Size(551, 182);
             this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "PackPalletDIalog";
             this.Padding = new System.Windows.Forms.Padding(11, 20, 11, 10);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

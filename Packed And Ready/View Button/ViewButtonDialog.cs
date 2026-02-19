@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -12,6 +14,9 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         /* -------------------------------------------------------------
          * FIELDS & DATA STORAGE
          * ------------------------------------------------------------- */
+
+        List<Bitmap> pages;
+        int currentPage = 0;
 
         private PbJobModel _job;
         public bool DataChanged { get; private set; }
@@ -32,24 +37,29 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
          * CONSTRUCTOR
          * ------------------------------------------------------------- */
 
-        public ViewButtonDialog(PbJobModel job)
+        public ViewButtonDialog(PbJobModel job, bool hideRemove=false , bool hidePrint=false ,bool hideClose=true)
         {
             InitializeComponent();
 
             _job = job;
 
+            btnRemovePallets.Visible =!hideRemove;
+            btnPrintPallets.Visible =! hidePrint;
+            btnClose.Visible =! hideClose;
             LoadHeaderInfo();
             lvPallet.SetItems(_job);
             lvPallet.PalletClicked += OnPalletClicked;
 
             pnlHeader.MouseDown += pnlHeader_MouseDown;
-            this.Paint += ViewButtonDialog_Paint;
+        //    this.Paint += ViewButtonDialog_Paint;
 
             CSSDesign.MakeRounded(btnRemovePallets, 10);
             CSSDesign.MakeRounded(btnPrintPallets, 10);
             CSSDesign.AddPanelBorder(pnlDashboard, Color.Silver, 1);
             CSSDesign.AddPanelBorder(pnlDetails, Color.Silver, 1);
 
+
+           
             //onload select first item
 
         }
@@ -64,18 +74,28 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
         private void LoadHeaderInfo()
         {
-            if (_job == null) return;
+            bool isShipped = _job.ShippedDate.HasValue;
 
-            txtPBJobName.Text = _job.JobName;
-            txtPBJobNumber.Text = _job.JobNumber.ToString();
+            if (isShipped)
+            {
+                // 🔁 Rename label
+                lblPackDate.Text = "Shipped Date and Time";
 
-            // Job-level date
-            var hasPackedPallet = _job.Pallets?.Any(p => p != null /* optionally: && p.WorkOrders?.Any() == true */) == true;
+                // Show shipped date + time
+                txtPackDate.Text = _job.ShippedDate.Value.ToString("MM/dd/yyyy  hh:mm tt");
+            }
+            else
+            {
+                // Default behavior (Packed)
+                lblPackDate.Text = "Packed Date";
 
-            txtPackDate.Text =
-                hasPackedPallet
+                var hasPackedPallet =
+                    _job.Pallets?.Any(p => p != null) == true;
+
+                txtPackDate.Text = hasPackedPallet
                     ? _job.EffectivePackDate.ToString("MM/dd/yyyy")
                     : "--/--/----";
+            }
 
         }
 
@@ -85,6 +105,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
         private void LoadDashboard(Pallet pallet)
         {
+            bool isShipped = _job.ShippedDate.HasValue;
+
             if (pallet == null)
             {
                 txtEnvelopeQty.Text = "0";
@@ -97,9 +119,24 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             txtEnvelopeQty.Text = pallet.PalletEnvelopeQty.ToString("N0");
             txtScannedWO.Text = pallet.PalletScannedWO.ToString("N0");
             txtTrayCount.Text = pallet.TrayCount.ToString("N0");
-            txtPackedTime.Text = pallet.PackedTime.HasValue
-    ? pallet.PackedTime.Value.ToString("hh:mm tt")
-    : string.Empty;
+            if (isShipped)
+            {
+                lblPackedTime.Text =
+                     "Packed Date Time: " + pallet.PackedTime.Value.ToString("MM/dd/yyyy");
+
+                txtPackedTime.Text = pallet.PackedTime.HasValue
+              ? pallet.PackedTime.Value.ToString("hh:mm tt")
+              : string.Empty;
+
+
+            }
+            else
+            {       txtPackedTime.Text = pallet.PackedTime.HasValue
+                ? pallet.PackedTime.Value.ToString("hh:mm tt")
+                : string.Empty;
+
+            }
+     
 
         }
 
@@ -213,6 +250,107 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             this.Close();
         }
 
-   
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+             if (pages == null || currentPage >= pages.Count)
+            {
+                e.HasMorePages = false;
+                currentPage = 0;
+                return;
+            }
+
+            Bitmap page = pages[currentPage];
+
+            // Fit width to page margin
+            int x = e.MarginBounds.Left;
+            int y = e.MarginBounds.Top;
+            int w = e.MarginBounds.Width;
+            int h = page.Height * w / page.Width;
+
+            e.Graphics.DrawImage(page, new Rectangle(x, y, w, h));
+
+            currentPage++;
+
+            e.HasMorePages = currentPage < pages.Count;
+        }
+        /* -------------------------------------------------------------
+         * PRINTING
+         * ------------------------------------------------------------- */
+
+
+        private void btnPrintPallets_Click(object sender, EventArgs e)
+        {
+
+
+            // Step 1: Capture full scrollable content
+            Bitmap full = CaptureScrollablePanel(pnlDashboard);
+
+            // Step 2: Convert to pages
+            SliceIntoPages(full, 1120); // Adjust page height if needed
+
+            // Step 3: Setup PrintDocument
+            PrintDocument doc = new PrintDocument();
+            doc.PrintPage += printDocument1_PrintPage;
+
+            // Step 4: Show Preview
+            PrintPreviewDialog preview = new PrintPreviewDialog();
+            preview.Document = doc;
+            preview.Width = 1200;
+            preview.Height = 800;
+
+            preview.ShowDialog();   // <- This shows the preview BEFORE printing
+
+
+        }
+
+        private Bitmap CaptureScrollablePanel(Panel panel)
+        {
+            // Save original size
+            int originalHeight = panel.Height;
+
+            // Expand the panel to full scroll height
+            panel.AutoScroll = false;
+            panel.Height = panel.DisplayRectangle.Height;
+
+            // Create a bitmap based on full height
+            Bitmap bmp = new Bitmap(panel.Width, panel.Height);
+            panel.DrawToBitmap(bmp, new Rectangle(0, 0, panel.Width, panel.Height));
+
+            // Restore original
+            panel.Height = originalHeight;
+            panel.AutoScroll = true;
+
+            return bmp;
+        }
+
+        private void SliceIntoPages(Bitmap fullImage, int pageHeight)
+        {
+            pages = new List<Bitmap>();
+            int y = 0;
+
+            while (y < fullImage.Height)
+            {
+                int sliceHeight = Math.Min(pageHeight, fullImage.Height - y);
+
+                Bitmap page = new Bitmap(fullImage.Width, sliceHeight);
+
+                using (Graphics g = Graphics.FromImage(page))
+                {
+                    g.DrawImage(fullImage, new Rectangle(0, 0, page.Width, page.Height),
+                        new Rectangle(0, y, page.Width, sliceHeight), GraphicsUnit.Pixel);
+                }
+
+                pages.Add(page);
+                y += sliceHeight;
+            }
+
+        }
+
+
     }
 }

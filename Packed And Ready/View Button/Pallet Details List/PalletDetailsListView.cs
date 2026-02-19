@@ -36,8 +36,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details
 
                 // ✅ Alternate background color
                 row.BackColor = (index % 2 == 0)
-                    ? Color.White
-                    : Color.FromArgb(245, 245, 245); // light gray
+                    ?Color.FromArgb(245, 245, 245) // light gray
+                    :Color.White;
 
 
                 AddRow(row);

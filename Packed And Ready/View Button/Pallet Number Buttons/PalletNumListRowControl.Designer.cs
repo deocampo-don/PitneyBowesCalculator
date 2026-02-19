@@ -38,6 +38,7 @@
             // btnPalletNum
             // 
             this.btnPalletNum.BackColor = System.Drawing.Color.White;
+            this.btnPalletNum.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnPalletNum.FlatAppearance.BorderSize = 0;
             this.btnPalletNum.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPalletNum.ForeColor = System.Drawing.Color.Black;
@@ -66,8 +67,9 @@
             // 
             this.chkBox.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.chkBox.BackColor = System.Drawing.Color.Transparent;
+            this.chkBox.Cursor = System.Windows.Forms.Cursors.Hand;
             this.chkBox.Location = new System.Drawing.Point(57, 2);
-            this.chkBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkBox.Margin = new System.Windows.Forms.Padding(4);
             this.chkBox.Name = "chkBox";
             this.chkBox.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
             this.chkBox.Size = new System.Drawing.Size(19, 22);

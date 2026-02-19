@@ -48,7 +48,7 @@ namespace WindowsFormsApp1.Picked_Up
             ViewClicked?.Invoke(this, EventArgs.Empty);
 
             Form parentForm = this.FindForm();
-            using (var dlg = new ViewButtonDialog(_modelpbjob))
+            using (var dlg = new ViewButtonDialog(_modelpbjob,hideRemove:true,hidePrint:true,hideClose:false))
             {
                 dlg.ShowDialog(parentForm);
 
