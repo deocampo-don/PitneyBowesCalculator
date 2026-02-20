@@ -428,7 +428,7 @@ namespace WindowsFormsApp1
             try
             {
                 foreach (var job in selectedJobs)
-                {
+                {         
                     await RqliteClient.ShipJobsAsync(new[] { job.JobId });
                     await RefreshSingleJobAsync(job.JobId);
                 }

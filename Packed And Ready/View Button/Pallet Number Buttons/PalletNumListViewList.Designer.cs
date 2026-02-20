@@ -40,7 +40,7 @@
             this.rowFlow.Dock = System.Windows.Forms.DockStyle.Fill;
             this.rowFlow.Location = new System.Drawing.Point(0, 0);
             this.rowFlow.Name = "rowFlow";
-            this.rowFlow.Size = new System.Drawing.Size(299, 179);
+            this.rowFlow.Size = new System.Drawing.Size(245, 78);
             this.rowFlow.TabIndex = 0;
             // 
             // scrollHost
@@ -57,7 +57,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.rowFlow);
             this.Name = "PalletNumListViewList";
-            this.Size = new System.Drawing.Size(299, 179);
+            this.Size = new System.Drawing.Size(245, 78);
             this.rowFlow.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.scrollHost)).EndInit();
             this.ResumeLayout(false);

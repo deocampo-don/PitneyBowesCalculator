@@ -45,7 +45,7 @@
             this.btnPalletNum.Location = new System.Drawing.Point(3, 2);
             this.btnPalletNum.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnPalletNum.Name = "btnPalletNum";
-            this.btnPalletNum.Size = new System.Drawing.Size(232, 25);
+            this.btnPalletNum.Size = new System.Drawing.Size(211, 25);
             this.btnPalletNum.TabIndex = 0;
             this.btnPalletNum.Text = "Pallet #";
             this.btnPalletNum.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -57,10 +57,11 @@
             this.pnlMain.BackColor = System.Drawing.Color.White;
             this.pnlMain.Controls.Add(this.chkBox);
             this.pnlMain.Controls.Add(this.btnPalletNum);
+            this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlMain.Location = new System.Drawing.Point(0, 0);
             this.pnlMain.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(237, 30);
+            this.pnlMain.Size = new System.Drawing.Size(217, 30);
             this.pnlMain.TabIndex = 1;
             // 
             // chkBox
@@ -68,7 +69,7 @@
             this.chkBox.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.chkBox.BackColor = System.Drawing.Color.Transparent;
             this.chkBox.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.chkBox.Location = new System.Drawing.Point(57, 2);
+            this.chkBox.Location = new System.Drawing.Point(47, 2);
             this.chkBox.Margin = new System.Windows.Forms.Padding(4);
             this.chkBox.Name = "chkBox";
             this.chkBox.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
@@ -78,10 +79,11 @@
             // 
             // flowPanel
             // 
+            this.flowPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowPanel.Location = new System.Drawing.Point(0, 0);
             this.flowPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.flowPanel.Name = "flowPanel";
-            this.flowPanel.Size = new System.Drawing.Size(237, 30);
+            this.flowPanel.Size = new System.Drawing.Size(217, 30);
             this.flowPanel.TabIndex = 2;
             // 
             // PalletNumListRowControl
@@ -92,7 +94,7 @@
             this.Controls.Add(this.flowPanel);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "PalletNumListRowControl";
-            this.Size = new System.Drawing.Size(237, 30);
+            this.Size = new System.Drawing.Size(217, 30);
             this.pnlMain.ResumeLayout(false);
             this.ResumeLayout(false);
 

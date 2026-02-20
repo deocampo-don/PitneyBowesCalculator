@@ -389,11 +389,11 @@ public static class RqliteClient
             return;
 
         var idList = string.Join(",", jobIds);
-
+        string now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         string sql = $@"
         UPDATE {TableJobs}
         SET IsReady = 1,
-            ShippedDate = CURRENT_TIMESTAMP,
+            ShippedDate = '{now}',
             LastUpdated = CURRENT_TIMESTAMP
         WHERE JobId IN ({idList})";
 

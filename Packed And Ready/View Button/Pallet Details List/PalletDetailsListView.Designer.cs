@@ -42,7 +42,7 @@
             this.flowRow.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowRow.Location = new System.Drawing.Point(0, 0);
             this.flowRow.Name = "flowRow";
-            this.flowRow.Size = new System.Drawing.Size(664, 643);
+            this.flowRow.Size = new System.Drawing.Size(361, 124);
             this.flowRow.TabIndex = 0;
             this.flowRow.WrapContents = false;
             // 
@@ -60,7 +60,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.flowRow);
             this.Name = "PalletDetailsListView";
-            this.Size = new System.Drawing.Size(664, 643);
+            this.Size = new System.Drawing.Size(361, 124);
             this.flowRow.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pnlPalletDetailsView)).EndInit();
             this.ResumeLayout(false);

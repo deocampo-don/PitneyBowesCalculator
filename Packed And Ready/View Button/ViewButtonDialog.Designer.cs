@@ -36,7 +36,6 @@
             this.txtTrayCount = new Krypton.Toolkit.KryptonLabel();
             this.txtScannedWO = new Krypton.Toolkit.KryptonLabel();
             this.txtEnvelopeQty = new Krypton.Toolkit.KryptonLabel();
-            this.pnlDetails = new System.Windows.Forms.Panel();
             this.lblPackedTime = new Krypton.Toolkit.KryptonLabel();
             this.lblEnvelopeQty = new Krypton.Toolkit.KryptonLabel();
             this.lblScannedWO = new Krypton.Toolkit.KryptonLabel();
@@ -47,23 +46,23 @@
             this.txtPackDate = new Krypton.Toolkit.KryptonLabel();
             this.lblPackDate = new Krypton.Toolkit.KryptonLabel();
             this.txtPBJobName = new Krypton.Toolkit.KryptonLabel();
-            this.pnlPalletNoList = new Krypton.Toolkit.KryptonPanel();
             this.kryptonGroup1 = new Krypton.Toolkit.KryptonGroup();
+            this.pnlDetails = new System.Windows.Forms.Panel();
             this.btnClose = new System.Windows.Forms.Button();
             this.kryptonPrintDialog1 = new Krypton.Toolkit.KryptonPrintDialog();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
+            this.pnlPalletNum = new System.Windows.Forms.Panel();
             this.lvPallet = new WindowsFormsApp1.Packed_And_Ready.View_Button.PalletNumListViewList();
             this.lvPalletDetails = new WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details.PalletDetailsListView();
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
             this.pnlDashboard.SuspendLayout();
-            this.pnlDetails.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pnlPalletNoList)).BeginInit();
-            this.pnlPalletNoList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonGroup1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonGroup1.Panel)).BeginInit();
             this.kryptonGroup1.Panel.SuspendLayout();
             this.kryptonGroup1.SuspendLayout();
+            this.pnlDetails.SuspendLayout();
+            this.pnlPalletNum.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlHeader
@@ -105,7 +104,6 @@
             this.pnlDashboard.Controls.Add(this.txtTrayCount);
             this.pnlDashboard.Controls.Add(this.txtScannedWO);
             this.pnlDashboard.Controls.Add(this.txtEnvelopeQty);
-            this.pnlDashboard.Controls.Add(this.pnlDetails);
             this.pnlDashboard.Controls.Add(this.lblPackedTime);
             this.pnlDashboard.Controls.Add(this.lblEnvelopeQty);
             this.pnlDashboard.Controls.Add(this.lblScannedWO);
@@ -113,7 +111,7 @@
             this.pnlDashboard.Location = new System.Drawing.Point(270, 173);
             this.pnlDashboard.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlDashboard.Name = "pnlDashboard";
-            this.pnlDashboard.Size = new System.Drawing.Size(677, 458);
+            this.pnlDashboard.Size = new System.Drawing.Size(677, 61);
             this.pnlDashboard.TabIndex = 58;
             // 
             // txtPackedTime
@@ -155,16 +153,6 @@
             this.txtEnvelopeQty.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
             this.txtEnvelopeQty.TabIndex = 6;
             this.txtEnvelopeQty.Values.Text = "0";
-            // 
-            // pnlDetails
-            // 
-            this.pnlDetails.BackColor = System.Drawing.Color.White;
-            this.pnlDetails.Controls.Add(this.lvPalletDetails);
-            this.pnlDetails.Location = new System.Drawing.Point(5, 65);
-            this.pnlDetails.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pnlDetails.Name = "pnlDetails";
-            this.pnlDetails.Size = new System.Drawing.Size(667, 388);
-            this.pnlDetails.TabIndex = 5;
             // 
             // lblPackedTime
             // 
@@ -292,17 +280,6 @@
             this.txtPBJobName.TabIndex = 50;
             this.txtPBJobName.Values.Text = "Job Name";
             // 
-            // pnlPalletNoList
-            // 
-            this.pnlPalletNoList.Controls.Add(this.lvPallet);
-            this.pnlPalletNoList.Location = new System.Drawing.Point(28, 173);
-            this.pnlPalletNoList.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pnlPalletNoList.Name = "pnlPalletNoList";
-            this.pnlPalletNoList.Size = new System.Drawing.Size(237, 454);
-            this.pnlPalletNoList.StateCommon.Color1 = System.Drawing.Color.Transparent;
-            this.pnlPalletNoList.StateCommon.ColorStyle = Krypton.Toolkit.PaletteColorStyle.Solid;
-            this.pnlPalletNoList.TabIndex = 55;
-            // 
             // kryptonGroup1
             // 
             this.kryptonGroup1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -310,9 +287,10 @@
             // 
             // kryptonGroup1.Panel
             // 
+            this.kryptonGroup1.Panel.Controls.Add(this.pnlPalletNum);
+            this.kryptonGroup1.Panel.Controls.Add(this.pnlDetails);
             this.kryptonGroup1.Panel.Controls.Add(this.btnClose);
             this.kryptonGroup1.Panel.Controls.Add(this.pnlHeader);
-            this.kryptonGroup1.Panel.Controls.Add(this.pnlPalletNoList);
             this.kryptonGroup1.Panel.Controls.Add(this.pnlDashboard);
             this.kryptonGroup1.Panel.Controls.Add(this.txtPBJobName);
             this.kryptonGroup1.Panel.Controls.Add(this.btnPrintPallets);
@@ -329,6 +307,16 @@
             this.kryptonGroup1.StateCommon.Border.ColorStyle = Krypton.Toolkit.PaletteColorStyle.Solid;
             this.kryptonGroup1.StateCommon.Border.Rounding = 7F;
             this.kryptonGroup1.TabIndex = 0;
+            // 
+            // pnlDetails
+            // 
+            this.pnlDetails.BackColor = System.Drawing.Color.White;
+            this.pnlDetails.Controls.Add(this.lvPalletDetails);
+            this.pnlDetails.Location = new System.Drawing.Point(269, 235);
+            this.pnlDetails.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pnlDetails.Name = "pnlDetails";
+            this.pnlDetails.Size = new System.Drawing.Size(677, 392);
+            this.pnlDetails.TabIndex = 5;
             // 
             // btnClose
             // 
@@ -358,21 +346,29 @@
             // 
             this.printDocument1.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.printDocument1_PrintPage);
             // 
+            // pnlPalletNum
+            // 
+            this.pnlPalletNum.Controls.Add(this.lvPallet);
+            this.pnlPalletNum.Location = new System.Drawing.Point(30, 173);
+            this.pnlPalletNum.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pnlPalletNum.Name = "pnlPalletNum";
+            this.pnlPalletNum.Size = new System.Drawing.Size(236, 454);
+            this.pnlPalletNum.TabIndex = 60;
+            // 
             // lvPallet
             // 
-            this.lvPallet.Location = new System.Drawing.Point(3, 5);
+            this.lvPallet.Location = new System.Drawing.Point(6, 5);
             this.lvPallet.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lvPallet.Name = "lvPallet";
-            this.lvPallet.Size = new System.Drawing.Size(232, 446);
+            this.lvPallet.Size = new System.Drawing.Size(224, 443);
             this.lvPallet.TabIndex = 0;
             // 
             // lvPalletDetails
             // 
-            this.lvPalletDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvPalletDetails.Location = new System.Drawing.Point(0, 0);
+            this.lvPalletDetails.Location = new System.Drawing.Point(6, 5);
             this.lvPalletDetails.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lvPalletDetails.Name = "lvPalletDetails";
-            this.lvPalletDetails.Size = new System.Drawing.Size(667, 388);
+            this.lvPalletDetails.Size = new System.Drawing.Size(665, 381);
             this.lvPalletDetails.TabIndex = 0;
             // 
             // ViewButtonDialog
@@ -391,14 +387,13 @@
             this.pnlHeader.ResumeLayout(false);
             this.pnlDashboard.ResumeLayout(false);
             this.pnlDashboard.PerformLayout();
-            this.pnlDetails.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pnlPalletNoList)).EndInit();
-            this.pnlPalletNoList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.kryptonGroup1.Panel)).EndInit();
             this.kryptonGroup1.Panel.ResumeLayout(false);
             this.kryptonGroup1.Panel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonGroup1)).EndInit();
             this.kryptonGroup1.ResumeLayout(false);
+            this.pnlDetails.ResumeLayout(false);
+            this.pnlPalletNum.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -407,7 +402,6 @@
 
         private Krypton.Toolkit.KryptonPanel pnlHeader;
         private System.Windows.Forms.Panel pnlDashboard;
-        private System.Windows.Forms.Panel pnlDetails;
         private Krypton.Toolkit.KryptonLabel lblPackedTime;
         private Krypton.Toolkit.KryptonLabel lblEnvelopeQty;
         private Krypton.Toolkit.KryptonLabel lblScannedWO;
@@ -418,17 +412,18 @@
         private Krypton.Toolkit.KryptonLabel txtPackDate;
         private Krypton.Toolkit.KryptonLabel lblPackDate;
         private Krypton.Toolkit.KryptonLabel txtPBJobName;
-        private Krypton.Toolkit.KryptonPanel pnlPalletNoList;
         private Krypton.Toolkit.KryptonButton btnExit;
         private Krypton.Toolkit.KryptonLabel txtPackedTime;
         private Krypton.Toolkit.KryptonLabel txtTrayCount;
         private Krypton.Toolkit.KryptonLabel txtScannedWO;
         private Krypton.Toolkit.KryptonLabel txtEnvelopeQty;
         private PalletNumListViewList lvPallet;
-        private Pallets_Details.PalletDetailsListView lvPalletDetails;
         private Krypton.Toolkit.KryptonGroup kryptonGroup1;
         private System.Windows.Forms.Button btnClose;
         private Krypton.Toolkit.KryptonPrintDialog kryptonPrintDialog1;
         private System.Drawing.Printing.PrintDocument printDocument1;
+        private System.Windows.Forms.Panel pnlDetails;
+        private Pallets_Details.PalletDetailsListView lvPalletDetails;
+        private System.Windows.Forms.Panel pnlPalletNum;
     }
 }

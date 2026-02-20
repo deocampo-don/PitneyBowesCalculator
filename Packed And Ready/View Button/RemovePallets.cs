@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WindowsFormsApp1.Packed_And_Ready.View_Button
@@ -18,15 +19,12 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         public RemovePallets()
         {
             InitializeComponent();
-            btnNo.Focus();
-
-            //CSSDesign.ApplyRoundedCorners(this, 20);
-           // Paint += RemovePallets_Paint;
+            
 
             pnlHeader.MouseDown += pnlHeader_MouseDown;
 
-            CSSDesign.MakeRounded(btnNo, 15);
-            CSSDesign.MakeRounded(btnYes, 15);
+
+            btnCancel1.Visible = false;
         }
 
 
@@ -40,27 +38,81 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             }
         }
 
-        private void RemovePallets_Paint(object sender, PaintEventArgs e)
+    
+
+       
+        private bool firstYesClicked = false;
+
+        private async void btnYes1_Click(object sender, EventArgs e)
         {
-            CSSDesign.PaintRoundedForm(this, e, _formRadius, Color.Gray);
+            // SECOND CLICK OF YES → RETURN DialogResult.Yes
+            if (firstYesClicked)
+            {
+                //Merge function here
+
+                // this.Close();
+                return;
+            }
+
+            // FIRST CLICK OF YES → RUN ANIMATION
+            firstYesClicked = true;
+            int targetHeight = 330;
+            int step = 10;            // how many pixels per frame
+            int delay = 3;           // delay per frame (ms)
+
+            int bottom = this.Top + this.Height;
+
+            while (this.Height < targetHeight)
+            {
+
+                int nextHeight = Math.Min(this.Height + step, targetHeight);
+                this.Height = nextHeight;
+                this.Top = bottom - this.Height;  // move top up so bottom stays put
+                await Task.Delay(delay);
+
+            }
+
+            //New Labels
+            lblHeader.Text = "Hold On!";
+            label1.Text = "You already have a pallet in progress. Would you like";
+            label2.Text = "to merge this to that ongoing pallet";
+
+            label3.Text = "Yes - Merge to the ongoing pallet.";
+            label4.Text = "No - Delete the pallet.";
+            label5.Text = "Cancel - Finish packing the current pallet.";
+
+            // Ensure exact final geometry
+            this.Height = targetHeight;
+            this.Top = bottom - this.Height;
+
+            btnCancel1.Visible = true;
+
         }
 
-        private void btnNo_Click_1(object sender, EventArgs e) => Close();
-
-     
-
-        private void btnYes_Click_1(object sender, EventArgs e)
+        private void btnNo1_Click(object sender, EventArgs e)
         {
-            // ✅ Important: return Yes so parent knows to proceed
-            this.DialogResult = DialogResult.Yes;
+
+            // SECOND CLICK OF YES → RETURN DialogResult.Yes
+            if (firstYesClicked)
+            {
+                //Delete the pallet
+                this.DialogResult = DialogResult.Yes;
+                this.Close();
+                return;
+            }
+            // FIRST CLICK OF YES → RUN ANIMATION
+            firstYesClicked = true;
             this.Close();
         }
 
-        private void btnExit_Click_1(object sender, EventArgs e)
+        private void btnCancel1_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+        private void btnExit_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-     
     }
 }

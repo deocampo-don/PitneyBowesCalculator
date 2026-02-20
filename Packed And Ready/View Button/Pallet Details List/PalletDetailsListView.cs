@@ -11,10 +11,10 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details
         public PalletDetailsListView()
         {
             InitializeComponent();
-            this.Dock = DockStyle.Fill;
+           // this.Dock = DockStyle.Fill;
 
         }
-
+        public FlowLayoutPanel ScrollContainer => flowRow;
         public void SetItems(IEnumerable<WorkOrder> items)
         {
             flowRow.SuspendLayout();
