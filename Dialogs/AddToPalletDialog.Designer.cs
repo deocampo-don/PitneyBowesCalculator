@@ -47,7 +47,7 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20.97701F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 74F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 57F));
             this.tableLayoutPanel1.Controls.Add(this.txtScannedWO, 3, 2);
             this.tableLayoutPanel1.Controls.Add(this.txtEnvelopeQty, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.label3, 2, 2);
@@ -57,45 +57,44 @@
             this.tableLayoutPanel1.Controls.Add(this.label2, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.btnCancel, 3, 3);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(11, 20);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(8, 16);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 4;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(529, 178);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(397, 145);
             this.tableLayoutPanel1.TabIndex = 0;
-           // this.tableLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint);
             // 
             // txtScannedWO
             // 
             this.txtScannedWO.AutoSize = true;
-            this.txtScannedWO.Location = new System.Drawing.Point(344, 98);
-            this.txtScannedWO.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.txtScannedWO.Location = new System.Drawing.Point(257, 84);
+            this.txtScannedWO.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.txtScannedWO.Name = "txtScannedWO";
-            this.txtScannedWO.Size = new System.Drawing.Size(14, 16);
+            this.txtScannedWO.Size = new System.Drawing.Size(13, 13);
             this.txtScannedWO.TabIndex = 13;
             this.txtScannedWO.Text = "0";
             // 
             // txtEnvelopeQty
             // 
             this.txtEnvelopeQty.AutoSize = true;
-            this.txtEnvelopeQty.Location = new System.Drawing.Point(136, 98);
-            this.txtEnvelopeQty.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.txtEnvelopeQty.Location = new System.Drawing.Point(101, 84);
+            this.txtEnvelopeQty.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.txtEnvelopeQty.Name = "txtEnvelopeQty";
-            this.txtEnvelopeQty.Size = new System.Drawing.Size(14, 16);
+            this.txtEnvelopeQty.Size = new System.Drawing.Size(13, 13);
             this.txtEnvelopeQty.TabIndex = 12;
             this.txtEnvelopeQty.Text = "0";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(231, 98);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
+            this.label3.Location = new System.Drawing.Point(172, 84);
+            this.label3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(90, 16);
+            this.label3.Size = new System.Drawing.Size(75, 13);
             this.label3.TabIndex = 11;
             this.label3.Text = "Scanned WO:";
             // 
@@ -104,9 +103,10 @@
             this.label1.AutoSize = true;
             this.tableLayoutPanel1.SetColumnSpan(this.label1, 5);
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(3, 0);
+            this.label1.Location = new System.Drawing.Point(2, 0);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(314, 32);
+            this.label1.Size = new System.Drawing.Size(251, 26);
             this.label1.TabIndex = 0;
             this.label1.Text = "Scan PER Work Order";
             // 
@@ -117,29 +117,30 @@
             this.tbWoBarcode.CueHint.CueHintText = "PER Work Order Barcode";
             this.tbWoBarcode.CueHint.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tbWoBarcode.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbWoBarcode.Location = new System.Drawing.Point(11, 42);
-            this.tbWoBarcode.Margin = new System.Windows.Forms.Padding(11, 10, 7, 6);
+            this.tbWoBarcode.Location = new System.Drawing.Point(8, 34);
+            this.tbWoBarcode.Margin = new System.Windows.Forms.Padding(8, 8, 5, 5);
             this.tbWoBarcode.Name = "tbWoBarcode";
             this.tbWoBarcode.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.tbWoBarcode.Size = new System.Drawing.Size(511, 46);
-            this.tbWoBarcode.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom)
-            | Krypton.Toolkit.PaletteDrawBorders.Left)
+            this.tbWoBarcode.Size = new System.Drawing.Size(384, 42);
+            this.tbWoBarcode.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | Krypton.Toolkit.PaletteDrawBorders.Left) 
             | Krypton.Toolkit.PaletteDrawBorders.Right)));
             this.tbWoBarcode.StateCommon.Border.Rounding = 5F;
             this.tbWoBarcode.StateCommon.Content.Padding = new System.Windows.Forms.Padding(10);
             this.tbWoBarcode.TabIndex = 1;
+            this.tbWoBarcode.TextChanged += new System.EventHandler(this.tbWoBarcode_TextChanged);
             // 
             // btnOk
             // 
             this.btnOk.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.btnOk.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnOk.Location = new System.Drawing.Point(466, 130);
-            this.btnOk.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnOk.Location = new System.Drawing.Point(350, 108);
+            this.btnOk.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(60, 37);
+            this.btnOk.Size = new System.Drawing.Size(45, 30);
             this.btnOk.StateCommon.Back.Color1 = System.Drawing.Color.Black;
-            this.btnOk.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom)
-            | Krypton.Toolkit.PaletteDrawBorders.Left)
+            this.btnOk.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | Krypton.Toolkit.PaletteDrawBorders.Left) 
             | Krypton.Toolkit.PaletteDrawBorders.Right)));
             this.btnOk.StateCommon.Border.Rounding = 5F;
             this.btnOk.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
@@ -153,10 +154,10 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 98);
-            this.label2.Margin = new System.Windows.Forms.Padding(7, 4, 4, 0);
+            this.label2.Location = new System.Drawing.Point(5, 84);
+            this.label2.Margin = new System.Windows.Forms.Padding(5, 3, 3, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(99, 16);
+            this.label2.Size = new System.Drawing.Size(80, 13);
             this.label2.TabIndex = 10;
             this.label2.Text = "Envelope QTY:";
             // 
@@ -164,13 +165,13 @@
             // 
             this.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.btnCancel.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnCancel.Location = new System.Drawing.Point(366, 130);
-            this.btnCancel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnCancel.Location = new System.Drawing.Point(274, 108);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(84, 37);
+            this.btnCancel.Size = new System.Drawing.Size(63, 30);
             this.btnCancel.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
-            this.btnCancel.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom)
-            | Krypton.Toolkit.PaletteDrawBorders.Left)
+            this.btnCancel.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | Krypton.Toolkit.PaletteDrawBorders.Left) 
             | Krypton.Toolkit.PaletteDrawBorders.Right)));
             this.btnCancel.StateCommon.Border.Rounding = 5F;
             this.btnCancel.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.Black;
@@ -183,15 +184,15 @@
             // 
             // AddToPalletDialog
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(551, 208);
+            this.ClientSize = new System.Drawing.Size(413, 169);
             this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "AddToPalletDialog";
-            this.Padding = new System.Windows.Forms.Padding(11, 20, 11, 10);
+            this.Padding = new System.Windows.Forms.Padding(8, 16, 8, 8);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AddToPallet";
             this.tableLayoutPanel1.ResumeLayout(false);

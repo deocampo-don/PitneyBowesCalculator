@@ -12,7 +12,7 @@ public class PbJobModel
     // ===== Core Data =====
     public string JobName { get; set; }
     public int JobNumber { get; set; }
-    public bool IsReady { get; set; } = false;
+    public bool IsTemp { get; set; } = false;
 
     // ===== Dates =====
     public DateTime? PackDate { get; set; }   // nullable
@@ -38,7 +38,7 @@ public class PbJobModel
         {
             return Pallets
                 .SelectMany(p => p.WorkOrders)
-                .Sum(w => w.EnvelopeQty);
+                .Sum(w => w.Quantity);
         }
     }
 
@@ -65,7 +65,7 @@ public class PbJobModel
             if (Pallets.Count == 0)
                 return null;
 
-            return Pallets.Max(p => p.PackedTime);
+            return Pallets.Max(p => p.PackedAt);
         }
     }
 
@@ -83,7 +83,7 @@ public class PbJobModel
     {
         // If there is an unpacked pallet, use it
         var existing = Pallets
-            .FirstOrDefault(p => p.PackedTime == null);
+            .FirstOrDefault(p => p.PackedAt == null);
 
         if (existing != null)
             return existing;
@@ -91,7 +91,7 @@ public class PbJobModel
         // Otherwise create new pallet
         var newPallet = new Pallet
         {
-            JobId = this.JobId,
+            PalletId = this.JobId,
             PalletNumber = Pallets.Count + 1
         };
 
@@ -101,7 +101,7 @@ public class PbJobModel
     public Pallet GetActivePallet()
     {
         return Pallets
-            .FirstOrDefault(p => p.PackedTime == null);
+            .FirstOrDefault(p => p.PackedAt == null);
     }
 
 }
@@ -114,48 +114,42 @@ public class Pallet
 {
     // ===== Identity =====
     public int PalletId { get; set; }
-    public int JobId { get; set; }
+    public int PBJobId { get; set; }
 
     // ===== Core Data =====
     public int PalletNumber { get; set; }
-    public DateTime? PackedTime { get; set; }
+
+    public DateTime? PackedAt { get; set; }
+    public DateTime? ShippedAt { get; set; }
 
     public int TrayCount { get; set; }
 
+    public PalletState State { get; set; }
+
     // ===== Aggregates =====
-    public List<WorkOrder> WorkOrders { get; set; }
+    public List<WorkOrder> WorkOrders { get; set; } = new List<WorkOrder>();
 
 
-    public Pallet()
-    {
-        PackedTime = null;
-        TrayCount = 0;
-        WorkOrders = new List<WorkOrder>();
-
-    }
-
+    // ===== Computed =====
     public int PalletScannedWO
     {
-        get
-        {
-            return WorkOrders?.Count ?? 0;
-        }
+        get { return WorkOrders?.Count ?? 0; }
     }
-
-  
 
     public int PalletEnvelopeQty
     {
-        get
-        {
-            return WorkOrders.Sum(w => w.EnvelopeQty);
-        }
+        get { return WorkOrders?.Sum(w => w.Quantity) ?? 0; }
     }
 
- 
 
+    // ===== Helper Flags (Very Useful) =====
+    public bool IsPacked => State == PalletState.Packed;
+
+    public bool IsReady =>
+        State == PalletState.Ready || State == PalletState.Packed;
+
+    public bool IsShipped => State == PalletState.Shipped;
 }
-
 
 #endregion
 
@@ -164,27 +158,34 @@ public class Pallet
 public class WorkOrder
 {
     // ===== Identity =====
-    public int PalletWorkOrderId { get; set; }
+    public int Id { get; set; }
     public int PalletId { get; set; }
 
     // ===== Core Data =====
-    public string WoCode { get; private set; }
-    public int EnvelopeQty { get; private set; }
+    public string Barcode { get; set; }
+    public string WorkOrderCode { get; set; }
+
+    public int Quantity { get; set; }
 
     // ===== Scan State =====
-    public int ScannedWorkOrders { get; private set; }
+    public int ScannedCount { get; private set; }
 
-    public WorkOrder(string woCode, int envelopeQty)
+    public WorkOrder(string workOrderCode, int quantity)
     {
-        WoCode = woCode;
-        EnvelopeQty = envelopeQty;
-        ScannedWorkOrders = 0;
+        WorkOrderCode = workOrderCode;
+        Quantity = quantity;
+        ScannedCount = 0;
     }
 
     public void RecordScan()
     {
-        ScannedWorkOrders++;
+        ScannedCount++;
     }
+
+    // ===== Helpers =====
+    public bool IsComplete => ScannedCount >= Quantity;
+
+    public int Remaining => Math.Max(0, Quantity - ScannedCount);
 }
 
 #endregion

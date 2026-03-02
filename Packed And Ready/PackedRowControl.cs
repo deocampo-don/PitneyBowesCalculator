@@ -53,6 +53,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
         {
             if (job == null)
                 return;
+
             BoundJob = job;
             _modelpbjob = job;
 
@@ -63,17 +64,21 @@ namespace WindowsFormsApp1.Packed_And_Ready
             txtPallets.Text = (job.Pallets?.Count ?? 0).ToString();
             txtTrays.Text = job.TotalTraysOfJob.ToString();
 
-            //FOR DATE
-            var hasPackedPallet =
-                             job.Pallets?.Any(p => p != null) == true;
+            // ===== PACK DATE =====
+            var hasPackedPallet = job.Pallets?.Any(p => p.PackedAt.HasValue) == true;
 
             txtPackDate.Text = hasPackedPallet
                 ? job.EffectivePackDate.ToString("MM/dd/yyyy")
                 : "--/--/----";
 
 
+            // ===== STATE =====
+            bool isShipped = job.Pallets?.Any() == true &&
+                             job.Pallets.All(p => p.State == PalletState.Shipped);
 
-            bool isShipped = job.ShippedDate.HasValue;
+            bool isReady = job.Pallets?.Any(p =>
+                             p.State == PalletState.Ready ||
+                             p.State == PalletState.Packed) == true;
 
             if (isShipped)
             {
@@ -87,23 +92,21 @@ namespace WindowsFormsApp1.Packed_And_Ready
             else
             {
                 chkbxStatus.Enabled = true;
-                chkbxStatus.Checked = job.IsReady;
+                chkbxStatus.Checked = isReady;
 
-                if (job.IsReady)
+                if (isReady)
                 {
                     txtStatus.Text = "Ready to Ship";
                     txtStatus.StateCommon.ShortText.Color1 =
-                        ColorTranslator.FromHtml("#34C759");
+                        ColorTranslator.FromHtml("#34C759"); // green
                 }
                 else
                 {
                     txtStatus.Text = "Not Ready";
                     txtStatus.StateCommon.ShortText.Color1 =
-                        ColorTranslator.FromHtml("#FF383C");
+                        ColorTranslator.FromHtml("#FF383C"); // red
                 }
             }
-
-
         }
 
 

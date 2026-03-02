@@ -27,7 +27,15 @@ namespace WindowsFormsApp1.Picked_Up
             if (row != null)
                 row.Bind(job);
         }
+        public void BeginUpdate()
+        {
+            this.SuspendLayout();
+        }
 
+        public void EndUpdate()
+        {
+            this.ResumeLayout();
+        }
         public void RemoveItem(int jobId)
         {
             var row = pickflowRows.Controls

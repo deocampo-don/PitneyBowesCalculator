@@ -79,7 +79,7 @@ namespace WindowsFormsApp1
             try
             {
                 await RqliteClient.DeleteWorkOrdersAsync(
-                    DeletedItems.Select(w => w.PalletWorkOrderId)
+                    DeletedItems.Select(w => w.Id)
                 );
 
                 // Remove from dialog list

@@ -57,7 +57,15 @@ namespace WindowsFormsApp1
             BeginInvoke(new Action(ResizeRowsToHost));
         }
 
+        public void BeginUpdate()
+        {
+            this.SuspendLayout();
+        }
 
+        public void EndUpdate()
+        {
+            this.ResumeLayout();
+        }
         public void SetItems(IEnumerable<PbJobModel> items)
         {
             flowRows.SuspendLayout();

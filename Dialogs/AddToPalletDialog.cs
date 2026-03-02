@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.Services;
 
@@ -10,6 +12,9 @@ namespace WindowsFormsApp1.Dialogs
     {
         private readonly Pallet _targetPallet;
         private readonly IWorkOrderLookup _woLookup;
+        int Apos;
+        int Bpos;
+
 
         private readonly HashSet<string> _scannedCodes =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -97,6 +102,33 @@ namespace WindowsFormsApp1.Dialogs
             tbWoBarcode.Clear();
         }
 
+
+        private async Task<(bool IsValid, string Message)> IsValueValid(string barcode)
+        {
+            barcode = barcode?.Trim().ToUpper();
+
+            if (string.IsNullOrWhiteSpace(barcode))
+                return (false, "Barcode cannot be empty.");
+
+            if (barcode.Length != 21)
+                return (false, "Barcode length is invalid.");
+
+            string prefix = barcode.Substring(0, 5);
+            string datePart = barcode.Substring(5, 8);
+            string typePart = barcode.Substring(13, 3);
+            string sequencePart = barcode.Substring(16, 4);
+
+            bool isPrefixValid = prefix.All(char.IsLetter);
+            bool isDateValid = datePart.All(char.IsDigit);
+            bool isTypeValid = typePart.All(char.IsLetter);
+            bool isSequenceValid = sequencePart.All(char.IsDigit);
+
+            if (isPrefixValid && isDateValid && isTypeValid && isSequenceValid)
+                return (true, string.Empty);
+
+            return (false, "Invalid CPS barcode format.");
+        }
+
         // =====================================================
         // OK / CANCEL
         // =====================================================
@@ -118,6 +150,11 @@ namespace WindowsFormsApp1.Dialogs
 
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void tbWoBarcode_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,9 +18,13 @@ namespace WindowsFormsApp1
         // Fields
         // -----------------------------
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
+        private Dictionary<int, PbJobModel> _jobsById = new Dictionary<int, PbJobModel>();
         private System.Windows.Forms.Timer _pollTimer;
         private bool _isPolling;
-
+        public string iniFileName;
+        internal INIClass? appINI;
+ 
+        string CPSConnectionString = string.Empty;
 
         public event EventHandler ItemsChanged;
 
@@ -61,6 +66,9 @@ namespace WindowsFormsApp1
             this.Location = mouseScreen.WorkingArea.Location;
 
             this.WindowState = FormWindowState.Maximized;
+            lvBuild.EnableDoubleBuffer();
+            packedListView2.EnableDoubleBuffer();
+            pickedUpListView.EnableDoubleBuffer();
         }
 
         // -----------------------------
@@ -79,11 +87,14 @@ namespace WindowsFormsApp1
                 RqliteClient.httpClient = new HttpClient(handler);
 
                 // 🔴 Use HTTPS and your server IP
-                RqliteClient.DefaultEndPoint = "https://10.32.101.160:4001";
+                //RqliteClient.DefaultEndPoint = "https://10.32.101.160:4001";
+                RqliteClient.DefaultEndPoint = "http://127.0.0.1:4001";
             }
 
             await RqliteClient.CreatePbSchemaAsync();
         }
+
+        //keydown event
 
         private void StartBackgroundPolling()
         {
@@ -92,25 +103,36 @@ namespace WindowsFormsApp1
 
             _pollTimer.Tick += async (_, __) =>
             {
-                if (_isPolling) return; // prevent overlap
+                if (_isPolling) return;
+
                 _isPolling = true;
 
                 try
                 {
+                    lvBuild.BeginUpdate();
+                    packedListView2.BeginUpdate();
+                    pickedUpListView.BeginUpdate();
+
                     await PollForUpdatesAsync();
                 }
                 catch
                 {
-                    // silently ignore or log
+                    // optional logging
                 }
                 finally
                 {
+                    lvBuild.EndUpdate();
+                    packedListView2.EndUpdate();
+                    pickedUpListView.EndUpdate();
+
                     _isPolling = false;
                 }
             };
 
             _pollTimer.Start();
         }
+
+
 
         private async Task PollForUpdatesAsync()
         {
@@ -120,52 +142,57 @@ namespace WindowsFormsApp1
             var dbInfo = await RqliteClient.LoadJobUpdateInfoAsync();
 
             var dbJobIds = dbInfo.Select(x => x.JobId).ToHashSet();
-            var localJobIds = _pbJobs.Select(j => j.JobId).ToHashSet();
 
             // -------------------------
             // 1️⃣ Detect NEW jobs
             // -------------------------
-            var newJobIds = dbJobIds.Except(localJobIds).ToList();
-
-            foreach (var jobId in newJobIds)
+            foreach (var (jobId, _) in dbInfo)
             {
+                if (_jobsById.ContainsKey(jobId))
+                    continue;
+
                 var newJob = await RqliteClient.LoadSingleJobGraphAsync(jobId);
+
                 if (newJob != null)
                 {
                     _pbJobs.Add(newJob);
+                    _jobsById[jobId] = newJob;
+
                     RefreshSingleJobUI(newJob);
                 }
             }
 
             // -------------------------
-            // 2️⃣ Detect DELETED jobs
-            // -------------------------
-            var deletedJobIds = localJobIds.Except(dbJobIds).ToList();
-
-            foreach (var jobId in deletedJobIds)
-            {
-                var local = _pbJobs.FirstOrDefault(j => j.JobId == jobId);
-                if (local != null)
-                {
-                    _pbJobs.Remove(local);
-                    RemoveJobFromUI(jobId);
-                }
-            }
-
-
-            // -------------------------
-            // 3️⃣ Detect UPDATED jobs
+            // 2️⃣ Detect UPDATED jobs
             // -------------------------
             foreach (var (jobId, lastUpdated) in dbInfo)
             {
-                var local = _pbJobs.FirstOrDefault(j => j.JobId == jobId);
-
-                if (local == null)
+                if (!_jobsById.TryGetValue(jobId, out var local))
                     continue;
 
                 if (local.LastUpdated != lastUpdated)
                 {
                     await RefreshSingleJobAsync(jobId);
+                }
+            }
+
+            // -------------------------
+            // 3️⃣ Detect DELETED jobs (safe verification)
+            // -------------------------
+            foreach (var local in _pbJobs.ToList())
+            {
+                if (!dbJobIds.Contains(local.JobId))
+                {
+                    var check = await RqliteClient.QueryAsync(
+                        $"SELECT 1 FROM PBJOB WHERE Id = {local.JobId} LIMIT 1");
+
+                    if (check.Records.Count == 0)
+                    {
+                        _pbJobs.Remove(local);
+                        _jobsById.Remove(local.JobId);
+
+                        RemoveJobFromUI(local.JobId);
+                    }
                 }
             }
         }
@@ -318,6 +345,8 @@ namespace WindowsFormsApp1
             CSSDesign.MakeTitleBarButton(btnSettings);
         }
 
+
+
         // -----------------------------
         // Data Loading (DB → UI)
         // -----------------------------
@@ -325,7 +354,7 @@ namespace WindowsFormsApp1
         {
             _pbJobs.Clear();
 
-            var jobs = await RqliteClient.LoadFullJobGraphAsync();
+            var jobs = await RqliteClient.LoadJobsAsync();
 
             _pbJobs.AddRange(jobs);
             RefreshAllViews();
@@ -360,17 +389,16 @@ namespace WindowsFormsApp1
             if (existing == null)
                 return;
 
-            bool wasShipped = existing.ShippedDate.HasValue;
-            bool isShipped = updated.ShippedDate.HasValue;
+            // Determine shipped state based on pallets
+            bool wasShipped = existing.Pallets.All(p => p.State == PalletState.Shipped);
+            bool isShipped = updated.Pallets.All(p => p.State == PalletState.Shipped);
 
             // Update model properties
             existing.JobName = updated.JobName;
             existing.JobNumber = updated.JobNumber;
-            existing.IsReady = updated.IsReady;
-            existing.PackDate = updated.PackDate;
-            existing.ShippedDate = updated.ShippedDate;
-            existing.Pallets = updated.Pallets;
+            existing.IsTemp = updated.IsTemp;
             existing.LastUpdated = updated.LastUpdated;
+            existing.Pallets = updated.Pallets;
 
             // 🚨 If shipped state changed → MOVE UI
             if (wasShipped != isShipped)
@@ -384,7 +412,6 @@ namespace WindowsFormsApp1
             packedListView2?.RefreshItem(existing);
             pickedUpListView?.RefreshItem(existing);
         }
-
 
 
 
@@ -442,13 +469,7 @@ namespace WindowsFormsApp1
         // -----------------------------
         // Settings
         // -----------------------------
-        private void btnSettings_Click(object sender, EventArgs e)
-        {
-            using (var dlg = new SettingsDialog())
-            {
-                dlg.ShowDialog(this);
-            }
-        }
+
 
         // -----------------------------
         // Actions
@@ -462,15 +483,29 @@ namespace WindowsFormsApp1
 
                 try
                 {
+                    int jobNumber = int.TryParse(dlg.JobNumber, out var num) ? num : 0;
+
+                    // 🔴 PREVENT DUPLICATES
+                    if (await RqliteClient.JobNumberExistsAsync(jobNumber))
+                    {
+                        MessageBox.Show(
+                            $"Job number {jobNumber} already exists.",
+                            "Duplicate Job",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+
+                        return;
+                    }
+
                     var job = new PbJobModel
                     {
                         JobName = dlg.JobName ?? string.Empty,
-                        JobNumber = int.TryParse(dlg.JobNumber, out var num) ? num : 0,
-                        IsReady = true,
-                        PackDate = null
+                        JobNumber = jobNumber,
+                        IsTemp = true
                     };
 
                     await RqliteClient.InsertPbJobAsync(job);
+
                     await LoadJobsAsync();
                 }
                 catch (Exception ex)
@@ -490,6 +525,25 @@ namespace WindowsFormsApp1
         {
             packedListView2.SetAllSelected(      chkbxSelectAll.Checked);
         }
-  
+
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+            using (var dlg = new SettingsDialog())
+            {
+                dlg.ShowDialog(this);
+            }
+        }
+    }
+}
+
+public static class ControlExtensions
+{
+    public static void EnableDoubleBuffer(this Control control)
+    {
+        typeof(Control)
+            .GetProperty("DoubleBuffered",
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.Instance)
+            .SetValue(control, true, null);
     }
 }

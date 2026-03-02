@@ -23,8 +23,8 @@ namespace WindowsFormsApp1
         {
             _model = model;
 
-            lblWOname.Text = model.WoCode;
-            lblWOqty.Text = model.EnvelopeQty.ToString("N0");
+            lblWOname.Text = model.WorkOrderCode;
+            lblWOqty.Text = model.Quantity.ToString("N0");
 
             // Reset checkbox every time dialog loads
             cbWO.Checked = false;

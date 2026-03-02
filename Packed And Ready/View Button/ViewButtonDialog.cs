@@ -107,8 +107,6 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
         private void LoadDashboard(Pallet pallet)
         {
-            bool isShipped = _job.ShippedDate.HasValue;
-
             if (pallet == null)
             {
                 txtEnvelopeQty.Text = "0";
@@ -118,29 +116,28 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                 return;
             }
 
+            bool isShipped = pallet.State == PalletState.Shipped;
+
             txtEnvelopeQty.Text = pallet.PalletEnvelopeQty.ToString("N0");
             txtScannedWO.Text = pallet.PalletScannedWO.ToString("N0");
             txtTrayCount.Text = pallet.TrayCount.ToString("N0");
+
             if (isShipped)
             {
                 lblPackedTime.Text =
-                     "Packed Date Time: " + pallet.PackedTime.Value.ToString("MM/dd/yyyy");
+                    "Packed Date Time: " +
+                    (pallet.PackedAt?.ToString("MM/dd/yyyy") ?? "--/--/----");
 
-                txtPackedTime.Text = pallet.PackedTime.HasValue
-              ? pallet.PackedTime.Value.ToString("hh:mm tt")
-              : string.Empty;
-
-
+                txtPackedTime.Text = pallet.PackedAt.HasValue
+                    ? pallet.PackedAt.Value.ToString("hh:mm tt")
+                    : string.Empty;
             }
             else
             {
-                txtPackedTime.Text = pallet.PackedTime.HasValue
-                ? pallet.PackedTime.Value.ToString("hh:mm tt")
-                : string.Empty;
-
+                txtPackedTime.Text = pallet.PackedAt.HasValue
+                    ? pallet.PackedAt.Value.ToString("hh:mm tt")
+                    : string.Empty;
             }
-
-
         }
 
         /* -------------------------------------------------------------

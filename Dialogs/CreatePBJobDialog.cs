@@ -15,6 +15,7 @@ namespace WindowsFormsApp1
 
         public string JobName => tbPBJobName.Text.Trim();
         public string JobNumber => tbJobNumber.Text.Trim();
+        public bool IsTemp => cbPBTemp.Checked;
 
         public CreatePBJobDialog()
         {

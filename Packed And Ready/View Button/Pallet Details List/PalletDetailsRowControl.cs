@@ -20,10 +20,10 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             _workorder = workorder;
 
             // ✅ Display WO Code
-            txtWOName.Text = _workorder.WoCode ?? string.Empty;
+            txtWOName.Text = _workorder.WorkOrderCode ?? string.Empty;
 
             // ✅ Display Envelope Qty (formatted)
-            txtValue.Text = _workorder.EnvelopeQty.ToString("N0");
+            txtValue.Text = _workorder.Quantity.ToString("N0");
 
             // Optional: checkbox
            // chkSelected.Checked = _workorder.IsSelected;

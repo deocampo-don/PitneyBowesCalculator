@@ -71,6 +71,9 @@
     <Reference Include="Krypton.Toolkit.Suite.Extended.Panels, Version=100.25.11.328, Culture=neutral, PublicKeyToken=a87e673e9ecb6e8e, processorArchitecture=MSIL">
       <HintPath>packages\Krypton.Toolkit.Suite.Extended.Panels.100.25.11.328\lib\net48\Krypton.Toolkit.Suite.Extended.Panels.dll</HintPath>
     </Reference>
+    <Reference Include="MadMilkman.Ini, Version=1.0.6.0, Culture=neutral, PublicKeyToken=4e0b5157a7ffbb74, processorArchitecture=MSIL">
+      <HintPath>packages\MadMilkman.Ini.1.0.6.0\lib\net20\MadMilkman.Ini.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -115,11 +118,14 @@
     <Compile Include="Dialogs\SettingsDialog.Designer.cs">
       <DependentUpon>SettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="INIClass.cs" />
     <Compile Include="Models\ForDBTest\IScanResolver.cs.cs" />
     <Compile Include="Models\ForDBTest\IWorkOrderLookup.cs" />
     <Compile Include="Models\ForDBTest\ScanResult.cs" />
     <Compile Include="Models\ForDBTest\TestScanResolver.cs" />
     <Compile Include="Models\ForDBTest\TestWorkOrderLookup.cs" />
+    <Compile Include="Models\PalletState.cs" />
+    <Compile Include="Models\Settings.cs" />
     <Compile Include="Packed And Ready\PackedListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -219,6 +225,7 @@
     <Compile Include="Dialogs\ViewWOListDialog.Designer.cs">
       <DependentUpon>ViewWOListDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utils.cs" />
     <Compile Include="View\WorkOrderRowControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

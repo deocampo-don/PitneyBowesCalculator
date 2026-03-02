@@ -247,7 +247,7 @@ namespace WindowsFormsApp1
             // 
             this.gbRoundedParent.Panel.Controls.Add(this.pnlNavigator);
             this.gbRoundedParent.Panel.Controls.Add(this.pnlSettings);
-            this.gbRoundedParent.Panel.Margin = new System.Windows.Forms.Padding(7);
+            this.gbRoundedParent.Panel.Margin = new System.Windows.Forms.Padding(7, 7, 7, 7);
             this.gbRoundedParent.Size = new System.Drawing.Size(1441, 610);
             this.gbRoundedParent.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
             this.gbRoundedParent.StateCommon.Back.Color2 = System.Drawing.Color.Transparent;
@@ -339,7 +339,7 @@ namespace WindowsFormsApp1
             this.btnAddPBJob.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
             this.btnAddPBJob.Dock = System.Windows.Forms.DockStyle.Left;
             this.btnAddPBJob.Location = new System.Drawing.Point(12, 12);
-            this.btnAddPBJob.Margin = new System.Windows.Forms.Padding(12);
+            this.btnAddPBJob.Margin = new System.Windows.Forms.Padding(12, 12, 12, 12);
             this.btnAddPBJob.Name = "btnAddPBJob";
             this.btnAddPBJob.Size = new System.Drawing.Size(159, 51);
             this.btnAddPBJob.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
@@ -468,7 +468,7 @@ namespace WindowsFormsApp1
             this.kryptonPanel2.Controls.Add(this.tableLayoutPanel1);
             this.kryptonPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.kryptonPanel2.Location = new System.Drawing.Point(0, 0);
-            this.kryptonPanel2.Margin = new System.Windows.Forms.Padding(5);
+            this.kryptonPanel2.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.kryptonPanel2.Name = "kryptonPanel2";
             this.kryptonPanel2.Size = new System.Drawing.Size(1367, 494);
             this.kryptonPanel2.StateCommon.Color1 = System.Drawing.Color.White;
@@ -713,7 +713,7 @@ namespace WindowsFormsApp1
             this.kryptonPanel5.Location = new System.Drawing.Point(3, 2);
             this.kryptonPanel5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.kryptonPanel5.Name = "kryptonPanel5";
-            this.kryptonPanel5.Padding = new System.Windows.Forms.Padding(5);
+            this.kryptonPanel5.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.kryptonPanel5.Size = new System.Drawing.Size(316, 57);
             this.kryptonPanel5.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.kryptonPanel5.TabIndex = 1;
@@ -747,7 +747,7 @@ namespace WindowsFormsApp1
             this.kryptonPanel4.Location = new System.Drawing.Point(395, 2);
             this.kryptonPanel4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.kryptonPanel4.Name = "kryptonPanel4";
-            this.kryptonPanel4.Padding = new System.Windows.Forms.Padding(5);
+            this.kryptonPanel4.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.kryptonPanel4.Size = new System.Drawing.Size(317, 57);
             this.kryptonPanel4.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.kryptonPanel4.TabIndex = 0;
@@ -877,6 +877,7 @@ namespace WindowsFormsApp1
             this.btnSettings.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             this.btnSettings.Values.Image = global::WindowsFormsApp1.Properties.Resources.settings_img;
             this.btnSettings.Values.Text = "";
+            this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
             // 
             // Main
             // 

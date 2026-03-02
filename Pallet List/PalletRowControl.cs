@@ -145,11 +145,12 @@ namespace WindowsFormsApp1
             if (_model == null)
                 return;
 
-            // 🔎 Get ONLY the current working pallet (unpacked one)
+            // 🔎 Get ONLY the current working pallet (not yet packed)
             var activePallet = _model.Pallets
-                .FirstOrDefault(p => p.PackedTime == null);
+                .FirstOrDefault(p => p.PackedAt == null);
 
             bool hasActive = activePallet != null;
+
             bool activeHasData = hasActive &&
                                  (activePallet.PalletEnvelopeQty > 0 ||
                                   activePallet.PalletScannedWO > 0);
@@ -160,35 +161,58 @@ namespace WindowsFormsApp1
             if (hasActive)
             {
                 // Continue adding to existing pallet
-                StylePrimaryEnabled(btnAddPallet, "Add To Pallet",
+                StylePrimaryEnabled(
+                    btnAddPallet,
+                    "Add To Pallet",
                     Purple1, Purple2, Purple2, Color.White);
 
                 if (activeHasData)
-                    StylePrimaryEnabled(btnPackPallet, "Pack Pallet",
+                {
+                    StylePrimaryEnabled(
+                        btnPackPallet,
+                        "Pack Pallet",
                         Blue1, Blue2, Blue1, Color.White);
+                }
                 else
-                    StyleDisabled(btnPackPallet, "Pack Pallet",
+                {
+                    StyleDisabled(
+                        btnPackPallet,
+                        "Pack Pallet",
                         Grey, Grey, Color.White);
+                }
             }
             else
             {
                 // All pallets packed → new pallet allowed
-                StylePrimaryEnabled(btnAddPallet, "New Pallet",
+                StylePrimaryEnabled(
+                    btnAddPallet,
+                    "New Pallet",
                     Green1, Green2, Green2, Color.White);
 
-                StyleDisabled(btnPackPallet, "Pack Pallet",
+                StyleDisabled(
+                    btnPackPallet,
+                    "Pack Pallet",
                     Grey, Grey, Color.White);
             }
 
             // -------------------------
-            // View logic (ONLY current pallet matters)
+            // View logic
             // -------------------------
             if (activeHasData)
-                StyleNeutralEnabled(btnView, "View",
-                    Color.White, Color.White, Grey, Color.Black);
+            {
+                StyleNeutralEnabled(
+                    btnView,
+                    "View",
+                    Color.White, Color.White,
+                    Grey, Color.Black);
+            }
             else
-                StyleDisabled(btnView, "View",
+            {
+                StyleDisabled(
+                    btnView,
+                    "View",
                     Grey, Grey, Color.White);
+            }
         }
 
 
@@ -200,7 +224,7 @@ namespace WindowsFormsApp1
                 return;
 
             var activePallet = _model.Pallets
-                .FirstOrDefault(p => p.PackedTime == null);
+                .FirstOrDefault(p => p.PackedAt == null);
 
             if (activePallet == null)
             {
@@ -341,7 +365,7 @@ namespace WindowsFormsApp1
 
             // 1️⃣ Get active (unpacked) pallet
             var activePallet = _model.Pallets
-                .FirstOrDefault(p => p.PackedTime == null);
+                .FirstOrDefault(p => p.PackedAt == null);
 
             if (activePallet == null)
             {
@@ -370,7 +394,7 @@ namespace WindowsFormsApp1
 
                 // 3️⃣ Apply locally first
                 activePallet.TrayCount = dlg.TrayCount;
-                activePallet.PackedTime  = DateTime.Now;
+                activePallet.PackedAt  = DateTime.Now;
 
             }
 
@@ -380,13 +404,13 @@ namespace WindowsFormsApp1
                 await RqliteClient.UpdatePalletPackingAsync(
                     activePallet.PalletId,
                     activePallet.TrayCount,
-                    activePallet.PackedTime
+                    activePallet.PackedAt
                 );
             }
             catch (Exception ex)
             {
                 // Rollback
-                activePallet.PackedTime = null;
+                activePallet.PackedAt = null;
                 activePallet.TrayCount = 0;
 
                 MessageBox.Show("Error saving pack data: " + ex.Message);

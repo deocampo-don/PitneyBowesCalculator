@@ -39,8 +39,16 @@ namespace WindowsFormsApp1.Packed_And_Ready
 
             packedFlowRow.ResumeLayout(); 
         }
-   
 
+        public void BeginUpdate()
+        {
+            this.SuspendLayout();
+        }
+
+        public void EndUpdate()
+        {
+            this.ResumeLayout();
+        }
         private void ResizeCards()
         {
             if (packedFlowRow.Controls.Count == 0)
