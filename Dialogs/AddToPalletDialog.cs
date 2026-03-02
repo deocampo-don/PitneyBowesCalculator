@@ -15,7 +15,8 @@ namespace WindowsFormsApp1.Dialogs
         int Apos;
         int Bpos;
 
-
+        private readonly List<WorkOrder> _sessionWorkOrders = new List<WorkOrder>();
+        public List<WorkOrder> ScannedWorkOrders => _sessionWorkOrders;
         private readonly HashSet<string> _scannedCodes =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -63,7 +64,6 @@ namespace WindowsFormsApp1.Dialogs
                 return;
             }
 
-            // Format: WODATA|123
             var parts = raw.Split('|');
             if (parts.Length != 2)
             {
@@ -83,25 +83,23 @@ namespace WindowsFormsApp1.Dialogs
                 return;
             }
 
-            // ✅ Create real WorkOrder per scan
             var workOrder = new WorkOrder(woCode, envQty);
-
             workOrder.RecordScan();
 
-            _targetPallet.WorkOrders.Add(workOrder);
+            // ⭐ store only in session
+            _sessionWorkOrders.Add(workOrder);
 
             _scannedCodes.Add(raw);
 
-            // 🔄 Update UI totals
+            // ⭐ update session counters
             txtEnvelopeQty.Text =
-                _targetPallet.PalletEnvelopeQty.ToString("N0");
+                _sessionWorkOrders.Sum(x => x.Quantity).ToString("N0");
 
             txtScannedWO.Text =
-                _targetPallet.PalletScannedWO.ToString("N0");
+                _sessionWorkOrders.Count.ToString();
 
             tbWoBarcode.Clear();
         }
-
 
         private async Task<(bool IsValid, string Message)> IsValueValid(string barcode)
         {
@@ -141,17 +139,15 @@ namespace WindowsFormsApp1.Dialogs
 
         private void BtnOK_Click(object sender, EventArgs e)
         {
-            if (_targetPallet.WorkOrders.Count == 0)
+            if (!_sessionWorkOrders.Any())
             {
-                MessageBox.Show("No scans to commit.");
-                tbWoBarcode.Focus();
+                MessageBox.Show("No scans.");
                 return;
             }
 
             DialogResult = DialogResult.OK;
             Close();
         }
-
         private void tbWoBarcode_TextChanged(object sender, EventArgs e)
         {
 

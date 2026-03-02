@@ -49,41 +49,6 @@ namespace WindowsFormsApp1.Packed_And_Ready
         {
             this.ResumeLayout();
         }
-        private void ResizeCards()
-        {
-            if (packedFlowRow.Controls.Count == 0)
-                return;
-
-            int scrollbarWidth = SystemInformation.VerticalScrollBarWidth;
-
-            bool hasScrollbar = packedFlowRow.VerticalScroll.Visible;
-
-            int availableWidth = packedFlowRow.ClientSize.Width
-                                 - (hasScrollbar ? scrollbarWidth : 0);
-
-            int cardsPerRow = 3;
-            int spacing = 20;
-
-            int cardWidth = (availableWidth / cardsPerRow) - spacing;
-
-            foreach (Control c in packedFlowRow.Controls)
-            {
-                c.Width = cardWidth;
-            }
-        }
-
-
-        public void SetAllReadyToShip(bool isReady)
-        {
-            foreach (Control c in packedFlowRow.Controls)
-            {
-                if (c is PackedRowControl row)
-                {
-                    row.SetReadyToShip(isReady);
-                }
-            }
-        }
-
 
 
         public void AddRow(PackedRowControl row)

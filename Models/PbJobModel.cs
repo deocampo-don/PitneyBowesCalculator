@@ -104,6 +104,18 @@ public class PbJobModel
             .FirstOrDefault(p => p.PackedAt == null);
     }
 
+    //////////////////
+    public IEnumerable<DateTime> ShipmentTimes
+    {
+        get
+        {
+            return Pallets
+                .Where(p => p.ShippedAt.HasValue)
+                .Select(p => p.ShippedAt.Value)
+                .Distinct()
+                .OrderByDescending(t => t);
+        }
+    }
 }
 
 #endregion
@@ -233,5 +245,18 @@ public static class PalletScanCommitter
         return wo;
     }
 }
+public class ShipmentGroup
+{
+    public DateTime ShippedAt { get; set; }
 
+    public List<Pallet> Pallets { get; set; } = new List<Pallet>();
+
+    public int TotalTrays => Pallets.Sum(p => p.TrayCount);
+
+    public int TotalEnvelopes =>
+        Pallets.SelectMany(p => p.WorkOrders).Sum(w => w.Quantity);
+
+    public List<int> JobNumbers =>
+        Pallets.Select(p => p.PBJobId).Distinct().ToList();
+}
 #endregion

@@ -23,7 +23,8 @@ namespace WindowsFormsApp1
         private bool _isPolling;
         public string iniFileName;
         internal INIClass? appINI;
- 
+        private DateTime? _lastJobsTimestamp;
+
         string CPSConnectionString = string.Empty;
 
         public event EventHandler ItemsChanged;
@@ -48,14 +49,54 @@ namespace WindowsFormsApp1
 
             lvBuild.DeleteRequested += async (_, job) =>
             {
+                if (job == null) return;
+
                 try
                 {
                     await RqliteClient.DeletePbJobAsync(job.JobId);
-                    await LoadJobsAsync();
+                    _pbJobs.Remove(job);
+                    _jobsById.Remove(job.JobId);
+                    RemoveJobFromUI(job.JobId);
                 }
                 catch (Exception ex)
                 {
                     ShowDatabaseError(ex);
+                }
+            };
+
+            lvBuild.EditRequested += async (_, job) =>
+            {
+                using (var dialog = new CreatePBJobDialog(job))
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        if (!int.TryParse(dialog.JobNumber, out int jobNumber))
+                        {
+                            MessageBox.Show("Invalid job number.");
+                            return;
+                        }
+
+                        var rows = await RqliteClient.UpdatePbJobAsync(
+    job.JobId,
+    dialog.JobName,
+    jobNumber,
+    dialog.IsTemp,
+    job.LastUpdated);
+
+                        if (rows == 0)
+                        {
+                            MessageBox.Show(
+                                "This job was modified by another workstation.\nPlease reopen and try again.",
+                                "Update Conflict",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+
+                            await RefreshSingleJobAsync(job.JobId);
+                            return;
+                        }
+
+                        await RefreshSingleJobAsync(job.JobId);
+                    }
                 }
             };
 
@@ -136,8 +177,22 @@ namespace WindowsFormsApp1
 
         private async Task PollForUpdatesAsync()
         {
+            if (WindowState == FormWindowState.Minimized)
+                return;
             if (Application.OpenForms.OfType<ViewButtonDialog>().Any())
                 return;
+
+            // ⭐ GLOBAL CHANGE DETECTION (very cheap)
+            var dbTimestamp = await RqliteClient.GetJobsLastUpdatedAsync();
+
+            if (_lastJobsTimestamp == dbTimestamp)
+                return; // nothing changed in the database
+
+            _lastJobsTimestamp = dbTimestamp;
+
+            // ---------------------------------------
+            // Existing logic runs only when needed
+            // ---------------------------------------
 
             var dbInfo = await RqliteClient.LoadJobUpdateInfoAsync();
 
@@ -146,11 +201,13 @@ namespace WindowsFormsApp1
             // -------------------------
             // 1️⃣ Detect NEW jobs
             // -------------------------
-            foreach (var (jobId, _) in dbInfo)
-            {
-                if (_jobsById.ContainsKey(jobId))
-                    continue;
+            var newJobIds = dbInfo
+     .Select(x => x.JobId)
+     .Where(id => !_jobsById.ContainsKey(id))
+     .ToList();
 
+            foreach (var jobId in newJobIds)
+            {
                 var newJob = await RqliteClient.LoadSingleJobGraphAsync(jobId);
 
                 if (newJob != null)
@@ -177,42 +234,48 @@ namespace WindowsFormsApp1
             }
 
             // -------------------------
-            // 3️⃣ Detect DELETED jobs (safe verification)
+            // 3️⃣ Detect DELETED jobs
             // -------------------------
             foreach (var local in _pbJobs.ToList())
             {
                 if (!dbJobIds.Contains(local.JobId))
                 {
-                    var check = await RqliteClient.QueryAsync(
-                        $"SELECT 1 FROM PBJOB WHERE Id = {local.JobId} LIMIT 1");
+                    _pbJobs.Remove(local);
+                    _jobsById.Remove(local.JobId);
 
-                    if (check.Records.Count == 0)
-                    {
-                        _pbJobs.Remove(local);
-                        _jobsById.Remove(local.JobId);
-
-                        RemoveJobFromUI(local.JobId);
-                    }
+                    RemoveJobFromUI(local.JobId);
                 }
             }
         }
 
         private void RefreshSingleJobUI(PbJobModel job)
         {
-            // Always remove first (safe)
             RemoveJobFromUI(job.JobId);
 
-            if (job.ShippedDate.HasValue)
+            // Build and Packed always contain the job
+            lvBuild?.AddItem(job);
+            packedListView2?.AddItem(job);
+
+            // PickedUp only if shipped pallets exist
+            if (job.Pallets.Any(p => p.ShippedAt.HasValue))
             {
                 pickedUpListView?.AddItem(job);
             }
-            else
-            {
-                lvBuild?.AddItem(job);
-                packedListView2?.AddItem(job);
-            }
         }
-
+        public static List<ShipmentGroup> BuildShipments(List<PbJobModel> jobs)
+{
+    return jobs
+        .SelectMany(j => j.Pallets)
+        .Where(p => p.ShippedAt.HasValue)
+        .GroupBy(p => p.ShippedAt.Value)
+        .Select(g => new ShipmentGroup
+        {
+            ShippedAt = g.Key,
+            Pallets = g.ToList()
+        })
+        .OrderByDescending(s => s.ShippedAt)
+        .ToList();
+}
         private void RemoveJobFromUI(int jobId)
         {
             lvBuild?.RemoveItem(jobId);
@@ -241,6 +304,7 @@ namespace WindowsFormsApp1
 
                 SyncNavigatorWithCheckedTab();
                 await LoadJobsAsync();
+                _lastJobsTimestamp = await RqliteClient.GetJobsLastUpdatedAsync();
                 StartBackgroundPolling();
 
             }
@@ -352,11 +416,13 @@ namespace WindowsFormsApp1
         // -----------------------------
         private async Task LoadJobsAsync()
         {
-            _pbJobs.Clear();
-
             var jobs = await RqliteClient.LoadJobsAsync();
 
+            _pbJobs.Clear();
             _pbJobs.AddRange(jobs);
+
+            _jobsById = jobs.ToDictionary(j => j.JobId);
+
             RefreshAllViews();
         }
 
@@ -365,33 +431,48 @@ namespace WindowsFormsApp1
         // -----------------------------
         private void RefreshAllViews()
         {
-        
+            // Build and Packed tabs always show all jobs
+            lvBuild?.SetItems(_pbJobs);
+            packedListView2?.SetItems(_pbJobs);
 
-            var shippedJobs = _pbJobs
-        .Where(j => j.ShippedDate.HasValue)
-        .ToList();
-            var notShippedJobs = _pbJobs
-        .Where(j => !j.ShippedDate.HasValue)
-        .ToList();
-            packedListView2?.SetItems(notShippedJobs);
-            lvBuild?.SetItems(notShippedJobs);
-        
-            pickedUpListView?.SetItems(shippedJobs);
+            var shipmentRows = new List<PbJobModel>();
+
+            foreach (var job in _pbJobs)
+            {
+                foreach (var shipTime in job.ShipmentTimes)
+                {
+                    var clone = new PbJobModel
+                    {
+                        JobId = job.JobId,
+                        JobName = job.JobName,
+                        JobNumber = job.JobNumber,
+                        Pallets = job.Pallets
+                            .Where(p => p.ShippedAt == shipTime)
+                            .ToList(),
+                        ShippedDate = shipTime
+                    };
+
+                    shipmentRows.Add(clone);
+                }
+            }
+
+            pickedUpListView.SetItems(shipmentRows);
         }
-
         private async Task RefreshSingleJobAsync(int jobId)
         {
             var updated = await RqliteClient.LoadSingleJobGraphAsync(jobId);
             if (updated == null)
                 return;
 
-            var existing = _pbJobs.FirstOrDefault(j => j.JobId == jobId);
-            if (existing == null)
+            if (!_jobsById.TryGetValue(jobId, out var existing))
                 return;
 
             // Determine shipped state based on pallets
-            bool wasShipped = existing.Pallets.All(p => p.State == PalletState.Shipped);
-            bool isShipped = updated.Pallets.All(p => p.State == PalletState.Shipped);
+            bool wasShipped = existing.Pallets.Any() &&
+                   existing.Pallets.All(p => p.State == PalletState.Shipped);
+
+            bool isShipped = updated.Pallets.Any() &&
+                             updated.Pallets.All(p => p.State == PalletState.Shipped);
 
             // Update model properties
             existing.JobName = updated.JobName;
@@ -399,15 +480,21 @@ namespace WindowsFormsApp1
             existing.IsTemp = updated.IsTemp;
             existing.LastUpdated = updated.LastUpdated;
             existing.Pallets = updated.Pallets;
+            existing.ShippedDate = updated.Pallets
+    .Where(p => p.State == PalletState.Shipped)
+    .Select(p => p.ShippedAt)
+    .FirstOrDefault();
 
-            // 🚨 If shipped state changed → MOVE UI
+            _jobsById[jobId] = existing;
+
+            // If shipped state changed → move job between views
             if (wasShipped != isShipped)
             {
                 RefreshSingleJobUI(existing);
                 return;
             }
 
-            // Otherwise just refresh row in place
+            // Otherwise refresh item in place
             lvBuild?.RefreshItem(existing);
             packedListView2?.RefreshItem(existing);
             pickedUpListView?.RefreshItem(existing);
@@ -457,7 +544,7 @@ namespace WindowsFormsApp1
                 foreach (var job in selectedJobs)
                 {         
                     await RqliteClient.ShipJobsAsync(new[] { job.JobId });
-                    await RefreshSingleJobAsync(job.JobId);
+                    await LoadJobsAsync();
                 }
             }
             catch (Exception ex)

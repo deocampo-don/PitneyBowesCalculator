@@ -14,13 +14,12 @@ namespace WindowsFormsApp1
     {
         public event EventHandler<PbJobModel> DeleteRequested;
         public event EventHandler<PbJobModel> PalletChanged;
+        public event EventHandler<PbJobModel> EditRequested;
 
         public PalletListView()
         {
             InitializeComponent();
             scrollHost.Resize += (_, __) => ResizeRowsToHost();
-            
-
         }
 
         public void RefreshItem(PbJobModel job)

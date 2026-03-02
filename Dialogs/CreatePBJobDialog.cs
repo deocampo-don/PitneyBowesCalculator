@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Krypton.Toolkit;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,14 +17,23 @@ namespace WindowsFormsApp1
         public string JobName => tbPBJobName.Text.Trim();
         public string JobNumber => tbJobNumber.Text.Trim();
         public bool IsTemp => cbPBTemp.Checked;
-
+        private PbJobModel _job;
         public CreatePBJobDialog()
         {
             InitializeComponent();
             FormHelper.ApplyRoundedCorners(this, 20);
             this.KeyPreview = true; this.KeyDown += RoundedModal_KeyDown;
         }
+        public CreatePBJobDialog(PbJobModel job) : this()
+        {
+            _job = job;
 
+            tbPBJobName.Text = job.JobName;
+            tbJobNumber.Text = job.JobNumber.ToString();
+            cbPBTemp.Checked = job.IsTemp;
+
+            btnCreatePBJob.Text = "Save Changes";
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
 
