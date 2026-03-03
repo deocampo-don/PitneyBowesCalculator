@@ -62,7 +62,16 @@ namespace WindowsFormsApp1.Packed_And_Ready
         {
             return packedFlowRow.Controls
                 .OfType<PackedRowControl>()
-                .Where(r => r.IsReady())
+                .Where(r =>
+                {
+                    var job = r.GetModel();
+
+                    bool allPacked =
+                        job.Pallets.Any() &&
+                        job.Pallets.All(p => p.State == PalletState.Packed);
+
+                    return r.IsReady() && allPacked;
+                })
                 .Select(r => r.GetModel())
                 .ToList();
         }

@@ -256,7 +256,7 @@ namespace WindowsFormsApp1
             lvBuild?.AddItem(job);
             packedListView2?.AddItem(job);
 
-            // PickedUp only if shipped pallets exist
+            // PickedUp only if shipped pallets exist  
             if (job.Pallets.Any(p => p.ShippedAt.HasValue))
             {
                 pickedUpListView?.AddItem(job);
@@ -431,33 +431,113 @@ namespace WindowsFormsApp1
         // -----------------------------
         private void RefreshAllViews()
         {
-            // Build and Packed tabs always show all jobs
+            // =====================================================
+            // 1️⃣ BUILD TAB  (Always show full original jobs)
+            // =====================================================
             lvBuild?.SetItems(_pbJobs);
-            packedListView2?.SetItems(_pbJobs);
 
-            var shipmentRows = new List<PbJobModel>();
 
-            foreach (var job in _pbJobs)
-            {
-                foreach (var shipTime in job.ShipmentTimes)
+            // =====================================================
+            // 2️⃣ PACKED & READY TAB  (ONLY NON-SHIPPED PALLETS)
+            //    🔥 Deep clone to avoid reference contamination
+            // =====================================================
+            var activeJobs = _pbJobs
+                .Select(job =>
                 {
-                    var clone = new PbJobModel
+                    var activePallets = job.Pallets
+                        .Where(p => p.State != PalletState.Shipped)
+                        .Select(p => new Pallet
+                        {
+                            PalletId = p.PalletId,
+                            PBJobId = p.PBJobId,
+                            PalletNumber = p.PalletNumber,
+                            PackedAt = p.PackedAt,
+                            ShippedAt = p.ShippedAt,
+                            TrayCount = p.TrayCount,
+                            State = p.State,
+                            WorkOrders = p.WorkOrders
+                                .Select(w => new WorkOrder(w.WorkOrderCode, w.Quantity)
+                                {
+                                    Id = w.Id,
+                                    PalletId = w.PalletId
+                                })
+                                .ToList()
+                        })
+                        .ToList();
+
+                    if (!activePallets.Any())
+                        return null;
+
+                    return new PbJobModel
                     {
                         JobId = job.JobId,
                         JobName = job.JobName,
                         JobNumber = job.JobNumber,
-                        Pallets = job.Pallets
-                            .Where(p => p.ShippedAt == shipTime)
-                            .ToList(),
-                        ShippedDate = shipTime
+                        IsTemp = job.IsTemp,
+                        LastUpdated = job.LastUpdated,
+                        Pallets = activePallets
+                    };
+                })
+                .Where(j => j != null)
+                .ToList();
+
+            packedListView2?.SetItems(activeJobs);
+
+
+            // =====================================================
+            // 3️⃣ PICKUP TAB (ONLY SHIPPED PALLETS GROUPED BY TIME)
+            // =====================================================
+            var shipmentRows = new List<PbJobModel>();
+
+            foreach (var job in _pbJobs)
+            {
+                var shippedGroups = job.Pallets
+                    .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
+                    .GroupBy(p => p.ShippedAt.Value);
+
+                foreach (var group in shippedGroups)
+                {
+                    var shipmentClone = new PbJobModel
+                    {
+                        JobId = job.JobId,
+                        JobName = job.JobName,
+                        JobNumber = job.JobNumber,
+                        IsTemp = job.IsTemp,
+                        LastUpdated = job.LastUpdated,
+                        ShippedDate = group.Key,
+                        Pallets = group
+                            .Select(p => new Pallet
+                            {
+                                PalletId = p.PalletId,
+                                PBJobId = p.PBJobId,
+                                PalletNumber = p.PalletNumber,
+                                PackedAt = p.PackedAt,
+                                ShippedAt = p.ShippedAt,
+                                TrayCount = p.TrayCount,
+                                State = p.State,
+                                WorkOrders = p.WorkOrders
+                                    .Select(w => new WorkOrder(w.WorkOrderCode, w.Quantity)
+                                    {
+                                        Id = w.Id,
+                                        PalletId = w.PalletId
+                                    })
+                                    .ToList()
+                            })
+                            .ToList()
                     };
 
-                    shipmentRows.Add(clone);
+                    shipmentRows.Add(shipmentClone);
                 }
             }
 
-            pickedUpListView.SetItems(shipmentRows);
+            shipmentRows = shipmentRows
+                .OrderByDescending(s => s.ShippedDate)
+                .ToList();
+
+            pickedUpListView?.SetItems(shipmentRows);
         }
+
+
         private async Task RefreshSingleJobAsync(int jobId)
         {
             var updated = await RqliteClient.LoadSingleJobGraphAsync(jobId);
@@ -495,9 +575,11 @@ namespace WindowsFormsApp1
             }
 
             // Otherwise refresh item in place
-            lvBuild?.RefreshItem(existing);
-            packedListView2?.RefreshItem(existing);
-            pickedUpListView?.RefreshItem(existing);
+           // lvBuild?.RefreshItem(existing);
+           // packedListView2?.RefreshItem(existing);
+           // pickedUpListView?.RefreshItem(existing);
+
+            RefreshAllViews();
         }
 
 

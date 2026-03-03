@@ -557,6 +557,40 @@ AND NOT EXISTS (
         await ExecuteAsync(sql);
     }
 
+    // =====================================================
+    // MERGE PALLETS (MOVE WO ONLY, DELETE SOURCE PALLETS)
+    // =====================================================
+    public static async Task MergePalletsIntoAsync(
+        IEnumerable<int> sourcePalletIds,
+        int targetPalletId)
+    {
+        if (sourcePalletIds == null || !sourcePalletIds.Any())
+            return;
+
+        var idList = string.Join(",", sourcePalletIds);
+
+        string sql = $@"
+-- 1️⃣ Move WorkOrders into target pallet
+UPDATE {TablePalletWorkOrders}
+SET PalletId = {targetPalletId}
+WHERE PalletId IN ({idList});
+
+-- 2️⃣ Delete source pallets
+DELETE FROM {TablePallets}
+WHERE Id IN ({idList});
+
+-- 3️⃣ Update parent job timestamp
+UPDATE {TableJobs}
+SET LastUpdated = CURRENT_TIMESTAMP
+WHERE Id = (
+    SELECT PBJobId FROM {TablePallets}
+    WHERE Id = {targetPalletId}
+);
+";
+
+        await ExecuteAsync(sql);
+    }
+
     // ======================
     // READ OPERATIONS (⭐ ADDED)
     // ======================

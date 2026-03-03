@@ -76,9 +76,10 @@ namespace WindowsFormsApp1.Packed_And_Ready
             bool isShipped = job.Pallets?.Any() == true &&
                              job.Pallets.All(p => p.State == PalletState.Shipped);
 
-            bool isReady = job.Pallets?.Any(p =>
-                             p.State == PalletState.Ready ||
-                             p.State == PalletState.Packed) == true;
+            bool isReady =
+                      job.Pallets != null &&
+                      job.Pallets.Count > 0 &&
+                      job.Pallets.All(p => p.State == PalletState.Packed);
 
             if (isShipped)
             {
@@ -128,7 +129,9 @@ namespace WindowsFormsApp1.Packed_And_Ready
             ViewClicked?.Invoke(this, EventArgs.Empty);
 
             Form parentForm = this.FindForm();
-            using (var dlg = new ViewButtonDialog(_modelpbjob))
+            var clonedJob = ModelCloner.CloneJob(_modelpbjob);
+
+            using (var dlg = new ViewButtonDialog(clonedJob))
             {
                 dlg.ShowDialog(parentForm);
 
@@ -164,16 +167,38 @@ namespace WindowsFormsApp1.Packed_And_Ready
             }
         }
 
-        private async void chkbxStatus_CheckedChanged(object sender, EventArgs e)
+        private void chkbxStatus_CheckedChanged(object sender, EventArgs e)
         {
             if (_modelpbjob == null)
                 return;
 
+            // Already shipped → do nothing
             if (_modelpbjob.ShippedDate.HasValue)
                 return;
 
+            // Only validate when CHECKING
             if (chkbxStatus.Checked)
             {
+                bool allPacked =
+                    _modelpbjob.Pallets.Any() &&
+                    _modelpbjob.Pallets.All(p => p.State == PalletState.Packed);
+
+                if (!allPacked)
+                {
+                    // Prevent infinite recursion
+                    chkbxStatus.CheckedChanged -= chkbxStatus_CheckedChanged;
+                    chkbxStatus.Checked = false;
+                    chkbxStatus.CheckedChanged += chkbxStatus_CheckedChanged;
+
+                    MessageBox.Show(
+                        "There is no pallet or some pallets are not yet packed.",
+                        "Cannot Ship",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+
+                    return;
+                }
+
                 txtStatus.Text = "Ready to Ship";
                 txtStatus.StateCommon.ShortText.Color1 =
                     ColorTranslator.FromHtml("#34C759");

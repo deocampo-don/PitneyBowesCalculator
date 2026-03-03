@@ -121,6 +121,7 @@
     <Compile Include="INIClass.cs" />
     <Compile Include="Models\ForDBTest\IScanResolver.cs.cs" />
     <Compile Include="Models\ForDBTest\IWorkOrderLookup.cs" />
+    <Compile Include="Models\ModelCloner.cs" />
     <Compile Include="Models\ForDBTest\ScanResult.cs" />
     <Compile Include="Models\ForDBTest\TestScanResolver.cs" />
     <Compile Include="Models\ForDBTest\TestWorkOrderLookup.cs" />

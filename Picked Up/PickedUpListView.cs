@@ -16,6 +16,7 @@ namespace WindowsFormsApp1.Picked_Up
         {
             InitializeComponent();
         }
+       
         public event EventHandler<PbJobModel> PalletChanged;
 
         public void RefreshItem(PbJobModel job)
