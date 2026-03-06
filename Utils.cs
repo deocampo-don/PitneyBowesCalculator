@@ -26,6 +26,7 @@ namespace WindowsFormsApp1
 {
     internal static class Utils
     {
+        private static readonly string AppKey = "PITNEYBOWESAPPsupersecretkey0123";
         const string crlf = "\r\n";
         const string quote = "\"";
         internal static string logFileDirectory;
@@ -302,18 +303,55 @@ namespace WindowsFormsApp1
             return currId;
         }
 
-        public static string Encrypt(string text)
+        public static string Encrypt(string plainText)
         {
-            byte[] data = Encoding.UTF8.GetBytes(text);
-            byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.CurrentUser);
-            return Convert.ToBase64String(encrypted);
+            if (string.IsNullOrEmpty(plainText))
+                return "";
+
+            byte[] key = Encoding.UTF8.GetBytes(AppKey);
+            byte[] iv = new byte[16]; // fixed IV for simplicity
+
+            using var aes = Aes.Create();
+            aes.Key = key;
+            aes.IV = iv;
+
+            using var encryptor = aes.CreateEncryptor();
+            using var ms = new MemoryStream();
+            using var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write);
+            using var sw = new StreamWriter(cs);
+
+            sw.Write(plainText);
+
+            return Convert.ToBase64String(ms.ToArray());
         }
 
         public static string Decrypt(string encryptedText)
         {
-            byte[] data = Convert.FromBase64String(encryptedText);
-            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.CurrentUser);
-            return Encoding.UTF8.GetString(decrypted);
+            if (string.IsNullOrWhiteSpace(encryptedText))
+                return "";
+
+            try
+            {
+                byte[] key = Encoding.UTF8.GetBytes(AppKey);
+                byte[] iv = new byte[16];
+                byte[] buffer = Convert.FromBase64String(encryptedText);
+
+                using var aes = Aes.Create();
+                aes.Key = key;
+                aes.IV = iv;
+
+                using var decryptor = aes.CreateDecryptor();
+                using var ms = new MemoryStream(buffer);
+                using var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
+                using var sr = new StreamReader(cs);
+
+                return sr.ReadToEnd();
+            }
+            catch
+            {
+                // fallback if value already plain text
+                return encryptedText;
+            }
         }
 
         public static string AddFilterClause(string sql, string clause)

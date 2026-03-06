@@ -42,7 +42,7 @@ namespace WindowsFormsApp1
                 tglTrustedConnection.Checked = cps.TrustedConnection;
                 tglTrustedServerCert.Checked = cps.TrustedServerCertificate;
                 tbSqlUser.Text = cps.SqlUser;
-                tbSqlPwd.Text = Decrypt(cps.SqlPassword);
+                tbSqlPwd.Text = Utils.Decrypt(cps.SqlPassword);
             }
          
         }
@@ -91,7 +91,7 @@ namespace WindowsFormsApp1
                 sqlUser = tbSqlUser.Text.Trim();
 
                 // 🔐 Encrypt password before saving
-                sqlPassword = Encrypt(tbSqlPwd.Text.Trim());
+                sqlPassword = Utils.Encrypt(tbSqlPwd.Text.Trim());
             }
 
             if (missingFields.Count > 0)
@@ -119,9 +119,6 @@ namespace WindowsFormsApp1
 
 
 
-            Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Connected");
-
-
             if (!test.Success)
             {
                 MessageBox.Show(
@@ -129,9 +126,15 @@ namespace WindowsFormsApp1
                     "Connection Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+                lbStatus.Visible = false;
+                pbSpinner.Visible= false;
 
                 return;
             }
+
+
+            Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Connected");
+
 
             var result = await RqliteClient.SaveSettingsAsync(
                 tbCpsServer.Text.Trim(),
@@ -204,18 +207,6 @@ namespace WindowsFormsApp1
             }
         }
 
-        public static string Encrypt(string text)
-        {
-            byte[] data = Encoding.UTF8.GetBytes(text);
-            byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.CurrentUser);
-            return Convert.ToBase64String(encrypted);
-        }
 
-        public static string Decrypt(string encryptedText)
-        {
-            byte[] data = Convert.FromBase64String(encryptedText);
-            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.CurrentUser);
-            return Encoding.UTF8.GetString(decrypted);
-        }
     }
 }

@@ -89,9 +89,6 @@ namespace WindowsFormsApp1
                 RqliteClient.httpClient = client;
                 RqliteClient.DefaultEndPoint = Program.AppINI._rqClientAddress.Trim();
             }
-
-            // Ensure tables exist first
-            //await RqliteClient.CreatePbSchemaAsync();
         }
 
 

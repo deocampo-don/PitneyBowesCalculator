@@ -68,25 +68,6 @@ public static class RqliteClient
         return value.ToString();
     }
 
-    //public static async Task<RqliteResult> QueryAsync(string sql)
-    //{
-    //    var json = JsonConvert.SerializeObject(new[] { sql });
-    //    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-    //    var response = await httpClient.PostAsync(
-    //        DefaultEndPoint + "/db/query",
-    //        content
-    //    );
-
-    //    var body = await response.Content.ReadAsStringAsync();
-
-    //    return new RqliteResult
-    //    {
-    //        Success = true,
-    //        Records = ParseQueryResponse(body)
-    //    };
-    //}
-
     public static async Task<RqliteResult> QueryAsync(string sql)
     {
         int maxRetries = Program.AppINI._rqClientMaxRetries;
@@ -162,40 +143,7 @@ public static class RqliteClient
     {
         return value?.Replace("'", "''") ?? "";
     }
-    public static Task<RqliteWriteResult> CreateTableAsync(
-        string table,
-        Dictionary<string, string> columns)
-    {
-        var cols = string.Join(", ",
-            columns.Select(c => $"\"{c.Key}\" {c.Value}")
-        );
-
-        return ExecuteAsync(
-            $"CREATE TABLE IF NOT EXISTS \"{table}\" ({cols})"
-        );
-    }
-
-    public static Task<RqliteWriteResult> CreateIndexAsync(
-        string indexName,
-        string table,
-        string column)
-    {
-        return ExecuteAsync(
-            $"CREATE INDEX IF NOT EXISTS {indexName} ON \"{table}\"(\"{column}\")"
-        );
-    }
-
-    public static Task<RqliteWriteResult> InsertAsync(
-        string table,
-        Dictionary<string, object> data)
-    {
-        var cols = string.Join(", ", data.Keys.Select(k => $"\"{k}\""));
-        var vals = string.Join(", ", data.Values.Select(FormatValue));
-
-        return ExecuteAsync(
-            $"INSERT INTO \"{table}\" ({cols}) VALUES ({vals})"
-        );
-    }
+   
 
     public static async Task<RqliteResult> SelectAsync(string table, string where = "")
     {
@@ -272,18 +220,7 @@ public static class RqliteClient
             return false;
         }
     }
-    public static async Task UpdateJobShippedDateAsync(int jobId, DateTime shippedDate)
-    {
 
-        string sql = $@"
-    UPDATE PALLET
-    SET State = {(int)PalletState.Shipped},
-        ShippedAt = CURRENT_TIMESTAMP
-    WHERE PBJobId = {jobId};
-    ";
-
-        await ExecuteAsync(sql);
-    }
     public static async Task<List<(int JobId, DateTime? LastUpdated)>>
       LoadJobUpdateInfoAsync()
     {
@@ -439,7 +376,7 @@ ON CONFLICT(Id) DO UPDATE SET
         JobName = {FormatValue(jobName)},
         JobNumber = {jobNumber},
         IsTemp = {(isTemp ? 1 : 0)},
-        LastUpdated = CURRENT_TIMESTAMP
+        LastUpdated = datetime('now','localtime')
     WHERE Id = {jobId}
       AND LastUpdated = {FormatValue(expectedLastUpdated)};
     ";
@@ -459,7 +396,7 @@ ON CONFLICT(Id) DO UPDATE SET
     WHERE Id IN ({idList});
 
     UPDATE {TableJobs}
-    SET LastUpdated = CURRENT_TIMESTAMP
+    SET LastUpdated = datetime('now','localtime')
     WHERE Id IN (
         SELECT PBJobId
         FROM {TablePallets}
@@ -540,31 +477,33 @@ ON CONFLICT(Id) DO UPDATE SET
     }
 
     public static async Task<int> UpdatePalletPackingAsync(
-    int palletId,
-    int trayCount)
+      int palletId,
+      int trayCount)
     {
         string sql = $@"
-    UPDATE {TablePallets}
-    SET
-        TrayCount = {trayCount},
-        PackedAt = CURRENT_TIMESTAMP,
-        State = {(int)PalletState.Packed}
-    WHERE Id = {palletId}
-      AND PackedAt IS NULL;
+UPDATE {TablePallets}
+SET
+    TrayCount = {trayCount},
+    PackedAt = datetime('now','localtime'),
+    State = {(int)PalletState.Packed}
+WHERE Id = {palletId}
+  AND PackedAt IS NULL
+  AND State = {(int)PalletState.NotReady};
 
-    UPDATE {TableJobs}
-    SET LastUpdated = CURRENT_TIMESTAMP
-    WHERE Id = (
-        SELECT PBJobId
-        FROM {TablePallets}
-        WHERE Id = {palletId}
-    );
-    ";
+UPDATE {TableJobs}
+SET LastUpdated = datetime('now','localtime')
+WHERE Id = (
+    SELECT PBJobId
+    FROM {TablePallets}
+    WHERE Id = {palletId}
+)
+AND changes() > 0;
+";
 
         var result = await ExecuteAsync(sql);
+
         return result.RowsAffected;
     }
-
 
 
     // ======================
@@ -580,7 +519,7 @@ ON CONFLICT(Id) DO UPDATE SET
         string sql = $@"
         -- update parent jobs first
         UPDATE {TableJobs}
-        SET LastUpdated = CURRENT_TIMESTAMP
+        SET LastUpdated = datetime('now','localtime')
         WHERE JobId IN (
             SELECT DISTINCT JobId
             FROM {TablePallets}
@@ -597,106 +536,6 @@ ON CONFLICT(Id) DO UPDATE SET
         await ExecuteAsync(sql);
     }
 
-
-
-
-    // ======================
-    // SCHEMA CREATION
-    // ======================
-    public static async Task CreatePbSchemaAsync()
-    {
-        await ExecuteAsync("PRAGMA foreign_keys = ON;");
-
-        // PBJob
-        await ExecuteAsync(@"
-    CREATE TABLE IF NOT EXISTS PBJob (
-        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-        JobName VARCHAR(100) NOT NULL,
-        JobNumber INTEGER NOT NULL UNIQUE,
-        IsTemp INTEGER NOT NULL,
-        LastUpdated DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-    ");
-
-        // PALLET
-        await ExecuteAsync(@"
-    CREATE TABLE IF NOT EXISTS PALLET (
-        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-        PBJobId INTEGER NOT NULL,
-        PalletNumber INTEGER NOT NULL,
-        PackedAt DATETIME,
-        ShippedAt DATETIME,
-        State INTEGER DEFAULT 0,
-        TrayCount INTEGER NOT NULL DEFAULT 0,
-
-        FOREIGN KEY (PBJobId) REFERENCES PBJob(Id) ON DELETE CASCADE
-    );
-    ");
-
-        // WORKORDERS
-        await ExecuteAsync(@"
-    CREATE TABLE IF NOT EXISTS WORKORDERS (
-        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-        PalletId INTEGER NOT NULL,
-        Barcode VARCHAR(50) NOT NULL UNIQUE,
-        WorkOrder VARCHAR(50) NOT NULL,
-        Quantity INTEGER NOT NULL,
-
-        FOREIGN KEY (PalletId) REFERENCES PALLET(Id) ON DELETE CASCADE
-    );
-    ");
-
-        // AppSettings
-        await ExecuteAsync(@"
-    CREATE TABLE IF NOT EXISTS AppSettings (
-        Id INTEGER PRIMARY KEY,
-        CPSServer TEXT,
-        CPSDatabase TEXT,
-        CPSQuery TEXT,
-        ConnectionTimeout INTEGER,
-        TrustedConnection INTEGER,
-        TrustedServerCertificate INTEGER
-    );
-    ");
-
-        // Indexes
-        await ExecuteAsync("CREATE INDEX IF NOT EXISTS idx_pallet_pbjobid ON PALLET(PBJobId);");
-
-        await ExecuteAsync("CREATE INDEX IF NOT EXISTS idx_pallet_job_state ON PALLET(PBJobId, State);");
-
-        await ExecuteAsync("CREATE INDEX IF NOT EXISTS idx_workorders_palletid ON WORKORDERS(PalletId);");
-
-        await ExecuteAsync(@"
-CREATE UNIQUE INDEX IF NOT EXISTS idx_one_active_pallet
-ON PALLET(PBJobId)
-WHERE State = 0;
-");
-    }
-
-    public static async Task<RqliteWriteResult> SaveCpsSettingsAsync(
-    string server,
-    string database,
-    string query,
-    int timeout,
-    bool trustedConnection,
-    bool trustedServerCert)
-    {
-        string sql = $@"
-    INSERT OR REPLACE INTO {TableAppSettings}
-    (Id, CPSServer, CPSDatabase, CPSQuery, ConnectionTimeout, TrustedConnection, TrustedServerCertificate)
-    VALUES
-    (
-        1,
-        {FormatValue(server)},
-        {FormatValue(database)},
-        {FormatValue(query)},
-        {timeout},
-        {(trustedConnection ? 1 : 0)},
-        {(trustedServerCert ? 1 : 0)}
-    );";
-
-        return await ExecuteAsync(sql);
-    }
 
     public class CpsSettings
     {
@@ -771,25 +610,6 @@ WHERE State = 0;
         return result.Records.Count > 0;
     }
 
-    // ======================
-    // BATCH SHIP JOBS (New)
-    // ======================
-    //public static async Task ShipJobsAsync(IEnumerable<int> jobIds)
-    //{
-    //    if (jobIds == null || !jobIds.Any())
-    //        return;
-
-    //    var idList = string.Join(",", jobIds);
-
-    //    string sql = $@"
-    //UPDATE PALLET
-    //SET ShippedAt = CURRENT_TIMESTAMP,
-    //    State = {(int)PalletState.Shipped}
-    //WHERE PBJobId IN ({idList})";
-
-    //    await ExecuteAsync(sql);
-    //}
-
     public static async Task ShipJobsAsync(IEnumerable<int> jobIds)
     {
         if (jobIds == null || !jobIds.Any())
@@ -813,7 +633,12 @@ AND NOT EXISTS (
         {(int)PalletState.Ready},
         {(int)PalletState.Packed_NotReady}
     )
-);";
+);
+
+UPDATE PBJOB
+SET LastUpdated = datetime('now','localtime')
+WHERE Id IN ({idList});
+";
 
         await ExecuteAsync(sql);
     }
@@ -842,7 +667,7 @@ WHERE Id IN ({idList});
 
 -- 3️⃣ Update parent job timestamp
 UPDATE {TableJobs}
-SET LastUpdated = CURRENT_TIMESTAMP
+SET LastUpdated = datetime('now','localtime')
 WHERE Id = (
     SELECT PBJobId FROM {TablePallets}
     WHERE Id = {targetPalletId}
@@ -1017,34 +842,25 @@ ORDER BY j.Id, p.PalletNumber
 
         Console.WriteLine("[PALLET] No active pallet found. Creating new pallet...");
 
-        var numberResult = await QueryAsync($@"
-        SELECT IFNULL(MAX(PalletNumber),0) + 1 AS NextNum
-        FROM {TablePallets}
-        WHERE PBJobId = {jobId}
-    ");
-
-        int nextNumber = Convert.ToInt32(numberResult.Records[0]["NextNum"]);
-
-        Console.WriteLine($"[PALLET] Next pallet number: {nextNumber}");
-
         await ExecuteAsync($@"
-        INSERT INTO {TablePallets}
-        (PBJobId, PalletNumber, State, TrayCount)
-        VALUES (
-            {jobId},
-            {nextNumber},
-            {(int)PalletState.NotReady},
-            0
-        );
-    ");
+INSERT INTO {TablePallets}
+(PBJobId, State, TrayCount)
+VALUES (
+    {jobId},
+    {(int)PalletState.NotReady},
+    0
+);
 
-        var result = await QueryAsync($@"
-        SELECT Id
-        FROM {TablePallets}
-        WHERE PBJobId = {jobId}
-        AND State = {(int)PalletState.NotReady}
-        LIMIT 1
-    ");
+UPDATE {TablePallets}
+SET PalletNumber = Id
+WHERE Id = last_insert_rowid();
+
+UPDATE {TableJobs}
+SET LastUpdated = CURRENT_TIMESTAMP
+WHERE Id = {jobId};
+");
+
+        var result = await QueryAsync("SELECT last_insert_rowid() AS Id");
 
         if (result.Records.Count == 0)
             throw new Exception("Failed to locate active pallet.");
@@ -1165,49 +981,7 @@ ORDER BY j.Id, p.PalletNumber
 
         return rows;
     }
-    //public static async Task<List<Pallet>> LoadPalletsAsync(int jobId)
-    //{
-    //    var result = await SelectAsync(TablePallets, $"WHERE PBJobId = {jobId}");
-    //    var pallets = new List<Pallet>();
-
-    //    foreach (var row in result.Records)
-    //    {
-    //        pallets.Add(new Pallet
-    //        {
-    //            PalletId = Convert.ToInt32(row["Id"]),
-    //            PBJobId = jobId,
-    //            PalletNumber = Convert.ToInt32(row["PalletNumber"]),
-    //            TrayCount = Convert.ToInt32(row["TrayCount"]),
-    //            PackedAt = row["PackedAt"] == null ? (DateTime?)null : Convert.ToDateTime(row["PackedAt"]),
-    //            ShippedAt = row["ShippedAt"] == null ? (DateTime?)null : Convert.ToDateTime(row["ShippedAt"]),
-    //            State = (PalletState)Convert.ToInt32(row["State"]),
-    //            WorkOrders = new List<WorkOrder>()
-    //        });
-    //    }
-
-    //    return pallets;
-    //}
-
-    //public static async Task<List<WorkOrder>> LoadWorkOrdersAsync(int palletId)
-    //{
-    //    var result = await SelectAsync(TablePalletWorkOrders, $"WHERE PalletId = {palletId}");
-    //    var workOrders = new List<WorkOrder>();
-
-    //    foreach (var row in result.Records)
-    //    {
-    //        workOrders.Add(new WorkOrder(
-    //            row["WorkOrder"].ToString(),
-    //            Convert.ToInt32(row["Quantity"])
-    //        )
-    //        {
-    //            PalletId = palletId,
-    //            Barcode = row["Barcode"]?.ToString()
-    //        });
-    //    }
-
-    //    return workOrders;
-    //}
-
+ 
     public static async Task<List<WorkOrder>> LoadWorkOrdersAsync(int palletId)
     {
         var result = await QueryAsync($@"
@@ -1313,7 +1087,7 @@ ORDER BY j.Id, p.PalletNumber
     );
 
     UPDATE {TableJobs}
-    SET LastUpdated = CURRENT_TIMESTAMP
+    SET LastUpdated = datetime('now','localtime')
     WHERE Id = {pallet.PBJobId};
     ";
 
@@ -1330,35 +1104,6 @@ ORDER BY j.Id, p.PalletNumber
     }
 
 
-    //public static async Task SaveWorkOrdersAsync(
-    // int palletId,
-    // List<WorkOrder> workOrders)
-    //{
-    //    if (workOrders == null || !workOrders.Any())
-    //        return;
-
-    //    var sqlBuilder = new StringBuilder();
-
-    //    foreach (var wo in workOrders)
-    //    {
-    //        var barcode = string.IsNullOrWhiteSpace(wo.Barcode)
-    //            ? $"STATIC-{Guid.NewGuid()}"
-    //            : wo.Barcode;
-
-    //        sqlBuilder.AppendLine($@"
-    //INSERT OR IGNORE INTO {TablePalletWorkOrders}
-    //(PalletId, Barcode, WorkOrder, Quantity)
-    //VALUES (
-    //    {palletId},
-    //    {FormatValue(barcode)},
-    //    {FormatValue(wo.WorkOrderCode)},
-    //    {wo.Quantity}
-    //);
-    //");
-    //    }
-
-    //    await ExecuteAsync(sqlBuilder.ToString());
-    //}
     public static async Task<RqliteWriteResult> SaveWorkOrdersAsync(
     int palletId,
     List<WorkOrder> workOrders)
@@ -1380,7 +1125,15 @@ VALUES (
     {wo.Quantity}
 );");
         }
-
+        sqlBuilder.AppendLine($@"
+UPDATE {TableJobs}
+SET LastUpdated = datetime('now','localtime')
+WHERE Id = (
+    SELECT PBJobId
+    FROM {TablePallets}
+    WHERE Id = {palletId}
+);
+");
         return await ExecuteAsync(sqlBuilder.ToString());
     }
 
