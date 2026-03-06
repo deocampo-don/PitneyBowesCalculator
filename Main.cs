@@ -1,14 +1,18 @@
 ﻿using Krypton.Toolkit;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp1.Dialogs;
 using WindowsFormsApp1.Packed_And_Ready;
 using WindowsFormsApp1.Packed_And_Ready.View_Button;
+using WindowsFormsApp1.Properties;
 
 namespace WindowsFormsApp1
 {
@@ -18,14 +22,16 @@ namespace WindowsFormsApp1
         // Fields
         // -----------------------------
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
+        private System.Windows.Forms.Timer _connectionStatusTimer;
         private Dictionary<int, PbJobModel> _jobsById = new Dictionary<int, PbJobModel>();
         private System.Windows.Forms.Timer _pollTimer;
         private bool _isPolling;
         public string iniFileName;
         internal INIClass? appINI;
         private DateTime? _lastJobsTimestamp;
-
-        string CPSConnectionString = string.Empty;
+        public static CpsConfig DbCpsConfig;
+        private bool _isReconnecting = false;
+        public static string CPSConnectionString;
 
         public event EventHandler ItemsChanged;
 
@@ -44,6 +50,112 @@ namespace WindowsFormsApp1
 
 
             // UI event wiring
+            UiEvents();
+     
+
+             StartPosition = FormStartPosition.Manual;
+
+            var mouseScreen = Screen.FromPoint(Cursor.Position);
+
+            this.Location = mouseScreen.WorkingArea.Location;
+
+            this.WindowState = FormWindowState.Maximized;
+            lvBuild.EnableDoubleBuffer();
+            packedListView2.EnableDoubleBuffer();
+            pickedUpListView.EnableDoubleBuffer();
+        }
+
+        // -----------------------------
+        // ⭐ rqlite Initialization
+        // -----------------------------
+        private async Task InitializeRqliteAsync()
+        {
+            if (RqliteClient.httpClient == null)
+            {
+                ServicePointManager.Expect100Continue = false;
+
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback =
+                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+
+                var client = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(Program.AppINI._rqClientAddress.Trim()),
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+
+                RqliteClient.httpClient = client;
+                RqliteClient.DefaultEndPoint = Program.AppINI._rqClientAddress.Trim();
+            }
+
+            // Ensure tables exist first
+            //await RqliteClient.CreatePbSchemaAsync();
+        }
+
+
+        private async Task LoadCPSConfig()
+        {
+            MessageBox.Show("Starting LoadCPS Config");
+
+            DbCpsConfig = await RqliteClient.LoadCpsConfigFromDB();
+
+            // Fallback if DB has no config
+            if (DbCpsConfig == null)
+            {
+                DbCpsConfig = new CpsConfig
+                {
+                    CpsDb = "OCS",
+                    CpsQuery = "cps_query.sql", // default file
+                    CpsServer = "USCHSERV36.corp.idemia.com",
+                    TrustedConn = true,
+                    TrustedServerCert = true,
+                    ConnTimeOut = 100
+                };
+            }
+
+            // Determine whether CpsQuery is a file or SQL text
+            string sqlQuery;
+
+            if (DbCpsConfig.CpsQuery.EndsWith(".sql", StringComparison.OrdinalIgnoreCase))
+            {
+                string queryPath = Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "sql_query",
+                    DbCpsConfig.CpsQuery
+                );
+
+                if (!File.Exists(queryPath))
+                {
+                    MessageBox.Show($"SQL query file not found:\n{queryPath}");
+                    return;
+                }
+
+                sqlQuery = File.ReadAllText(queryPath);
+            }
+            else
+            {
+                // SQL stored directly in DB
+                sqlQuery = DbCpsConfig.CpsQuery;
+            }
+
+            // Store query for later use if needed
+            DbCpsConfig.CpsQuery = sqlQuery;
+
+            // TESTING ONLY (SQL authentication)
+            CPSConnectionString =
+                $"Server=PHMAVSERV1012.corp.idemia.com;" +
+                $"Database=OCS;" +
+                $"User Id=ocssql;" +
+                $"Password=ocssql;" +
+                $"TrustServerCertificate=True;" +
+                $"Connection Timeout=100;";
+
+            MessageBox.Show("CPS Connection String Loaded:\n" + CPSConnectionString);
+        }
+        private void UiEvents()
+        {
             packedListView2.PackedDataChanged += PackedListView2_PackedDataChanged;
             lvBuild.PalletChanged += PalletListView_PalletChanged;
 
@@ -99,48 +211,15 @@ namespace WindowsFormsApp1
                     }
                 }
             };
-
-            StartPosition = FormStartPosition.Manual;
-
-            var mouseScreen = Screen.FromPoint(Cursor.Position);
-
-            this.Location = mouseScreen.WorkingArea.Location;
-
-            this.WindowState = FormWindowState.Maximized;
-            lvBuild.EnableDoubleBuffer();
-            packedListView2.EnableDoubleBuffer();
-            pickedUpListView.EnableDoubleBuffer();
         }
-
-        // -----------------------------
-        // ⭐ rqlite Initialization
-        // -----------------------------
-        private async Task InitializeRqliteAsync()
-        {
-            if (RqliteClient.httpClient == null)
-            {
-                var handler = new HttpClientHandler
-                {
-                    ServerCertificateCustomValidationCallback =
-                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                };
-
-                RqliteClient.httpClient = new HttpClient(handler);
-
-                // 🔴 Use HTTPS and your server IP
-                //RqliteClient.DefaultEndPoint = "https://10.32.101.160:4001";
-                RqliteClient.DefaultEndPoint = "http://127.0.0.1:4001";
-            }
-
-            await RqliteClient.CreatePbSchemaAsync();
-        }
-
-        //keydown event
 
         private void StartBackgroundPolling()
         {
+            _pollTimer?.Stop();
+            _pollTimer?.Dispose();
+
             _pollTimer = new System.Windows.Forms.Timer();
-            _pollTimer.Interval = 5000; // 5 seconds
+            _pollTimer.Interval = Program.AppINI._appRefresh;
 
             _pollTimer.Tick += async (_, __) =>
             {
@@ -158,7 +237,11 @@ namespace WindowsFormsApp1
                 }
                 catch
                 {
-                    // optional logging
+                    _pollTimer.Stop();
+
+                    ShowDatabaseOfflineMessage();
+
+                    StartReconnectWatcher();
                 }
                 finally
                 {
@@ -172,6 +255,43 @@ namespace WindowsFormsApp1
 
             _pollTimer.Start();
         }
+        //private void StartBackgroundPolling()
+        //{
+        //    _pollTimer = new System.Windows.Forms.Timer();
+        //    _pollTimer.Interval = Program.AppINI._appRefresh;
+
+        //    _pollTimer.Tick += async (_, __) =>
+        //    {
+        //        if (_isPolling) return;
+
+        //        _isPolling = true;
+
+        //        try
+        //        {
+        //            lvBuild.BeginUpdate();
+        //            packedListView2.BeginUpdate();
+        //            pickedUpListView.BeginUpdate();
+
+        //            await PollForUpdatesAsync();
+        //        }
+        //        catch
+        //        {
+        //            // optional logging
+        //            ShowDatabaseOfflineMessage();
+        //            StartReconnectWatcher();
+        //        }
+        //        finally
+        //        {
+        //            lvBuild.EndUpdate();
+        //            packedListView2.EndUpdate();
+        //            pickedUpListView.EndUpdate();
+
+        //            _isPolling = false;
+        //        }
+        //    };
+
+        //    _pollTimer.Start();
+        //}
 
 
 
@@ -283,35 +403,99 @@ namespace WindowsFormsApp1
             pickedUpListView?.RemoveItem(jobId);
         }
 
-
-
-
-
         // -----------------------------
         // Form Events
         // -----------------------------
         private async void Form1_Load(object sender, EventArgs e)
         {
+            SyncNavigatorWithCheckedTab();
+
             try
             {
                 await InitializeRqliteAsync();
 
-                if (!await RqliteClient.IsDatabaseAvailableAsync())
-                {
-                    ShowDatabaseOfflineMessage();
-                    return;
-                }
-
-                SyncNavigatorWithCheckedTab();
-                await LoadJobsAsync();
-                _lastJobsTimestamp = await RqliteClient.GetJobsLastUpdatedAsync();
-                StartBackgroundPolling();
-
+                await StartApplicationAsync();
             }
             catch (Exception ex)
             {
                 ShowDatabaseError(ex);
             }
+        }
+
+        private async Task StartApplicationAsync()
+        {
+            if (!await RqliteClient.IsDatabaseAvailableAsync())
+            {
+                ShowDatabaseOfflineMessage();
+                StartReconnectWatcher();
+                return;
+            }
+
+            HideDatabaseOfflineMessage();
+
+            await LoadJobsAsync();
+
+            _lastJobsTimestamp = await RqliteClient.GetJobsLastUpdatedAsync();
+
+            StartBackgroundPolling();
+        }
+
+        private async void StartReconnectWatcher()
+        {
+            if (_isReconnecting) return;
+
+            _isReconnecting = true;
+
+            while (true)
+            {
+                await Task.Delay(5000);
+
+                if (await RqliteClient.IsDatabaseAvailableAsync())
+                {
+                    _isReconnecting = false;
+
+                    await StartApplicationAsync();
+
+                    break;
+                }
+            }
+        }
+
+
+        private void ShowDatabaseOfflineMessage()
+        {
+          
+            lbDbConnecting.Text = "Database Offline - Reconnecting...";
+            lbDbConnecting.ForeColor = Color.Red;
+            lbDbConnecting.Visible = true;
+            pbConnectionSpinner.Visible = true;
+            pbConnectionSpinner.Image=Resources.spinner_32px;
+        }
+
+        private void HideDatabaseOfflineMessage()
+        {
+            lbDbConnecting.Text = "Connected";
+            lbDbConnecting.ForeColor = Color.Green;
+            lbDbConnecting.Visible = true;
+
+            pbConnectionSpinner.Visible = true;
+            pbConnectionSpinner.Image = Resources.check_32px;
+
+            // stop old timer if running
+            _connectionStatusTimer?.Stop();
+
+            _connectionStatusTimer = new System.Windows.Forms.Timer();
+            _connectionStatusTimer.Interval = 2000; // 2 seconds
+
+            _connectionStatusTimer.Tick += (s, e) =>
+            {
+                lbDbConnecting.Visible = false;
+                pbConnectionSpinner.Visible = false;
+
+                _connectionStatusTimer.Stop();
+            };
+
+            _connectionStatusTimer.Start();
         }
         private void PalletListView_PalletChanged(object sender, PbJobModel job)
         {
@@ -323,15 +507,15 @@ namespace WindowsFormsApp1
             RefreshAllViews();
         }
 
-        private void ShowDatabaseOfflineMessage()
-        {
-            MessageBox.Show(
-                "Database service is not running.\n\nPlease start rqlite and restart the application.",
-                "Database Offline",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Warning
-            );
-        }
+        //private void ShowDatabaseOfflineMessage()
+        //{
+        //    MessageBox.Show(
+        //        "Database service is not running.\n\nPlease start rqlite and restart the application.",
+        //        "Database Offline",
+        //        MessageBoxButtons.OK,
+        //        MessageBoxIcon.Warning
+        //    );
+        //}
 
         private void ShowDatabaseError(Exception ex)
         {
@@ -354,20 +538,26 @@ namespace WindowsFormsApp1
             var filtered = _pbJobs
                 .Where(job =>
                 {
-                    // Use shipped date OR packed date depending on your business rule
-                    var date = job.ShippedDate ?? job.PackDate;
+                    // If job has shipments, filter by shipment date
+                    if (job.ShipmentTimes.Any())
+                    {
+                        return job.ShipmentTimes
+                            .Any(t => t >= fromDate && t <= toDate);
+                    }
 
-                    if (!date.HasValue)
-                        return false;
+                    // fallback to pack date if never shipped
+                    if (job.PackDate.HasValue)
+                    {
+                        return job.PackDate.Value >= fromDate &&
+                               job.PackDate.Value <= toDate;
+                    }
 
-                    return date.Value >= fromDate && date.Value <= toDate;
+                    return false;
                 })
                 .ToList();
 
-            // Apply to the list below
             pickedUpListView.SetItems(filtered);
         }
-
 
 
         // -----------------------------

@@ -93,6 +93,16 @@ namespace WindowsFormsApp1.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap check_32px {
+            get {
+                object obj = ResourceManager.GetObject("check_32px", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap close_img {
             get {
                 object obj = ResourceManager.GetObject("close_img", resourceCulture);
@@ -166,6 +176,16 @@ namespace WindowsFormsApp1.Properties {
         internal static System.Drawing.Bitmap settings_img {
             get {
                 object obj = ResourceManager.GetObject("settings_img", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap spinner_32px {
+            get {
+                object obj = ResourceManager.GetObject("spinner_32px", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp1.Properties;
 using WindowsFormsApp1.Services;
 
 namespace WindowsFormsApp1.Dialogs
@@ -45,6 +47,61 @@ namespace WindowsFormsApp1.Dialogs
         // 🔎 SCAN HANDLER (Option B: Create WO per scan)
         // =====================================================
 
+        //private async void TbWoBarcode_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    if (e.KeyCode != Keys.Enter)
+        //        return;
+
+        //    e.Handled = true;
+        //    e.SuppressKeyPress = true;
+
+        //    var raw = tbWoBarcode.Text?.Trim();
+        //    if (string.IsNullOrEmpty(raw))
+        //        return;
+
+        //    if (_scannedCodes.Contains(raw))
+        //    {
+        //        System.Media.SystemSounds.Beep.Play();
+        //        tbWoBarcode.SelectAll();
+        //        return;
+        //    }
+
+        //    var parts = raw.Split('|');
+        //    if (parts.Length != 2)
+        //    {
+        //        MessageBox.Show("Invalid format. Use WOCode|123");
+        //        tbWoBarcode.SelectAll();
+        //        return;
+        //    }
+
+        //    string woCode = parts[0].Trim();
+
+        //    int envQty = await _woLookup.GetEnvelopeQtyAsync(raw);
+
+        //    if (envQty <= 0)
+        //    {
+        //        MessageBox.Show("Invalid quantity.");
+        //        tbWoBarcode.SelectAll();
+        //        return;
+        //    }
+
+        //    var workOrder = new WorkOrder(woCode, envQty);
+        //    workOrder.RecordScan();
+
+        //    // ⭐ store only in session
+        //    _sessionWorkOrders.Add(workOrder);
+
+        //    _scannedCodes.Add(raw);
+
+        //    // ⭐ update session counters
+        //    txtEnvelopeQty.Text =
+        //        _sessionWorkOrders.Sum(x => x.Quantity).ToString("N0");
+
+        //    txtScannedWO.Text =
+        //        _sessionWorkOrders.Count.ToString();
+
+        //    tbWoBarcode.Clear();
+        //}
         private async void TbWoBarcode_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter)
@@ -53,78 +110,177 @@ namespace WindowsFormsApp1.Dialogs
             e.Handled = true;
             e.SuppressKeyPress = true;
 
-            var raw = tbWoBarcode.Text?.Trim();
-            if (string.IsNullOrEmpty(raw))
+            var barcodeValue = tbWoBarcode.Text?.Trim();
+
+            if (string.IsNullOrWhiteSpace(barcodeValue))
                 return;
 
-            if (_scannedCodes.Contains(raw))
+            if (_scannedCodes.Contains(barcodeValue))
             {
                 System.Media.SystemSounds.Beep.Play();
                 tbWoBarcode.SelectAll();
                 return;
             }
 
-            var parts = raw.Split('|');
-            if (parts.Length != 2)
+            var checkValue = await IsValueValid(barcodeValue);
+
+            if (!checkValue.IsValid)
             {
-                MessageBox.Show("Invalid format. Use WOCode|123");
+                MessageBox.Show(checkValue.Message);
                 tbWoBarcode.SelectAll();
                 return;
             }
 
-            string woCode = parts[0].Trim();
+            bool isCPSBarcodeScanned = (Apos != -1) && (Bpos != -1);
 
-            int envQty = await _woLookup.GetEnvelopeQtyAsync(raw);
-
-            if (envQty <= 0)
+            if (!isCPSBarcodeScanned)
             {
-                MessageBox.Show("Invalid quantity.");
+                MessageBox.Show("Invalid CPS barcode.");
                 tbWoBarcode.SelectAll();
                 return;
             }
 
-            var workOrder = new WorkOrder(woCode, envQty);
-            workOrder.RecordScan();
+            string woID = barcodeValue.Substring(Apos + 1, Bpos - Apos - 1).ToUpper();
+            string woNSID = barcodeValue.Substring(0, Apos).ToUpper();
 
-            // ⭐ store only in session
-            _sessionWorkOrders.Add(workOrder);
+            int envQty = 0;
+            string workOrderCode = "";
 
-            _scannedCodes.Add(raw);
+            try
+            {
+                if (string.IsNullOrEmpty(Main.CPSConnectionString))
+                {
+                    MessageBox.Show("CPS Database Connection String is empty!");
+                    return;
+                }
+                pbSpinner.Visible = true;
+                pbSpinner.Image = Resources.spinner_32px;
+                lbStatus.Visible = true;
+                lbStatus.Text = "Checking";
+                string queryPath = GetCpsQueryPath();
+                string sqlQuery = File.ReadAllText(queryPath);
 
-            // ⭐ update session counters
-            txtEnvelopeQty.Text =
-                _sessionWorkOrders.Sum(x => x.Quantity).ToString("N0");
+                sqlQuery = AddFilterClause(sqlQuery, "PWO.ID = @woID AND PWO.NSID = @woNSID");
 
-            txtScannedWO.Text =
-                _sessionWorkOrders.Count.ToString();
+                using (var connection = new SqlConnection(Main.CPSConnectionString))
+                {
+                    await connection.OpenAsync();
 
-            tbWoBarcode.Clear();
+                    using (var command = new SqlCommand(sqlQuery, connection))
+                    {
+                        command.Parameters.AddWithValue("@woID", woID);
+                        command.Parameters.AddWithValue("@woNSID", woNSID);
+
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            if (reader.HasRows && await reader.ReadAsync())
+                            {
+                                workOrderCode = reader["WOName"]?.ToString() ?? "";
+                                envQty = Convert.ToInt32(reader["items"]);
+                                MessageBox.Show(
+    $"WOName: {woID}\n" +
+    $"items: {woNSID}"
+);                              pbSpinner.Image = Resources.check_32px;
+                                lbStatus.Visible = true;
+                                lbStatus.Text = workOrderCode;
+                            }
+                            else
+                            {
+                                MessageBox.Show("Scanned Work Order not found.");
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                var workOrder = new WorkOrder(workOrderCode, envQty)
+                {
+                    Barcode = barcodeValue
+                };
+
+                workOrder.RecordScan();
+
+                _sessionWorkOrders.Add(workOrder);
+                _scannedCodes.Add(barcodeValue);
+
+                txtEnvelopeQty.Text =
+                    _sessionWorkOrders.Sum(x => x.Quantity).ToString("N0");
+
+                txtScannedWO.Text =
+                    _sessionWorkOrders.Count.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error scanning barcode:\n" + ex.Message);
+            }
+            finally
+            {
+                tbWoBarcode.Clear();
+                tbWoBarcode.Focus();
+            }
+        }
+        private string GetCpsQueryPath()
+        {
+            return Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "sql_query",
+                "cps_query.sql"
+            );
         }
 
+        public static string AddFilterClause(string sql, string clause)
+        {
+            // Find position of GROUP BY or ORDER BY (case-insensitive)
+            int groupByIndex = sql.IndexOf("GROUP BY", StringComparison.OrdinalIgnoreCase);
+            int orderByIndex = sql.IndexOf("ORDER BY", StringComparison.OrdinalIgnoreCase);
+
+            // Find earliest clause (GROUP BY or ORDER BY)
+            int insertPos = -1;
+            if (groupByIndex >= 0 && orderByIndex >= 0)
+                insertPos = Math.Min(groupByIndex, orderByIndex);
+            else if (groupByIndex >= 0)
+                insertPos = groupByIndex;
+            else if (orderByIndex >= 0)
+                insertPos = orderByIndex;
+
+            string before, after;
+            if (insertPos >= 0)
+            {
+                before = sql.Substring(0, insertPos);
+                after = sql.Substring(insertPos);
+            }
+            else
+            {
+                before = sql;
+                after = "";
+            }
+
+            // Add WHERE or AND
+            if (before.IndexOf("WHERE", StringComparison.OrdinalIgnoreCase) >= 0)
+                return before.TrimEnd() + " AND " + clause + " " + after;
+            else
+                return before.TrimEnd() + " WHERE " + clause + " " + after;
+        }
         private async Task<(bool IsValid, string Message)> IsValueValid(string barcode)
         {
-            barcode = barcode?.Trim().ToUpper();
+            int spacepos;
+            bool valid = false;
+            string message = string.Empty;
+            barcode = barcode.ToUpper();
+            Apos = barcode.IndexOf('A', 0);
+            Bpos = barcode.IndexOf('B', 0);
+            spacepos = barcode.IndexOf(' ', 0);
 
-            if (string.IsNullOrWhiteSpace(barcode))
-                return (false, "Barcode cannot be empty.");
+            if ((Apos != -1) && (Bpos != -1) && (spacepos == -1))
+                valid = true;
+            else
+            {
 
-            if (barcode.Length != 21)
-                return (false, "Barcode length is invalid.");
+                if (!valid && string.IsNullOrEmpty(message))
+                    message = "The scanned value isn’t valid. Please check and try again.";
+            }
 
-            string prefix = barcode.Substring(0, 5);
-            string datePart = barcode.Substring(5, 8);
-            string typePart = barcode.Substring(13, 3);
-            string sequencePart = barcode.Substring(16, 4);
-
-            bool isPrefixValid = prefix.All(char.IsLetter);
-            bool isDateValid = datePart.All(char.IsDigit);
-            bool isTypeValid = typePart.All(char.IsLetter);
-            bool isSequenceValid = sequencePart.All(char.IsDigit);
-
-            if (isPrefixValid && isDateValid && isTypeValid && isSequenceValid)
-                return (true, string.Empty);
-
-            return (false, "Invalid CPS barcode format.");
+            return (valid, message);
         }
 
         // =====================================================
@@ -152,5 +308,7 @@ namespace WindowsFormsApp1.Dialogs
         {
 
         }
+
+     
     }
 }

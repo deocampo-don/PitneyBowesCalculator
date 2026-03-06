@@ -6,7 +6,16 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using WindowsFormsApp1;
+public class CpsConfig
+{
+    public string CpsDb { get; set; }
+    public string CpsQuery { get; set; }
+    public string CpsServer { get; set; }
+    public int ConnTimeOut { get; set; }
+    public bool TrustedConn { get; set; }
+    public bool TrustedServerCert { get; set; }
+}
 public static class RqliteClient
 {
     // ======================
@@ -14,6 +23,7 @@ public static class RqliteClient
     // ======================
     public static HttpClient httpClient;
     public static string DefaultEndPoint;
+  
 
     // ======================
     // TABLE NAMES
@@ -53,23 +63,65 @@ public static class RqliteClient
         return value.ToString();
     }
 
+    //public static async Task<RqliteResult> QueryAsync(string sql)
+    //{
+    //    var json = JsonConvert.SerializeObject(new[] { sql });
+    //    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+    //    var response = await httpClient.PostAsync(
+    //        DefaultEndPoint + "/db/query",
+    //        content
+    //    );
+
+    //    var body = await response.Content.ReadAsStringAsync();
+
+    //    return new RqliteResult
+    //    {
+    //        Success = true,
+    //        Records = ParseQueryResponse(body)
+    //    };
+    //}
+
     public static async Task<RqliteResult> QueryAsync(string sql)
     {
-        var json = JsonConvert.SerializeObject(new[] { sql });
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        int maxRetries = Program.AppINI._rqClientMaxRetries;
+        int delayMs = Program.AppINI._rqClientDelayMs;
+        int attempt = 0;
 
-        var response = await httpClient.PostAsync(
-            DefaultEndPoint + "/db/query",
-            content
-        );
-
-        var body = await response.Content.ReadAsStringAsync();
-
-        return new RqliteResult
+        while (true)
         {
-            Success = true,
-            Records = ParseQueryResponse(body)
-        };
+            try
+            {
+                var json = JsonConvert.SerializeObject(new[] { sql });
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await httpClient.PostAsync(
+                    DefaultEndPoint + "/db/query",
+                    content
+                );
+
+                response.EnsureSuccessStatusCode();
+
+                var body = await response.Content.ReadAsStringAsync();
+
+                return new RqliteResult
+                {
+                    Success = true,
+                    Records = ParseQueryResponse(body)
+                };
+            }
+            catch (HttpRequestException ex)
+            {
+                attempt++;
+
+                Console.WriteLine($"Query retry {attempt}: {ex.Message}");
+
+                if (attempt >= maxRetries)
+                    throw;
+
+                await Task.Delay(delayMs);
+            }
+        }
     }
     private static async Task<RqliteWriteResult> ExecuteAsync(string sql)
     {
@@ -101,7 +153,10 @@ public static class RqliteClient
             RowsAffected = result?.results?.Sum(r => r.rows_affected) ?? 0
         };
     }
-
+    private static string Escape(string value)
+    {
+        return value?.Replace("'", "''") ?? "";
+    }
     public static Task<RqliteWriteResult> CreateTableAsync(
         string table,
         Dictionary<string, string> columns)
@@ -140,6 +195,7 @@ public static class RqliteClient
     public static async Task<RqliteResult> SelectAsync(string table, string where = "")
     {
         var sql = $"SELECT * FROM \"{table}\" {where}";
+
         var json = JsonConvert.SerializeObject(new[] { sql });
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -150,6 +206,15 @@ public static class RqliteClient
 
         var body = await response.Content.ReadAsStringAsync();
 
+        if (!response.IsSuccessStatusCode)
+        {
+            return new RqliteResult
+            {
+                Success = false,
+                Records = new List<Dictionary<string, object>>()
+            };
+        }
+
         return new RqliteResult
         {
             Success = true,
@@ -157,6 +222,26 @@ public static class RqliteClient
         };
     }
 
+    public static async Task<bool> ValidateAdminAsync(string username, string password)
+    {
+        try
+        {
+            // Prevent simple SQL injection
+            username = username.Replace("'", "''");
+            password = password.Replace("'", "''");
+
+            var result = await SelectAsync(
+                "users",
+                $"WHERE Username = '{username}' AND PassWord = '{password}' LIMIT 1"
+            );
+
+            return result?.Records?.Count > 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
     public static async Task UpdateJobShippedDateAsync(int jobId, DateTime shippedDate)
     {
 
@@ -206,6 +291,72 @@ public static class RqliteClient
         }
 
         return list;
+    }
+    public static async Task<CpsConfig?> LoadCpsConfigFromDB()
+    {
+        var result = await SelectAsync("settings", "LIMIT 1");
+
+        if (result == null || !result.Success || result.Records == null || result.Records.Count == 0)
+            return null;
+
+        var record = result.Records.First();
+
+        int.TryParse(record["ConnTimeOut"]?.ToString(), out int timeout);
+        int.TryParse(record["TrustedConn"]?.ToString(), out int trustedConn);
+        int.TryParse(record["TrustedServerCert"]?.ToString(), out int trustedCert);
+
+        return new CpsConfig
+        {
+            CpsDb = record["CpsDb"]?.ToString()?.Trim() ?? "",
+            CpsQuery = record["CpsQuery"]?.ToString()?.Trim() ?? "",
+            CpsServer = record["CpsServer"]?.ToString()?.Trim() ?? "",
+            ConnTimeOut = timeout,
+            TrustedConn = trustedConn == 1,
+            TrustedServerCert = trustedCert == 1
+        };
+    }
+    public static async Task<RqliteWriteResult> SaveSettingsAsync(
+     string server,
+     string db,
+     string query,
+     int timeout,
+     bool trustedConn,
+     bool trustedCert)
+    {
+        string sql = $@"
+INSERT INTO settings
+(
+    Id,
+    CpsDb,
+    CpsQuery,
+    CpsServer,
+    ConnTimeOut,
+    TrustedConn,
+    TrustedServerCert,
+    LastUpdated
+)
+VALUES
+(
+    1,
+    '{Escape(db)}',
+    '{Escape(query)}',
+    '{Escape(server)}',
+    {timeout},
+    {(trustedConn ? 1 : 0)},
+    {(trustedCert ? 1 : 0)},
+    datetime('now')
+)
+ON CONFLICT(Id) DO UPDATE SET
+    CpsDb = excluded.CpsDb,
+    CpsQuery = excluded.CpsQuery,
+    CpsServer = excluded.CpsServer,
+    ConnTimeOut = excluded.ConnTimeOut,
+    TrustedConn = excluded.TrustedConn,
+    TrustedServerCert = excluded.TrustedServerCert,
+    LastUpdated = datetime('now');
+";
+
+        return await ExecuteAsync(sql);
     }
     public static async Task<int> UpdatePbJobAsync(
      int jobId,
@@ -463,12 +614,12 @@ WHERE State = 0;
 
         return new CpsSettings
         {
-            CPSServer = row["CPSServer"]?.ToString(),
-            CPSDatabase = row["CPSDatabase"]?.ToString(),
-            CPSQuery = row["CPSQuery"]?.ToString(),
-            ConnectionTimeout = row["ConnectionTimeout"] == null ? 30 : Convert.ToInt32(row["ConnectionTimeout"]),
-            TrustedConnection = Convert.ToInt32(row["TrustedConnection"]) == 1,
-            TrustedServerCertificate = Convert.ToInt32(row["TrustedServerCertificate"]) == 1
+            CPSServer = row["CpsServer"]?.ToString(),
+            CPSDatabase = row["CpsDb"]?.ToString(),
+            CPSQuery = row["CpsQuery"]?.ToString(),
+            ConnectionTimeout = row["ConnTimeOut"] == null ? 30 : Convert.ToInt32(row["ConnTimeOut"]),
+            TrustedConnection = Convert.ToInt32(row["TrustedConn"]) == 1,
+            TrustedServerCertificate = Convert.ToInt32(row["TrustedServerCert"]) == 1
         };
     }
 
@@ -1039,9 +1190,38 @@ ORDER BY j.Id, p.PalletNumber
     }
 
 
+    //public static async Task SaveWorkOrdersAsync(
+    // int palletId,
+    // List<WorkOrder> workOrders)
+    //{
+    //    if (workOrders == null || !workOrders.Any())
+    //        return;
+
+    //    var sqlBuilder = new StringBuilder();
+
+    //    foreach (var wo in workOrders)
+    //    {
+    //        var barcode = string.IsNullOrWhiteSpace(wo.Barcode)
+    //            ? $"STATIC-{Guid.NewGuid()}"
+    //            : wo.Barcode;
+
+    //        sqlBuilder.AppendLine($@"
+    //INSERT OR IGNORE INTO {TablePalletWorkOrders}
+    //(PalletId, Barcode, WorkOrder, Quantity)
+    //VALUES (
+    //    {palletId},
+    //    {FormatValue(barcode)},
+    //    {FormatValue(wo.WorkOrderCode)},
+    //    {wo.Quantity}
+    //);
+    //");
+    //    }
+
+    //    await ExecuteAsync(sqlBuilder.ToString());
+    //}
     public static async Task SaveWorkOrdersAsync(
-     int palletId,
-     List<WorkOrder> workOrders)
+    int palletId,
+    List<WorkOrder> workOrders)
     {
         if (workOrders == null || !workOrders.Any())
             return;
@@ -1050,25 +1230,20 @@ ORDER BY j.Id, p.PalletNumber
 
         foreach (var wo in workOrders)
         {
-            var barcode = string.IsNullOrWhiteSpace(wo.Barcode)
-                ? $"STATIC-{Guid.NewGuid()}"
-                : wo.Barcode;
-
             sqlBuilder.AppendLine($@"
-    INSERT OR IGNORE INTO {TablePalletWorkOrders}
-    (PalletId, Barcode, WorkOrder, Quantity)
-    VALUES (
-        {palletId},
-        {FormatValue(barcode)},
-        {FormatValue(wo.WorkOrderCode)},
-        {wo.Quantity}
-    );
-    ");
+INSERT OR IGNORE INTO {TablePalletWorkOrders}
+(PalletId, Barcode, WorkOrder, Quantity)
+VALUES (
+    {palletId},
+    {FormatValue(wo.Barcode)},
+    {FormatValue(wo.WorkOrderCode)},
+    {wo.Quantity}
+);
+");
         }
 
         await ExecuteAsync(sqlBuilder.ToString());
     }
-
 
 
     public static async Task<bool> IsDatabaseAvailableAsync()

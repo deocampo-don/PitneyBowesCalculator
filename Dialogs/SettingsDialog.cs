@@ -7,77 +7,81 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 
-namespace WindowsFormsApp1
+namespace WindowsFormsApp1.Dialogs
 {
     public partial class SettingsDialog : Form
     {
-
-        private INIClass appINI;
         public SettingsDialog()
         {
             InitializeComponent();
-            FormHelper.ApplyRoundedCorners(this, 20);
-        
 
+            
+            tbDefPrint.Text = Program.AppINI._defaultPrinter;
+            tbPrinterIP.Text = Program.AppINI._printerIP;
+            tbPrinterPort.Text = Program.AppINI._printerPort;
+            tbAppRefFreq.Text = Program.AppINI._appRefresh.ToString();
+
+            // NEW FIELDS
+            tbRqClientAdd.Text = Program.AppINI._rqClientAddress;
+            tbClientMaxRetry.Text = Program.AppINI._rqClientMaxRetries.ToString();
+            tbClientDelay.Text = Program.AppINI._rqClientDelayMs.ToString();
+            this.TopLevel = true;
+            FormHelper.ApplyRoundedCorners(this, 20);
         }
 
-        private async void SettingsDialog_Load(object sender, EventArgs e)
-        {
-            tbDefPrinter.Text = appINI._defaultPrinter;
-            tbDirectory.Text = appINI._outputDir;
 
-            // CPS (DATABASE)
-            var cps = await RqliteClient.LoadCpsSettingsAsync();
-            if (cps != null)
+        private void btnAdmin_Click(object sender, EventArgs e)
+        {
+            using (var login = new LoginDialog())
             {
-                tbCpsServer.Text = cps.CPSServer;
-                tbCpsDb.Text = cps.CPSDatabase;
-                tbCpsQuery.Text = cps.CPSQuery;
-                tbConnTimeOut.Text = cps.ConnectionTimeout.ToString();
-                toggleTrustedConnection.Checked = cps.TrustedConnection;
-                toggleTrustedServerCert.Checked = cps.TrustedServerCertificate;
+                if (login.ShowDialog() == DialogResult.OK)
+                {
+                    MessageBox.Show("Admin verified.");
+
+                    using (var frm = new SettingsDialogAdmin())
+                    {
+                        frm.ShowDialog();
+                    }
+                }
             }
         }
 
-     
+        private void btnSettingsSave_Click(object sender, EventArgs e)
+        {
+            string err;
+
+            Program.AppINI._defaultPrinter = tbDefPrint.Text;
+            Program.AppINI._printerIP = tbPrinterIP.Text;
+            Program.AppINI._printerPort = tbPrinterPort.Text;
+
+            int.TryParse(tbAppRefFreq.Text, out int refresh);
+            Program.AppINI._appRefresh = refresh;
+
+            // NEW FIELDS
+            Program.AppINI._rqClientAddress = tbRqClientAdd.Text;
+
+            int.TryParse(tbClientMaxRetry.Text, out int retries);
+            Program.AppINI._rqClientMaxRetries = retries;
+
+            int.TryParse(tbClientDelay.Text, out int delay);
+            Program.AppINI._rqClientDelayMs = delay;
+
+            if (!Program.AppINI.UpdateIni(out err))
+            {
+                MessageBox.Show(err);
+                return;
+            }
+
+            MessageBox.Show("Settings saved.");
+        }
+
         private void btnSettingsCancel_Click(object sender, EventArgs e)
         {
-            this.Close();
+            DialogResult = DialogResult.Cancel;
+            Close();
         }
 
-        private async void btnSettingsSave_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // 1. Save CPS (DATABASE - rqlite)
-                await RqliteClient.SaveCpsSettingsAsync(
-                    tbCpsServer.Text,
-                    tbCpsDb.Text,
-                    tbCpsQuery.Text,
-                    int.TryParse(tbConnTimeOut.Text, out int t) ? t : 30,
-                    toggleTrustedConnection.Checked,
-                    toggleTrustedServerCert.Checked
-                );
-
-                // 2. Save LOCAL (INI - workstation specific)
-                //string err;
-                //if (!appINI.SaveLocalSettings(
-                //    tbDefPrinter.Text,
-                //    tbDirectory.Text,
-                //    out err))
-                //{
-                //    MessageBox.Show("Failed to save local settings: " + err);
-                //    return;
-                //}
-
-                MessageBox.Show("Settings saved successfully.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Save failed: " + ex.Message);
-            }
-        }
+    
     }
 }

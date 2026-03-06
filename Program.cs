@@ -1,24 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
 
 namespace WindowsFormsApp1
 {
     internal static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
+        public static INIClass AppINI;
+
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Main());
 
-          //  Application.Run(new TestForm());
+            string err;
+
+            // 🔹 Create config path beside the EXE
+            string configPath = Path.Combine(Application.StartupPath, "config.ini");
+
+            // 🔹 Initialize INI
+            AppINI = new INIClass(configPath);
+
+            // 🔹 Create INI if missing
+            if (!File.Exists(configPath))
+            {
+                AppINI.BuildNewIni(out err);
+
+                if (!string.IsNullOrEmpty(err))
+                {
+                    MessageBox.Show("Failed to create config.ini\n" + err);
+                    return;
+                }
+            }
+
+            // 🔹 Load values
+            if (!AppINI.GetINIVars(out err))
+            {
+                MessageBox.Show("Failed to load configuration\n" + err);
+                return;
+            }
+
+            Application.Run(new Main());
         }
     }
 }

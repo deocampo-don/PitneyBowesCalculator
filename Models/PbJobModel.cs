@@ -188,7 +188,6 @@ public class WorkOrder
         Quantity = quantity;
         ScannedCount = 0;
     }
-
     public void RecordScan()
     {
         ScannedCount++;

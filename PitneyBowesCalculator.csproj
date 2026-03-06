@@ -106,6 +106,12 @@
     <Compile Include="Dialogs\CreatePBJobDialog.Designer.cs">
       <DependentUpon>CreatePBJobDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\LoginDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\LoginDialog.Designer.cs">
+      <DependentUpon>LoginDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\PackPalletDIalog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -113,10 +119,16 @@
       <DependentUpon>PackPalletDIalog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\SettingsDialog.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Dialogs\SettingsDialog.Designer.cs">
       <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SettingsDialogAdmin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\SettingsDialogAdmin.Designer.cs">
+      <DependentUpon>SettingsDialogAdmin.cs</DependentUpon>
     </Compile>
     <Compile Include="INIClass.cs" />
     <Compile Include="Models\ForDBTest\IScanResolver.cs.cs" />
@@ -239,11 +251,17 @@
     <EmbeddedResource Include="Dialogs\CreatePBJobDialog.resx">
       <DependentUpon>CreatePBJobDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\LoginDialog.resx">
+      <DependentUpon>LoginDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\PackPalletDIalog.resx">
       <DependentUpon>PackPalletDIalog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\SettingsDialog.resx">
       <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SettingsDialogAdmin.resx">
+      <DependentUpon>SettingsDialogAdmin.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Packed And Ready\PackedListView.resx">
       <DependentUpon>PackedListView.cs</DependentUpon>
@@ -365,6 +383,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\search_img_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\spinner_32px.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\check_32px.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
