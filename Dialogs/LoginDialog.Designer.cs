@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.kryptonLabel1 = new Krypton.Toolkit.KryptonLabel();
+            this.lblAdminLogin = new Krypton.Toolkit.KryptonLabel();
             this.kryptonLabel2 = new Krypton.Toolkit.KryptonLabel();
             this.kryptonLabel3 = new Krypton.Toolkit.KryptonLabel();
             this.tbUserName = new Krypton.Toolkit.KryptonTextBox();
@@ -36,16 +36,20 @@
             this.btnCanecl = new Krypton.Toolkit.KryptonButton();
             this.btnLogin = new Krypton.Toolkit.KryptonButton();
             this.lbstatus = new Krypton.Toolkit.KryptonLabel();
+            this.tbVerifyPwd = new Krypton.Toolkit.KryptonTextBox();
+            this.lbVerifyPwd = new Krypton.Toolkit.KryptonLabel();
+            this.pbSpinner = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSpinner)).BeginInit();
             this.SuspendLayout();
             // 
-            // kryptonLabel1
+            // lblAdminLogin
             // 
-            this.kryptonLabel1.Location = new System.Drawing.Point(12, 12);
-            this.kryptonLabel1.Name = "kryptonLabel1";
-            this.kryptonLabel1.Size = new System.Drawing.Size(232, 53);
-            this.kryptonLabel1.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 25.8F, System.Drawing.FontStyle.Bold);
-            this.kryptonLabel1.TabIndex = 0;
-            this.kryptonLabel1.Values.Text = "Admin Login";
+            this.lblAdminLogin.Location = new System.Drawing.Point(12, 12);
+            this.lblAdminLogin.Name = "lblAdminLogin";
+            this.lblAdminLogin.Size = new System.Drawing.Size(232, 53);
+            this.lblAdminLogin.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 25.8F, System.Drawing.FontStyle.Bold);
+            this.lblAdminLogin.TabIndex = 0;
+            this.lblAdminLogin.Values.Text = "Admin Login";
             // 
             // kryptonLabel2
             // 
@@ -92,7 +96,7 @@
             // btnCanecl
             // 
             this.btnCanecl.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnCanecl.Location = new System.Drawing.Point(159, 220);
+            this.btnCanecl.Location = new System.Drawing.Point(159, 293);
             this.btnCanecl.Margin = new System.Windows.Forms.Padding(2, 2, 8, 2);
             this.btnCanecl.Name = "btnCanecl";
             this.btnCanecl.Size = new System.Drawing.Size(75, 32);
@@ -113,7 +117,7 @@
             // btnLogin
             // 
             this.btnLogin.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnLogin.Location = new System.Drawing.Point(244, 220);
+            this.btnLogin.Location = new System.Drawing.Point(244, 293);
             this.btnLogin.Margin = new System.Windows.Forms.Padding(2, 2, 5, 2);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(68, 32);
@@ -134,18 +138,58 @@
             // 
             // lbstatus
             // 
-            this.lbstatus.Location = new System.Drawing.Point(211, 73);
+            this.lbstatus.Location = new System.Drawing.Point(56, 298);
+            this.lbstatus.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.lbstatus.Name = "lbstatus";
             this.lbstatus.Size = new System.Drawing.Size(88, 20);
             this.lbstatus.TabIndex = 12;
             this.lbstatus.Values.Text = "kryptonLabel4";
             this.lbstatus.Visible = false;
+           
+            // 
+            // tbVerifyPwd
+            // 
+            this.tbVerifyPwd.Location = new System.Drawing.Point(22, 242);
+            this.tbVerifyPwd.Margin = new System.Windows.Forms.Padding(2);
+            this.tbVerifyPwd.Name = "tbVerifyPwd";
+            this.tbVerifyPwd.PasswordChar = '●';
+            this.tbVerifyPwd.Size = new System.Drawing.Size(288, 36);
+            this.tbVerifyPwd.StateCommon.Border.Rounding = 5F;
+            this.tbVerifyPwd.StateCommon.Content.Font = new System.Drawing.Font("Segoe UI", 13.8F);
+            this.tbVerifyPwd.StateCommon.Content.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.tbVerifyPwd.TabIndex = 14;
+            this.tbVerifyPwd.UseSystemPasswordChar = true;
+            this.tbVerifyPwd.Visible = false;
+            // 
+            // lbVerifyPwd
+            // 
+            this.lbVerifyPwd.Location = new System.Drawing.Point(18, 211);
+            this.lbVerifyPwd.Name = "lbVerifyPwd";
+            this.lbVerifyPwd.Size = new System.Drawing.Size(131, 26);
+            this.lbVerifyPwd.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbVerifyPwd.TabIndex = 13;
+            this.lbVerifyPwd.Values.Text = "Verify Password";
+            this.lbVerifyPwd.Visible = false;
+            // 
+            // pbSpinner
+            // 
+            this.pbSpinner.Location = new System.Drawing.Point(22, 293);
+            this.pbSpinner.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
+            this.pbSpinner.Name = "pbSpinner";
+            this.pbSpinner.Size = new System.Drawing.Size(34, 32);
+            this.pbSpinner.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pbSpinner.TabIndex = 15;
+            this.pbSpinner.TabStop = false;
+            this.pbSpinner.Visible = false;
             // 
             // LoginDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(335, 270);
+            this.ClientSize = new System.Drawing.Size(335, 346);
+            this.Controls.Add(this.pbSpinner);
+            this.Controls.Add(this.tbVerifyPwd);
+            this.Controls.Add(this.lbVerifyPwd);
             this.Controls.Add(this.lbstatus);
             this.Controls.Add(this.btnCanecl);
             this.Controls.Add(this.btnLogin);
@@ -153,12 +197,14 @@
             this.Controls.Add(this.tbUserName);
             this.Controls.Add(this.kryptonLabel3);
             this.Controls.Add(this.kryptonLabel2);
-            this.Controls.Add(this.kryptonLabel1);
+            this.Controls.Add(this.lblAdminLogin);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "LoginDialog";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "LoginDialog";
+            this.Load += new System.EventHandler(this.LoginDialog_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.pbSpinner)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -166,7 +212,7 @@
 
         #endregion
 
-        private Krypton.Toolkit.KryptonLabel kryptonLabel1;
+        private Krypton.Toolkit.KryptonLabel lblAdminLogin;
         private Krypton.Toolkit.KryptonLabel kryptonLabel2;
         private Krypton.Toolkit.KryptonLabel kryptonLabel3;
         private Krypton.Toolkit.KryptonTextBox tbUserName;
@@ -174,5 +220,8 @@
         private Krypton.Toolkit.KryptonButton btnCanecl;
         private Krypton.Toolkit.KryptonButton btnLogin;
         private Krypton.Toolkit.KryptonLabel lbstatus;
+        private Krypton.Toolkit.KryptonTextBox tbVerifyPwd;
+        private Krypton.Toolkit.KryptonLabel lbVerifyPwd;
+        private System.Windows.Forms.PictureBox pbSpinner;
     }
 }

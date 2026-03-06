@@ -16,14 +16,31 @@ namespace WindowsFormsApp1.Dialogs
     public partial class LoginDialog : Form
     {
         public bool IsAuthenticated { get; private set; }
+        private string DialogMode;
 
-        public LoginDialog()
+        public LoginDialog(string frm)
         {
             InitializeComponent();
+            this.DialogMode = frm;
         }
-
+        private void LoginDialog_Load(object sender, EventArgs e)
+        {
+            if (DialogMode == "Login")
+            {
+                lbVerifyPwd.Visible = false;
+                tbVerifyPwd.Visible = false;
+                lblAdminLogin.Text = "Admin Login";
+            }
+            else
+            {
+                lbVerifyPwd.Visible = true;
+                tbVerifyPwd.Visible = true;
+                lblAdminLogin.Text = "Add User";
+            }
+        }
         private void btnCanecl_Click(object sender, EventArgs e)
         {
+            
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
@@ -39,32 +56,76 @@ namespace WindowsFormsApp1.Dialogs
                 return;
             }
 
-            btnLogin.Enabled = false;
+            if (DialogMode == "AddUser")
+            {
+                if (password != tbVerifyPwd.Text.Trim())
+                {
+                    MessageBox.Show("Passwords do not match.");
+                    return;
+                }
+            }
 
-            lbstatus.Text = "Checking credentials...";
+            btnLogin.Enabled = false;
             lbstatus.Visible = true;
+
             string hashedPassword = HashPassword(password);
 
+            bool result = false;
 
-            bool valid = await RqliteClient.ValidateAdminAsync(hashedPassword, password);
+            if (DialogMode == "Login")
+            {
+                Utils.showStatusAndSpinner(lbstatus, pbSpinner, "Validating...");
+                result = await RqliteClient.ValidateAdminAsync(username, hashedPassword);
+            }
+            else
+            {
+                
+                Utils.hideStatusAndSpinner(lbstatus, pbSpinner, "Creating user...");
+                result = await RqliteClient.CreateUserAsync(username, hashedPassword);
+            }
 
             btnLogin.Enabled = true;
             lbstatus.Visible = false;
 
-            if (valid)
+            if (result)
             {
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             else
             {
-                MessageBox.Show("Invalid admin credentials.");
+                MessageBox.Show(DialogMode == "Login"
+                    ? "Invalid admin credentials."
+                    : "Failed to create user.");
             }
         }
 
+        //private async void btnLogin_Click(object sender, EventArgs e)
+        //{
+        //    string username = tbUserName.Text.Trim();
+        //    string password = tbPass.Text.Trim();
 
+        //    if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+        //    {
+        //        MessageBox.Show("Enter username and password.");
+        //        return;
+        //    }
 
-public static string HashPassword(string password)
+        //    string hashedPassword = HashPassword(password);
+
+        //    bool created = await RqliteClient.CreateUserAsync(username, hashedPassword);
+
+        //    if (created)
+        //    {
+        //        MessageBox.Show("Admin created successfully.");
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Failed to create admin.");
+        //    }
+        //}
+
+        public static string HashPassword(string password)
     {
         using (SHA256 sha256 = SHA256.Create())
         {
@@ -79,5 +140,7 @@ public static string HashPassword(string password)
             return builder.ToString();
         }
     }
-}
+
+    
+    }
 }

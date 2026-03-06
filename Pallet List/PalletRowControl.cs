@@ -311,8 +311,6 @@ namespace WindowsFormsApp1
             UpdateButtonsState();
         }
 
-
-
         // -----------------------------
         // Actions
         // -----------------------------
@@ -327,10 +325,8 @@ namespace WindowsFormsApp1
 
             try
             {
-                // 1️⃣ Ask DB for working pallet (concurrency-safe)
                 int palletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
 
-                // 2️⃣ Find or create local pallet object
                 pallet = _model.Pallets.FirstOrDefault(p => p.PalletId == palletId);
 
                 if (pallet == null)
@@ -350,10 +346,7 @@ namespace WindowsFormsApp1
                 return;
             }
 
-            // 🔌 Choose lookup strategy
-            IWorkOrderLookup lookup = new TestWorkOrderLookup();
-
-            using (var dlg = new AddToPalletDialog(pallet, lookup))
+            using (var dlg = new AddToPalletDialog())
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK)
                     return;
@@ -366,14 +359,46 @@ namespace WindowsFormsApp1
 
                 try
                 {
-                    // 3️⃣ Save ONLY the scans from this dialog session
-                    await RqliteClient.SaveWorkOrdersAsync(
-                        pallet.PalletId,
-                        dlg.ScannedWorkOrders
-                    );
+                    var scannedBarcodes = dlg.ScannedWorkOrders
+                        .Select(x => x.Barcode)
+                        .ToList();
 
-                    // 4️⃣ Update pallet in memory
-                    pallet.WorkOrders.AddRange(dlg.ScannedWorkOrders);
+                    // Check duplicates
+                    var existingBarcodes =
+                        await RqliteClient.GetExistingBarcodesAsync(scannedBarcodes);
+
+                    // Filter new workorders
+                    var newWorkOrders = dlg.ScannedWorkOrders
+                        .Where(x => !existingBarcodes.Contains(x.Barcode))
+                        .ToList();
+
+                    int scanned = scannedBarcodes.Count;
+                    int duplicates = existingBarcodes.Count;
+                    int inserted = newWorkOrders.Count;
+
+                    if (newWorkOrders.Any())
+                    {
+                        await RqliteClient.SaveWorkOrdersAsync(
+                            pallet.PalletId,
+                            newWorkOrders
+                        );
+                    }
+
+                    // Reload pallet from DB (source of truth)
+                    pallet.WorkOrders =
+                        await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
+
+                    // Inform user
+                    if (duplicates > 0)
+                    {
+                        MessageBox.Show(
+                            $"Inserted: {inserted}\nDuplicates skipped: {duplicates}\n\n" +
+                            string.Join("\n", existingBarcodes),
+                            "Duplicate Barcodes",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning
+                        );
+                    }
                 }
                 catch (Exception ex)
                 {

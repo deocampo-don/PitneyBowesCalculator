@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Krypton.Toolkit;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,11 +13,12 @@ namespace WindowsFormsApp1.Dialogs
 {
     public partial class SettingsDialog : Form
     {
+
+        public static event Action SettingsUpdated;
         public SettingsDialog()
         {
             InitializeComponent();
 
-            
             tbDefPrint.Text = Program.AppINI._defaultPrinter;
             tbPrinterIP.Text = Program.AppINI._printerIP;
             tbPrinterPort.Text = Program.AppINI._printerPort;
@@ -33,7 +35,7 @@ namespace WindowsFormsApp1.Dialogs
 
         private void btnAdmin_Click(object sender, EventArgs e)
         {
-            using (var login = new LoginDialog())
+            using (var login = new LoginDialog("Login"))
             {
                 if (login.ShowDialog() == DialogResult.OK)
                 {
@@ -47,26 +49,69 @@ namespace WindowsFormsApp1.Dialogs
             }
         }
 
-        private void btnSettingsSave_Click(object sender, EventArgs e)
+        private async void btnSettingsSave_Click(object sender, EventArgs e)
         {
-            string err;
+            List<string> errors = new List<string>();
 
-            Program.AppINI._defaultPrinter = tbDefPrint.Text;
-            Program.AppINI._printerIP = tbPrinterIP.Text;
-            Program.AppINI._printerPort = tbPrinterPort.Text;
+            // Validate textboxes visually
+            ValidateTextbox(tbRqClientAdd);
+            ValidateTextbox(tbAppRefFreq);
+            ValidateTextbox(tbClientMaxRetry);
+            ValidateTextbox(tbClientDelay);
 
-            int.TryParse(tbAppRefFreq.Text, out int refresh);
+            if (string.IsNullOrWhiteSpace(tbRqClientAdd.Text))
+                errors.Add("rqlite Client Address");
+
+            if (!int.TryParse(tbAppRefFreq.Text, out int refresh))
+                errors.Add("App Refresh Frequency (must be number)");
+
+            if (!int.TryParse(tbClientMaxRetry.Text, out int retries))
+                errors.Add("Client Max Retries (must be number)");
+
+            if (!int.TryParse(tbClientDelay.Text, out int delay))
+                errors.Add("Client Delay (must be number)");
+
+            if (errors.Count > 0)
+            {
+                MessageBox.Show(
+                    "Please fix the following:\n\n" + string.Join("\n", errors),
+                    "Validation",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            Utils.showStatusAndSpinner(lbStatus, pbSpinner, "Testing RQ client...");
+
+            var test = await RqliteClient.TestRqClientAsync(
+                tbRqClientAdd.Text.Trim(),
+                3000
+            );
+
+            if (!test.Success)
+            {
+                MessageBox.Show(
+                    "RQ Client connection failed:\n\n" + test.Error,
+                    "Connection Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
+                return;
+            }
+
+            Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Connected");
+
+            // Save settings
+            Program.AppINI._defaultPrinter = tbDefPrint.Text.Trim();
+            Program.AppINI._printerIP = tbPrinterIP.Text.Trim();
+            Program.AppINI._printerPort = tbPrinterPort.Text.Trim();
             Program.AppINI._appRefresh = refresh;
 
-            // NEW FIELDS
-            Program.AppINI._rqClientAddress = tbRqClientAdd.Text;
-
-            int.TryParse(tbClientMaxRetry.Text, out int retries);
+            Program.AppINI._rqClientAddress = tbRqClientAdd.Text.Trim();
             Program.AppINI._rqClientMaxRetries = retries;
-
-            int.TryParse(tbClientDelay.Text, out int delay);
             Program.AppINI._rqClientDelayMs = delay;
 
+            string err;
             if (!Program.AppINI.UpdateIni(out err))
             {
                 MessageBox.Show(err);
@@ -74,6 +119,7 @@ namespace WindowsFormsApp1.Dialogs
             }
 
             MessageBox.Show("Settings saved.");
+            Close();
         }
 
         private void btnSettingsCancel_Click(object sender, EventArgs e)
@@ -82,6 +128,18 @@ namespace WindowsFormsApp1.Dialogs
             Close();
         }
 
-    
+        private void ValidateTextbox(KryptonTextBox tb)
+        {
+            if (string.IsNullOrWhiteSpace(tb.Text))
+            {
+                tb.StateCommon.Border.Color1 = Color.Red;
+                tb.StateCommon.Border.Color2 = Color.Red;
+            }
+            else
+            {
+                tb.StateCommon.Border.Color1 = Color.Gray;
+                tb.StateCommon.Border.Color2 = Color.Gray;
+            }
+        }
     }
 }

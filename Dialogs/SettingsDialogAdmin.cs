@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using WindowsFormsApp1.Dialogs;
+using System.Security.Cryptography;
 
 namespace WindowsFormsApp1
 {
@@ -16,6 +18,7 @@ namespace WindowsFormsApp1
     {
 
         private INIClass appINI;
+        public static event Action OnCpsConfigUpdated;
         public SettingsDialogAdmin()
         {
             InitializeComponent();
@@ -38,6 +41,8 @@ namespace WindowsFormsApp1
                 tbConnTimeOut.Text = cps.ConnectionTimeout.ToString();
                 tglTrustedConnection.Checked = cps.TrustedConnection;
                 tglTrustedServerCert.Checked = cps.TrustedServerCertificate;
+                tbSqlUser.Text = cps.SqlUser;
+                tbSqlPwd.Text = Decrypt(cps.SqlPassword);
             }
          
         }
@@ -51,10 +56,11 @@ namespace WindowsFormsApp1
         private async void btnSettingsSave_Click(object sender, EventArgs e)
         {
             List<string> missingFields = new List<string>();
+
             ValidateTextbox(tbCpsServer);
             ValidateTextbox(tbCpsDb);
             ValidateTextbox(tbCpsQuery);
-            
+
             if (string.IsNullOrWhiteSpace(tbCpsServer.Text))
                 missingFields.Add("CPS Server");
 
@@ -68,6 +74,26 @@ namespace WindowsFormsApp1
             if (!int.TryParse(tbConnTimeOut.Text.Trim(), out timeout))
                 missingFields.Add("Connection Timeout (must be a number)");
 
+            string sqlUser = "";
+            string sqlPassword = "";
+
+            if (!tglTrustedConnection.Checked)
+            {
+                ValidateTextbox(tbSqlUser);
+                ValidateTextbox(tbSqlPwd);
+
+                if (string.IsNullOrWhiteSpace(tbSqlUser.Text))
+                    missingFields.Add("SQL User");
+
+                if (string.IsNullOrWhiteSpace(tbSqlPwd.Text))
+                    missingFields.Add("SQL Password");
+
+                sqlUser = tbSqlUser.Text.Trim();
+
+                // 🔐 Encrypt password before saving
+                sqlPassword = Encrypt(tbSqlPwd.Text.Trim());
+            }
+
             if (missingFields.Count > 0)
             {
                 MessageBox.Show(
@@ -78,13 +104,44 @@ namespace WindowsFormsApp1
                 return;
             }
 
+            Utils.showStatusAndSpinner(lbStatus, pbSpinner, "Testing SQL connection...");
+          
+
+            var test = await RqliteClient.TestSqlConnectionAsync(
+                tbCpsServer.Text.Trim(),
+                tbCpsDb.Text.Trim(),
+                timeout,
+                tglTrustedConnection.Checked,
+                tglTrustedServerCert.Checked,
+                sqlUser,
+                tbSqlPwd.Text.Trim() // use real password here
+            );
+
+
+
+            Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Connected");
+
+
+            if (!test.Success)
+            {
+                MessageBox.Show(
+                    "SQL connection failed:\n\n" + test.Error,
+                    "Connection Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
+                return;
+            }
+
             var result = await RqliteClient.SaveSettingsAsync(
                 tbCpsServer.Text.Trim(),
                 tbCpsDb.Text.Trim(),
                 tbCpsQuery.Text.Trim(),
                 timeout,
                 tglTrustedConnection.Checked,
-                tglTrustedServerCert.Checked
+                tglTrustedServerCert.Checked,
+                sqlUser,
+                sqlPassword
             );
 
             if (result.Success)
@@ -93,7 +150,9 @@ namespace WindowsFormsApp1
                 this.Close();
             }
             else
+            {
                 MessageBox.Show(result.ErrorMessage);
+            }
         }
 
         private void ValidateTextbox(KryptonTextBox tb)
@@ -108,6 +167,55 @@ namespace WindowsFormsApp1
                 tb.StateCommon.Border.Color1 = Color.Gray;
                 tb.StateCommon.Border.Color2 = Color.Gray;
             }
+        }
+
+
+        private void tglTrustedConnection_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!tglTrustedConnection.Checked)
+            {
+                lbSqlPwd.Visible = true;
+                lbSqlUser.Visible = true;
+                tbSqlPwd.Visible = true;
+                tbSqlUser.Visible = true;
+            }
+            else
+            {
+                lbSqlPwd.Visible = false;
+                lbSqlUser.Visible = false;
+                tbSqlPwd.Visible = false;
+                tbSqlUser.Visible = false;
+            }
+        }
+
+        private void kryptonButton1_Click(object sender, EventArgs e)
+        {
+            using (var login = new LoginDialog("AddUser"))
+            {
+                if (login.ShowDialog() == DialogResult.OK)
+                {
+                    MessageBox.Show("User Added.");
+
+                    using (var frm = new SettingsDialogAdmin())
+                    {
+                        frm.ShowDialog();
+                    }
+                }
+            }
+        }
+
+        public static string Encrypt(string text)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(text);
+            byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.CurrentUser);
+            return Convert.ToBase64String(encrypted);
+        }
+
+        public static string Decrypt(string encryptedText)
+        {
+            byte[] data = Convert.FromBase64String(encryptedText);
+            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.CurrentUser);
+            return Encoding.UTF8.GetString(decrypted);
         }
     }
 }

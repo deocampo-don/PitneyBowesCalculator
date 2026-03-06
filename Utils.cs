@@ -1,4 +1,5 @@
-﻿using MadMilkman.Ini;
+﻿using Krypton.Toolkit;
+using MadMilkman.Ini;
 using Newtonsoft.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -6,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -17,6 +19,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp1.Properties;
 using static RqliteClient;
 
 namespace WindowsFormsApp1
@@ -27,7 +30,7 @@ namespace WindowsFormsApp1
         const string quote = "\"";
         internal static string logFileDirectory;
         internal static string logFileName;
-
+        private static System.Windows.Forms.Timer _connectionStatusTimer;
         private static readonly byte[] Key = Encoding.UTF8.GetBytes("0123456789abcdef0123456789abcdef"); // 32 bytes for AES-256
         private static readonly byte[] IV = Encoding.UTF8.GetBytes("abcdef9876543210"); // 16 bytes for AES
 
@@ -287,6 +290,8 @@ namespace WindowsFormsApp1
             }
         }
 
+      
+
         public static string GetUniqueRef(int lastXchars)
         {
             string currId = DateTime.Now.Ticks.ToString("x").GetLast(lastXchars);
@@ -297,45 +302,87 @@ namespace WindowsFormsApp1
             return currId;
         }
 
-        public static string GetTimeOfDay()
+        public static string Encrypt(string text)
         {
-            DateTime now = DateTime.Now;
-            string timeOfDay;
-            if (now.Hour >= 5 && now.Hour < 12)
-                timeOfDay = "Good morning...";
-            else if (now.Hour >= 12 && now.Hour < 17)
-                timeOfDay = "Good afternoon...";
-            else
-                timeOfDay = "Good evening...";
-
-            return timeOfDay;
+            byte[] data = Encoding.UTF8.GetBytes(text);
+            byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.CurrentUser);
+            return Convert.ToBase64String(encrypted);
         }
 
-        //public static string GetStringUnitTime(string unitTime)
-        //{
-        //    string timeunit = string.Empty;
-        //    if (!String.IsNullOrEmpty(unitTime))
-        //    {
-        //        switch (unitTime.ToLower())
-        //        {
-        //            case "second" or "seconds":
-        //                timeunit = "secs";
-        //                break;
-        //            case "minute" or "minutes":
-        //                timeunit = "mins";
-        //                break;
-        //            case "hour" or "hours":
-        //                timeunit = "hr";
-        //                break;
-        //            default:
-        //                timeunit = "mins";
-        //                break;
-        //        }
-        //    }
+        public static string Decrypt(string encryptedText)
+        {
+            byte[] data = Convert.FromBase64String(encryptedText);
+            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.CurrentUser);
+            return Encoding.UTF8.GetString(decrypted);
+        }
 
-        //    return timeunit;
-        //}
+        public static string AddFilterClause(string sql, string clause)
+        {
+            // Find position of GROUP BY or ORDER BY (case-insensitive)
+            int groupByIndex = sql.IndexOf("GROUP BY", StringComparison.OrdinalIgnoreCase);
+            int orderByIndex = sql.IndexOf("ORDER BY", StringComparison.OrdinalIgnoreCase);
 
+            // Find earliest clause (GROUP BY or ORDER BY)
+            int insertPos = -1;
+            if (groupByIndex >= 0 && orderByIndex >= 0)
+                insertPos = Math.Min(groupByIndex, orderByIndex);
+            else if (groupByIndex >= 0)
+                insertPos = groupByIndex;
+            else if (orderByIndex >= 0)
+                insertPos = orderByIndex;
+
+            string before, after;
+            if (insertPos >= 0)
+            {
+                before = sql.Substring(0, insertPos);
+                after = sql.Substring(insertPos);
+            }
+            else
+            {
+                before = sql;
+                after = "";
+            }
+
+            // Add WHERE or AND
+            if (before.IndexOf("WHERE", StringComparison.OrdinalIgnoreCase) >= 0)
+                return before.TrimEnd() + " AND " + clause + " " + after;
+            else
+                return before.TrimEnd() + " WHERE " + clause + " " + after;
+        }
+        public static void showStatusAndSpinner(KryptonLabel lb, PictureBox pb, string stat)
+        {
+
+            lb.Text = stat;
+            lb.ForeColor = Color.Red;
+            lb.Visible = true;
+            pb.Visible = true;
+            pb.Image = Resources.spinner_32px;
+        }
+        public static void hideStatusAndSpinner(KryptonLabel lb, PictureBox pb, string stat)
+        {
+            lb.Text = stat;
+            lb.ForeColor = Color.Green;
+            lb.Visible = true;
+
+            pb.Visible = true;
+            pb.Image = Resources.check_32px;
+
+            // stop old timer if running
+            _connectionStatusTimer?.Stop();
+
+            _connectionStatusTimer = new System.Windows.Forms.Timer();
+            _connectionStatusTimer.Interval = 2000; // 2 seconds
+
+            _connectionStatusTimer.Tick += (s, e) =>
+            {
+                lb.Visible = false;
+                pb.Visible = false;
+
+                _connectionStatusTimer.Stop();
+            };
+
+            _connectionStatusTimer.Start();
+        }
         public static void DisableRowsExceptSelected(DataGridView dgv, int selectedRow)
         {
             if (dgv != null)

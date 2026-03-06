@@ -50,7 +50,7 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 19.38775F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.71576F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20.41344F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 71F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 72F));
             this.tableLayoutPanel1.Controls.Add(this.txtScannedWO, 3, 2);
             this.tableLayoutPanel1.Controls.Add(this.txtEnvelopeQty, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.label3, 2, 2);
@@ -79,7 +79,7 @@
             this.txtScannedWO.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.txtScannedWO.AutoSize = true;
             this.txtScannedWO.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.txtScannedWO.Location = new System.Drawing.Point(311, 85);
+            this.txtScannedWO.Location = new System.Drawing.Point(309, 85);
             this.txtScannedWO.Margin = new System.Windows.Forms.Padding(3);
             this.txtScannedWO.Name = "txtScannedWO";
             this.txtScannedWO.Size = new System.Drawing.Size(19, 21);
@@ -102,7 +102,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(196, 84);
+            this.label3.Location = new System.Drawing.Point(195, 84);
             this.label3.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(103, 21);
@@ -177,7 +177,7 @@
             // 
             this.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.btnCancel.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnCancel.Location = new System.Drawing.Point(314, 128);
+            this.btnCancel.Location = new System.Drawing.Point(311, 128);
             this.btnCancel.Margin = new System.Windows.Forms.Padding(2);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(71, 30);
@@ -199,7 +199,7 @@
             // 
             this.pbSpinner.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.pbSpinner.Image = global::WindowsFormsApp1.Properties.Resources.spinner_32px;
-            this.pbSpinner.Location = new System.Drawing.Point(160, 126);
+            this.pbSpinner.Location = new System.Drawing.Point(159, 126);
             this.pbSpinner.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.pbSpinner.Name = "pbSpinner";
             this.pbSpinner.Size = new System.Drawing.Size(33, 34);
@@ -210,7 +210,7 @@
             // lbStatus
             // 
             this.lbStatus.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.lbStatus.Location = new System.Drawing.Point(196, 134);
+            this.lbStatus.Location = new System.Drawing.Point(195, 134);
             this.lbStatus.Name = "lbStatus";
             this.lbStatus.Size = new System.Drawing.Size(55, 18);
             this.lbStatus.StateCommon.Padding = new System.Windows.Forms.Padding(0);

@@ -56,9 +56,12 @@
             this.btnAdmin = new Krypton.Toolkit.KryptonButton();
             this.btnSettingsCancel = new Krypton.Toolkit.KryptonButton();
             this.btnSettingsSave = new Krypton.Toolkit.KryptonButton();
+            this.lbStatus = new Krypton.Toolkit.KryptonLabel();
+            this.pbSpinner = new System.Windows.Forms.PictureBox();
             this.kryptonTableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel1)).BeginInit();
             this.kryptonPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSpinner)).BeginInit();
             this.SuspendLayout();
             // 
             // tbUiRefresh
@@ -367,6 +370,8 @@
             // 
             // kryptonPanel1
             // 
+            this.kryptonPanel1.Controls.Add(this.pbSpinner);
+            this.kryptonPanel1.Controls.Add(this.lbStatus);
             this.kryptonPanel1.Controls.Add(this.btnAdmin);
             this.kryptonPanel1.Controls.Add(this.btnSettingsCancel);
             this.kryptonPanel1.Controls.Add(this.btnSettingsSave);
@@ -378,7 +383,6 @@
             this.kryptonPanel1.Size = new System.Drawing.Size(554, 40);
             this.kryptonPanel1.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.kryptonPanel1.TabIndex = 6;
-           
             // 
             // btnAdmin
             // 
@@ -444,6 +448,29 @@
             this.btnSettingsSave.Values.Text = "Save";
             this.btnSettingsSave.Click += new System.EventHandler(this.btnSettingsSave_Click);
             // 
+            // lbStatus
+            // 
+            this.lbStatus.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lbStatus.Location = new System.Drawing.Point(44, 13);
+            this.lbStatus.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.lbStatus.Name = "lbStatus";
+            this.lbStatus.Size = new System.Drawing.Size(88, 20);
+            this.lbStatus.TabIndex = 3;
+            this.lbStatus.Values.Text = "kryptonLabel8";
+            this.lbStatus.Visible = false;
+            // 
+            // pbSpinner
+            // 
+            this.pbSpinner.Image = global::WindowsFormsApp1.Properties.Resources.spinner_32px;
+            this.pbSpinner.Location = new System.Drawing.Point(3, 0);
+            this.pbSpinner.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
+            this.pbSpinner.Name = "pbSpinner";
+            this.pbSpinner.Size = new System.Drawing.Size(41, 40);
+            this.pbSpinner.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pbSpinner.TabIndex = 4;
+            this.pbSpinner.TabStop = false;
+            this.pbSpinner.Visible = false;
+            // 
             // SettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -462,6 +489,8 @@
             this.kryptonTableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel1)).EndInit();
             this.kryptonPanel1.ResumeLayout(false);
+            this.kryptonPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSpinner)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -495,5 +524,7 @@
         private Krypton.Toolkit.KryptonLabel kryptonLabel6;
         private Krypton.Toolkit.KryptonLabel kryptonLabel7;
         private Krypton.Toolkit.KryptonTextBox tbPrinterIP;
+        private Krypton.Toolkit.KryptonLabel lbStatus;
+        private System.Windows.Forms.PictureBox pbSpinner;
     }
 }

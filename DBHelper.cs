@@ -1,9 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1;
@@ -15,6 +18,8 @@ public class CpsConfig
     public int ConnTimeOut { get; set; }
     public bool TrustedConn { get; set; }
     public bool TrustedServerCert { get; set; }
+    public string SqlUser { get; set; }
+    public string SqlPwd { get; set; }
 }
 public static class RqliteClient
 {
@@ -242,6 +247,31 @@ public static class RqliteClient
             return false;
         }
     }
+
+    public static async Task<bool> CreateUserAsync(string username, string password)
+    {
+        try
+        {
+            // Prevent simple SQL injection
+            username = username.Replace("'", "''");
+            password = password.Replace("'", "''");
+
+            string sql = $@"
+        INSERT INTO users (Username, PassWord, IsAdmin, IsActive)
+        VALUES ('{username}', '{password}', 1, 1)";
+
+            var json = JsonConvert.SerializeObject(new[] { sql });
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await httpClient.PostAsync("/db/execute", content);
+
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
     public static async Task UpdateJobShippedDateAsync(int jobId, DateTime shippedDate)
     {
 
@@ -312,16 +342,48 @@ public static class RqliteClient
             CpsServer = record["CpsServer"]?.ToString()?.Trim() ?? "",
             ConnTimeOut = timeout,
             TrustedConn = trustedConn == 1,
-            TrustedServerCert = trustedCert == 1
+            TrustedServerCert = trustedCert == 1,
+
+            // New fields
+            SqlUser = record["SqlUser"]?.ToString()?.Trim() ?? "",
+            SqlPwd = record["SqlPwd"]?.ToString()?.Trim() ?? ""
         };
     }
+
+    public static async Task<HashSet<string>> GetExistingBarcodesAsync(IEnumerable<string> barcodes)
+    {
+        var barcodeList = barcodes
+            .Where(b => !string.IsNullOrWhiteSpace(b))
+            .Select(b => $"'{Escape(b)}'")
+            .ToList();
+
+        if (!barcodeList.Any())
+            return new HashSet<string>();
+
+        string sql =
+            $"SELECT Barcode FROM workorders WHERE Barcode IN ({string.Join(",", barcodeList)})";
+
+        var result = await QueryAsync(sql);
+
+        var existing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (result?.Records != null)
+        {
+            foreach (var r in result.Records)
+                existing.Add(r["Barcode"]?.ToString());
+        }
+
+        return existing;
+    }
     public static async Task<RqliteWriteResult> SaveSettingsAsync(
-     string server,
-     string db,
-     string query,
-     int timeout,
-     bool trustedConn,
-     bool trustedCert)
+        string server,
+        string db,
+        string query,
+        int timeout,
+        bool trustedConn,
+        bool trustedCert,
+        string sqlUser,
+        string sqlPwd)
     {
         string sql = $@"
 INSERT INTO settings
@@ -333,6 +395,8 @@ INSERT INTO settings
     ConnTimeOut,
     TrustedConn,
     TrustedServerCert,
+    SqlUser,
+    SqlPwd,
     LastUpdated
 )
 VALUES
@@ -344,6 +408,8 @@ VALUES
     {timeout},
     {(trustedConn ? 1 : 0)},
     {(trustedCert ? 1 : 0)},
+    '{Escape(sqlUser)}',
+    '{Escape(sqlPwd)}',
     datetime('now')
 )
 ON CONFLICT(Id) DO UPDATE SET
@@ -353,6 +419,8 @@ ON CONFLICT(Id) DO UPDATE SET
     ConnTimeOut = excluded.ConnTimeOut,
     TrustedConn = excluded.TrustedConn,
     TrustedServerCert = excluded.TrustedServerCert,
+    SqlUser = excluded.SqlUser,
+    SqlPwd = excluded.SqlPwd,
     LastUpdated = datetime('now');
 ";
 
@@ -406,7 +474,44 @@ ON CONFLICT(Id) DO UPDATE SET
         await ExecuteAsync(sql);
     }
 
+    public static async Task<(bool Success, string Error)> TestSqlConnectionAsync(
+  string server,
+  string db,
+  int timeout,
+  bool trustedConn,
+  bool trustedCert,
+  string sqlUser,
+  string sqlPwd)
+    {
+        try
+        {
+            string connString;
 
+            if (trustedConn)
+            {
+                connString =
+                    $"Server={server};Database={db};Trusted_Connection=True;" +
+                    $"TrustServerCertificate={trustedCert};Connection Timeout={timeout};";
+            }
+            else
+            {
+                connString =
+                    $"Server={server};Database={db};User Id={sqlUser};Password={sqlPwd};" +
+                    $"TrustServerCertificate={trustedCert};Connection Timeout={timeout};";
+            }
+
+            using (var conn = new SqlConnection(connString))
+            {
+                await conn.OpenAsync();
+            }
+
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
     public static async Task<DateTime?> GetJobsLastUpdatedAsync()
     {
         var result = await QueryAsync(
@@ -601,6 +706,8 @@ WHERE State = 0;
         public int ConnectionTimeout { get; set; }
         public bool TrustedConnection { get; set; }
         public bool TrustedServerCertificate { get; set; }
+        public string SqlUser { get; set; }
+        public string SqlPassword { get; set; }
     }
 
     public static async Task<CpsSettings> LoadCpsSettingsAsync()
@@ -619,7 +726,10 @@ WHERE State = 0;
             CPSQuery = row["CpsQuery"]?.ToString(),
             ConnectionTimeout = row["ConnTimeOut"] == null ? 30 : Convert.ToInt32(row["ConnTimeOut"]),
             TrustedConnection = Convert.ToInt32(row["TrustedConn"]) == 1,
-            TrustedServerCertificate = Convert.ToInt32(row["TrustedServerCert"]) == 1
+            TrustedServerCertificate = Convert.ToInt32(row["TrustedServerCert"]) == 1,
+
+            SqlUser = row["SqlUser"]?.ToString(),
+            SqlPassword = row["SqlPwd"]?.ToString()
         };
     }
 
@@ -855,6 +965,36 @@ ORDER BY j.Id, p.PalletNumber
     
         return jobs.Values.ToList();
 
+    }
+
+    public static async Task<(bool Success, string Error)> TestRqClientAsync(string address, int timeoutMs)
+    {
+        try
+        {
+            ServicePointManager.Expect100Continue = false;
+
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+
+            using var client = new HttpClient(handler)
+            {
+                BaseAddress = new Uri(address.Trim()),
+                Timeout = TimeSpan.FromMilliseconds(timeoutMs)
+            };
+
+            using var cts = new CancellationTokenSource(timeoutMs);
+
+            var response = await client.GetAsync("/status", cts.Token);
+
+            return (response.IsSuccessStatusCode, null);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
     }
     public static async Task<int> GetOrCreateWorkingPalletAsync(int jobId)
     {
@@ -1219,12 +1359,12 @@ ORDER BY j.Id, p.PalletNumber
 
     //    await ExecuteAsync(sqlBuilder.ToString());
     //}
-    public static async Task SaveWorkOrdersAsync(
+    public static async Task<RqliteWriteResult> SaveWorkOrdersAsync(
     int palletId,
     List<WorkOrder> workOrders)
     {
         if (workOrders == null || !workOrders.Any())
-            return;
+            return new RqliteWriteResult { Success = true, RowsAffected = 0 };
 
         var sqlBuilder = new StringBuilder();
 
@@ -1238,11 +1378,10 @@ VALUES (
     {FormatValue(wo.Barcode)},
     {FormatValue(wo.WorkOrderCode)},
     {wo.Quantity}
-);
-");
+);");
         }
 
-        await ExecuteAsync(sqlBuilder.ToString());
+        return await ExecuteAsync(sqlBuilder.ToString());
     }
 
 
@@ -1250,12 +1389,9 @@ VALUES (
     {
         try
         {
-            using (var cts = new System.Threading.CancellationTokenSource(1000))
+            using (var cts = new CancellationTokenSource(3000)) // 3 seconds safer
             {
-                var response = await httpClient.GetAsync(
-                    DefaultEndPoint + "/status",
-                    cts.Token
-                );
+                var response = await httpClient.GetAsync("/status", cts.Token);
 
                 return response.IsSuccessStatusCode;
             }

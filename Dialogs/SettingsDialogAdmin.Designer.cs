@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.kryptonTableLayoutPanel1 = new Krypton.Toolkit.KryptonTableLayoutPanel();
+            this.tbSqlPwd = new Krypton.Toolkit.KryptonTextBox();
+            this.lbSqlPwd = new Krypton.Toolkit.KryptonLabel();
             this.kryptonLabel1 = new Krypton.Toolkit.KryptonLabel();
             this.kryptonLabel2 = new Krypton.Toolkit.KryptonLabel();
             this.kryptonLabel3 = new Krypton.Toolkit.KryptonLabel();
@@ -43,13 +45,19 @@
             this.kryptonLabel7 = new Krypton.Toolkit.KryptonLabel();
             this.tbCpsQuery = new Krypton.Toolkit.KryptonTextBox();
             this.tbConnTimeOut = new Krypton.Toolkit.KryptonNumericUpDown();
+            this.lbSqlUser = new Krypton.Toolkit.KryptonLabel();
+            this.tbSqlUser = new Krypton.Toolkit.KryptonTextBox();
             this.kryptonPanel1 = new Krypton.Toolkit.KryptonPanel();
             this.btnSettingsCancel = new Krypton.Toolkit.KryptonButton();
             this.btnSettingsSave = new Krypton.Toolkit.KryptonButton();
+            this.btnAddUser = new Krypton.Toolkit.KryptonButton();
+            this.lbStatus = new Krypton.Toolkit.KryptonLabel();
+            this.pbSpinner = new System.Windows.Forms.PictureBox();
             this.kryptonTableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel1)).BeginInit();
             this.kryptonPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSpinner)).BeginInit();
             this.SuspendLayout();
             // 
             // kryptonTableLayoutPanel1
@@ -58,6 +66,8 @@
             this.kryptonTableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 56F));
             this.kryptonTableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 1.636364F));
             this.kryptonTableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 42.36364F));
+            this.kryptonTableLayoutPanel1.Controls.Add(this.tbSqlPwd, 2, 10);
+            this.kryptonTableLayoutPanel1.Controls.Add(this.lbSqlPwd, 2, 9);
             this.kryptonTableLayoutPanel1.Controls.Add(this.kryptonLabel1, 0, 0);
             this.kryptonTableLayoutPanel1.Controls.Add(this.kryptonLabel2, 0, 1);
             this.kryptonTableLayoutPanel1.Controls.Add(this.kryptonLabel3, 2, 1);
@@ -68,16 +78,14 @@
             this.kryptonTableLayoutPanel1.Controls.Add(this.kryptonLabel7, 0, 7);
             this.kryptonTableLayoutPanel1.Controls.Add(this.tbCpsQuery, 0, 8);
             this.kryptonTableLayoutPanel1.Controls.Add(this.tbConnTimeOut, 2, 2);
+            this.kryptonTableLayoutPanel1.Controls.Add(this.lbSqlUser, 0, 9);
+            this.kryptonTableLayoutPanel1.Controls.Add(this.tbSqlUser, 0, 10);
             this.kryptonTableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.kryptonTableLayoutPanel1.Location = new System.Drawing.Point(15, 16);
             this.kryptonTableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonTableLayoutPanel1.Name = "kryptonTableLayoutPanel1";
             this.kryptonTableLayoutPanel1.Padding = new System.Windows.Forms.Padding(0, 0, 4, 0);
-            this.kryptonTableLayoutPanel1.RowCount = 17;
-            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.kryptonTableLayoutPanel1.RowCount = 11;
             this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -90,11 +98,34 @@
             this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.kryptonTableLayoutPanel1.Size = new System.Drawing.Size(554, 372);
+            this.kryptonTableLayoutPanel1.Size = new System.Drawing.Size(554, 414);
             this.kryptonTableLayoutPanel1.StateCommon.Color1 = System.Drawing.Color.White;
             this.kryptonTableLayoutPanel1.StateCommon.Color2 = System.Drawing.Color.Transparent;
             this.kryptonTableLayoutPanel1.TabIndex = 0;
+            // 
+            // tbSqlPwd
+            // 
+            this.tbSqlPwd.Location = new System.Drawing.Point(319, 310);
+            this.tbSqlPwd.Margin = new System.Windows.Forms.Padding(2);
+            this.tbSqlPwd.Name = "tbSqlPwd";
+            this.tbSqlPwd.PasswordChar = '●';
+            this.tbSqlPwd.Size = new System.Drawing.Size(229, 36);
+            this.tbSqlPwd.StateCommon.Border.Rounding = 5F;
+            this.tbSqlPwd.StateCommon.Content.Font = new System.Drawing.Font("Segoe UI", 13.8F);
+            this.tbSqlPwd.StateCommon.Content.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.tbSqlPwd.TabIndex = 15;
+            this.tbSqlPwd.UseSystemPasswordChar = true;
+            // 
+            // lbSqlPwd
+            // 
+            this.lbSqlPwd.Location = new System.Drawing.Point(317, 282);
+            this.lbSqlPwd.Margin = new System.Windows.Forms.Padding(0, 2, 2, 2);
+            this.lbSqlPwd.Name = "lbSqlPwd";
+            this.lbSqlPwd.Size = new System.Drawing.Size(141, 24);
+            this.lbSqlPwd.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.lbSqlPwd.StateCommon.ShortText.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbSqlPwd.TabIndex = 13;
+            this.lbSqlPwd.Values.Text = "SQL Username";
             // 
             // kryptonLabel1
             // 
@@ -226,6 +257,7 @@
             this.tglTrustedConnection.Size = new System.Drawing.Size(50, 20);
             this.tglTrustedConnection.StateCommon.Back.Color1 = System.Drawing.Color.White;
             this.tglTrustedConnection.TabIndex = 0;
+            this.tglTrustedConnection.CheckedChanged += new System.EventHandler(this.tglTrustedConnection_CheckedChanged);
             // 
             // kryptonLabel7
             // 
@@ -281,12 +313,37 @@
             0,
             0});
             // 
+            // lbSqlUser
+            // 
+            this.lbSqlUser.Location = new System.Drawing.Point(0, 282);
+            this.lbSqlUser.Margin = new System.Windows.Forms.Padding(0, 2, 2, 2);
+            this.lbSqlUser.Name = "lbSqlUser";
+            this.lbSqlUser.Size = new System.Drawing.Size(141, 24);
+            this.lbSqlUser.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            this.lbSqlUser.StateCommon.ShortText.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbSqlUser.TabIndex = 12;
+            this.lbSqlUser.Values.Text = "SQL Username";
+            // 
+            // tbSqlUser
+            // 
+            this.tbSqlUser.Location = new System.Drawing.Point(2, 310);
+            this.tbSqlUser.Margin = new System.Windows.Forms.Padding(2);
+            this.tbSqlUser.Name = "tbSqlUser";
+            this.tbSqlUser.Size = new System.Drawing.Size(304, 36);
+            this.tbSqlUser.StateCommon.Border.Rounding = 5F;
+            this.tbSqlUser.StateCommon.Content.Font = new System.Drawing.Font("Segoe UI", 13.8F);
+            this.tbSqlUser.StateCommon.Content.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.tbSqlUser.TabIndex = 14;
+            // 
             // kryptonPanel1
             // 
+            this.kryptonPanel1.Controls.Add(this.pbSpinner);
+            this.kryptonPanel1.Controls.Add(this.lbStatus);
+            this.kryptonPanel1.Controls.Add(this.btnAddUser);
             this.kryptonPanel1.Controls.Add(this.btnSettingsCancel);
             this.kryptonPanel1.Controls.Add(this.btnSettingsSave);
             this.kryptonPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.kryptonPanel1.Location = new System.Drawing.Point(15, 326);
+            this.kryptonPanel1.Location = new System.Drawing.Point(15, 368);
             this.kryptonPanel1.Margin = new System.Windows.Forms.Padding(2);
             this.kryptonPanel1.Name = "kryptonPanel1";
             this.kryptonPanel1.Padding = new System.Windows.Forms.Padding(0, 4, 0, 4);
@@ -297,7 +354,7 @@
             // btnSettingsCancel
             // 
             this.btnSettingsCancel.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnSettingsCancel.Location = new System.Drawing.Point(466, 14);
+            this.btnSettingsCancel.Location = new System.Drawing.Point(369, 14);
             this.btnSettingsCancel.Margin = new System.Windows.Forms.Padding(2, 2, 8, 2);
             this.btnSettingsCancel.Name = "btnSettingsCancel";
             this.btnSettingsCancel.Size = new System.Drawing.Size(78, 32);
@@ -307,6 +364,7 @@
             | Krypton.Toolkit.PaletteDrawBorders.Right)));
             this.btnSettingsCancel.StateCommon.Border.Rounding = 5F;
             this.btnSettingsCancel.StateCommon.Border.Width = 1;
+            this.btnSettingsCancel.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.Black;
             this.btnSettingsCancel.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSettingsCancel.StateCommon.Content.ShortText.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
             this.btnSettingsCancel.StateCommon.Content.ShortText.TextV = Krypton.Toolkit.PaletteRelativeAlign.Center;
@@ -319,8 +377,8 @@
             // 
             this.btnSettingsSave.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.btnSettingsSave.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            this.btnSettingsSave.Location = new System.Drawing.Point(380, 14);
-            this.btnSettingsSave.Margin = new System.Windows.Forms.Padding(8, 2, 8, 2);
+            this.btnSettingsSave.Location = new System.Drawing.Point(283, 14);
+            this.btnSettingsSave.Margin = new System.Windows.Forms.Padding(2, 2, 8, 2);
             this.btnSettingsSave.Name = "btnSettingsSave";
             this.btnSettingsSave.Size = new System.Drawing.Size(76, 32);
             this.btnSettingsSave.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(80)))), ((int)(((byte)(164)))));
@@ -338,12 +396,56 @@
             this.btnSettingsSave.Values.Text = "Save";
             this.btnSettingsSave.Click += new System.EventHandler(this.btnSettingsSave_Click);
             // 
+            // btnAddUser
+            // 
+            this.btnAddUser.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.btnAddUser.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            this.btnAddUser.Location = new System.Drawing.Point(457, 14);
+            this.btnAddUser.Margin = new System.Windows.Forms.Padding(2, 2, 8, 2);
+            this.btnAddUser.Name = "btnAddUser";
+            this.btnAddUser.Size = new System.Drawing.Size(91, 32);
+            this.btnAddUser.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(227)))), ((int)(((byte)(227)))), ((int)(((byte)(227)))));
+            this.btnAddUser.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnAddUser.StateCommon.Border.Rounding = 5F;
+            this.btnAddUser.StateCommon.Border.Width = 1;
+            this.btnAddUser.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.Black;
+            this.btnAddUser.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddUser.StateCommon.Content.ShortText.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnAddUser.StateCommon.Content.ShortText.TextV = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnAddUser.TabIndex = 2;
+            this.btnAddUser.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.btnAddUser.Values.Text = "Add User";
+            this.btnAddUser.Click += new System.EventHandler(this.kryptonButton1_Click);
+            // 
+            // lbStatus
+            // 
+            this.lbStatus.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lbStatus.Location = new System.Drawing.Point(48, 19);
+            this.lbStatus.Name = "lbStatus";
+            this.lbStatus.Size = new System.Drawing.Size(88, 20);
+            this.lbStatus.TabIndex = 3;
+            this.lbStatus.Values.Text = "kryptonLabel8";
+            this.lbStatus.Visible = false;
+            // 
+            // pbSpinner
+            // 
+            this.pbSpinner.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.pbSpinner.Location = new System.Drawing.Point(3, 14);
+            this.pbSpinner.Name = "pbSpinner";
+            this.pbSpinner.Size = new System.Drawing.Size(43, 32);
+            this.pbSpinner.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pbSpinner.TabIndex = 4;
+            this.pbSpinner.TabStop = false;
+            this.pbSpinner.Visible = false;
+            // 
             // SettingsDialogAdmin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(584, 404);
+            this.ClientSize = new System.Drawing.Size(584, 446);
             this.Controls.Add(this.kryptonPanel1);
             this.Controls.Add(this.kryptonTableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -360,6 +462,8 @@
             this.tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kryptonPanel1)).EndInit();
             this.kryptonPanel1.ResumeLayout(false);
+            this.kryptonPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSpinner)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -373,7 +477,6 @@
         private Krypton.Toolkit.KryptonLabel kryptonLabel4;
         private Krypton.Toolkit.KryptonTextBox tbCpsDb;
         private Krypton.Toolkit.KryptonLabel kryptonLabel7;
-        private Krypton.Toolkit.KryptonTextBox tbCpsQuery;
         private Krypton.Toolkit.KryptonLabel kryptonLabel3;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private Krypton.Toolkit.KryptonLabel kryptonLabel6;
@@ -384,5 +487,13 @@
         private Krypton.Toolkit.KryptonButton btnSettingsSave;
         private Krypton.Toolkit.KryptonToggleSwitch tglTrustedServerCert;
         private Krypton.Toolkit.KryptonNumericUpDown tbConnTimeOut;
+        private Krypton.Toolkit.KryptonLabel lbSqlUser;
+        private Krypton.Toolkit.KryptonTextBox tbSqlUser;
+        private Krypton.Toolkit.KryptonLabel lbSqlPwd;
+        private Krypton.Toolkit.KryptonTextBox tbCpsQuery;
+        private Krypton.Toolkit.KryptonTextBox tbSqlPwd;
+        private Krypton.Toolkit.KryptonButton btnAddUser;
+        private Krypton.Toolkit.KryptonLabel lbStatus;
+        private System.Windows.Forms.PictureBox pbSpinner;
     }
 }

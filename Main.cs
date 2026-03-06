@@ -32,7 +32,7 @@ namespace WindowsFormsApp1
         public static CpsConfig DbCpsConfig;
         private bool _isReconnecting = false;
         public static string CPSConnectionString;
-
+        private string _preparedCpsQuery;
         public event EventHandler ItemsChanged;
 
         // -----------------------------
@@ -95,10 +95,8 @@ namespace WindowsFormsApp1
         }
 
 
-        private async Task LoadCPSConfig()
+        public static async Task LoadCPSConfig()
         {
-            MessageBox.Show("Starting LoadCPS Config");
-
             DbCpsConfig = await RqliteClient.LoadCpsConfigFromDB();
 
             // Fallback if DB has no config
@@ -107,11 +105,13 @@ namespace WindowsFormsApp1
                 DbCpsConfig = new CpsConfig
                 {
                     CpsDb = "OCS",
-                    CpsQuery = "cps_query.sql", // default file
+                    CpsQuery = "cps_query.sql",
                     CpsServer = "USCHSERV36.corp.idemia.com",
                     TrustedConn = true,
                     TrustedServerCert = true,
-                    ConnTimeOut = 100
+                    ConnTimeOut = 100,
+                    SqlUser = "",
+                    SqlPwd = ""
                 };
             }
 
@@ -136,24 +136,39 @@ namespace WindowsFormsApp1
             }
             else
             {
-                // SQL stored directly in DB
                 sqlQuery = DbCpsConfig.CpsQuery;
             }
 
-            // Store query for later use if needed
+            // Store resolved query
             DbCpsConfig.CpsQuery = sqlQuery;
 
-            // TESTING ONLY (SQL authentication)
-            CPSConnectionString =
-                $"Server=PHMAVSERV1012.corp.idemia.com;" +
-                $"Database=OCS;" +
-                $"User Id=ocssql;" +
-                $"Password=ocssql;" +
-                $"TrustServerCertificate=True;" +
-                $"Connection Timeout=100;";
+            // Decrypt password if present
+            
 
-            MessageBox.Show("CPS Connection String Loaded:\n" + CPSConnectionString);
+            if (DbCpsConfig.TrustedConn)
+            {
+                CPSConnectionString =
+   $"Server={DbCpsConfig.CpsServer};" +
+   $"Database={DbCpsConfig.CpsDb};" +
+   $"Trusted_Connection=True;" +
+   $"TrustServerCertificate={DbCpsConfig.TrustedServerCert};" +
+   $"Connection Timeout={DbCpsConfig.ConnTimeOut};";
+            }
+            else
+            {
+                string password = Utils.Decrypt(DbCpsConfig.SqlPwd);
+                CPSConnectionString =
+  $"Server={DbCpsConfig.CpsServer};" +
+  $"Database={DbCpsConfig.CpsDb};" +
+  $"Trusted_Connection=False;" +
+  $"TrustServerCertificate={DbCpsConfig.TrustedServerCert};" +
+  $"Connection Timeout={DbCpsConfig.ConnTimeOut};" +
+  $"User Id={DbCpsConfig.SqlUser};" +
+  $"Password={password};";
+            }
         }
+
+
         private void UiEvents()
         {
             packedListView2.PackedDataChanged += PackedListView2_PackedDataChanged;
@@ -220,7 +235,7 @@ namespace WindowsFormsApp1
 
             _pollTimer = new System.Windows.Forms.Timer();
             _pollTimer.Interval = Program.AppINI._appRefresh;
-
+     
             _pollTimer.Tick += async (_, __) =>
             {
                 if (_isPolling) return;
@@ -239,7 +254,7 @@ namespace WindowsFormsApp1
                 {
                     _pollTimer.Stop();
 
-                    ShowDatabaseOfflineMessage();
+                    Utils.showStatusAndSpinner(lbDbConnecting,pbConnectionSpinner, "Database Offline - Reconnecting...");
 
                     StartReconnectWatcher();
                 }
@@ -255,44 +270,6 @@ namespace WindowsFormsApp1
 
             _pollTimer.Start();
         }
-        //private void StartBackgroundPolling()
-        //{
-        //    _pollTimer = new System.Windows.Forms.Timer();
-        //    _pollTimer.Interval = Program.AppINI._appRefresh;
-
-        //    _pollTimer.Tick += async (_, __) =>
-        //    {
-        //        if (_isPolling) return;
-
-        //        _isPolling = true;
-
-        //        try
-        //        {
-        //            lvBuild.BeginUpdate();
-        //            packedListView2.BeginUpdate();
-        //            pickedUpListView.BeginUpdate();
-
-        //            await PollForUpdatesAsync();
-        //        }
-        //        catch
-        //        {
-        //            // optional logging
-        //            ShowDatabaseOfflineMessage();
-        //            StartReconnectWatcher();
-        //        }
-        //        finally
-        //        {
-        //            lvBuild.EndUpdate();
-        //            packedListView2.EndUpdate();
-        //            pickedUpListView.EndUpdate();
-
-        //            _isPolling = false;
-        //        }
-        //    };
-
-        //    _pollTimer.Start();
-        //}
-
 
 
         private async Task PollForUpdatesAsync()
@@ -382,20 +359,6 @@ namespace WindowsFormsApp1
                 pickedUpListView?.AddItem(job);
             }
         }
-        public static List<ShipmentGroup> BuildShipments(List<PbJobModel> jobs)
-{
-    return jobs
-        .SelectMany(j => j.Pallets)
-        .Where(p => p.ShippedAt.HasValue)
-        .GroupBy(p => p.ShippedAt.Value)
-        .Select(g => new ShipmentGroup
-        {
-            ShippedAt = g.Key,
-            Pallets = g.ToList()
-        })
-        .OrderByDescending(s => s.ShippedAt)
-        .ToList();
-}
         private void RemoveJobFromUI(int jobId)
         {
             lvBuild?.RemoveItem(jobId);
@@ -413,8 +376,8 @@ namespace WindowsFormsApp1
             try
             {
                 await InitializeRqliteAsync();
-
                 await StartApplicationAsync();
+                await LoadCPSConfig();
             }
             catch (Exception ex)
             {
@@ -426,12 +389,12 @@ namespace WindowsFormsApp1
         {
             if (!await RqliteClient.IsDatabaseAvailableAsync())
             {
-                ShowDatabaseOfflineMessage();
+                Utils.showStatusAndSpinner(lbDbConnecting, pbConnectionSpinner, "Database Offline - Reconnecting...");
                 StartReconnectWatcher();
                 return;
             }
 
-            HideDatabaseOfflineMessage();
+            Utils.hideStatusAndSpinner(lbDbConnecting, pbConnectionSpinner, "Connected");
 
             await LoadJobsAsync();
 
@@ -462,41 +425,9 @@ namespace WindowsFormsApp1
         }
 
 
-        private void ShowDatabaseOfflineMessage()
-        {
-          
-            lbDbConnecting.Text = "Database Offline - Reconnecting...";
-            lbDbConnecting.ForeColor = Color.Red;
-            lbDbConnecting.Visible = true;
-            pbConnectionSpinner.Visible = true;
-            pbConnectionSpinner.Image=Resources.spinner_32px;
-        }
+    
 
-        private void HideDatabaseOfflineMessage()
-        {
-            lbDbConnecting.Text = "Connected";
-            lbDbConnecting.ForeColor = Color.Green;
-            lbDbConnecting.Visible = true;
-
-            pbConnectionSpinner.Visible = true;
-            pbConnectionSpinner.Image = Resources.check_32px;
-
-            // stop old timer if running
-            _connectionStatusTimer?.Stop();
-
-            _connectionStatusTimer = new System.Windows.Forms.Timer();
-            _connectionStatusTimer.Interval = 2000; // 2 seconds
-
-            _connectionStatusTimer.Tick += (s, e) =>
-            {
-                lbDbConnecting.Visible = false;
-                pbConnectionSpinner.Visible = false;
-
-                _connectionStatusTimer.Stop();
-            };
-
-            _connectionStatusTimer.Start();
-        }
+      
         private void PalletListView_PalletChanged(object sender, PbJobModel job)
         {
             RefreshAllViews();
@@ -507,15 +438,7 @@ namespace WindowsFormsApp1
             RefreshAllViews();
         }
 
-        //private void ShowDatabaseOfflineMessage()
-        //{
-        //    MessageBox.Show(
-        //        "Database service is not running.\n\nPlease start rqlite and restart the application.",
-        //        "Database Offline",
-        //        MessageBoxButtons.OK,
-        //        MessageBoxIcon.Warning
-        //    );
-        //}
+ 
 
         private void ShowDatabaseError(Exception ex)
         {
@@ -763,12 +686,6 @@ namespace WindowsFormsApp1
                 RefreshSingleJobUI(existing);
                 return;
             }
-
-            // Otherwise refresh item in place
-           // lvBuild?.RefreshItem(existing);
-           // packedListView2?.RefreshItem(existing);
-           // pickedUpListView?.RefreshItem(existing);
-
             RefreshAllViews();
         }
 
@@ -891,6 +808,7 @@ namespace WindowsFormsApp1
             {
                 dlg.ShowDialog(this);
             }
+            StartBackgroundPolling();
         }
     }
 }
