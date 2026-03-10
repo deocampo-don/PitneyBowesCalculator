@@ -46,30 +46,27 @@
             this.txtPackDate = new Krypton.Toolkit.KryptonLabel();
             this.lblPackDate = new Krypton.Toolkit.KryptonLabel();
             this.txtPBJobName = new Krypton.Toolkit.KryptonLabel();
-            this.kryptonGroup1 = new Krypton.Toolkit.KryptonGroup();
+            this.pnlPalletNum = new System.Windows.Forms.Panel();
             this.pnlDetails = new System.Windows.Forms.Panel();
             this.btnClose = new System.Windows.Forms.Button();
             this.kryptonPrintDialog1 = new Krypton.Toolkit.KryptonPrintDialog();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
-            this.pnlPalletNum = new System.Windows.Forms.Panel();
             this.lvPallet = new WindowsFormsApp1.Packed_And_Ready.View_Button.PalletNumListViewList();
             this.lvPalletDetails = new WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details.PalletDetailsListView();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.pnlHeader)).BeginInit();
             this.pnlHeader.SuspendLayout();
             this.pnlDashboard.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonGroup1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonGroup1.Panel)).BeginInit();
-            this.kryptonGroup1.Panel.SuspendLayout();
-            this.kryptonGroup1.SuspendLayout();
-            this.pnlDetails.SuspendLayout();
             this.pnlPalletNum.SuspendLayout();
+            this.pnlDetails.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlHeader
             // 
             this.pnlHeader.Controls.Add(this.btnExit);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlHeader.Location = new System.Drawing.Point(0, 0);
+            this.pnlHeader.Location = new System.Drawing.Point(3, 18);
             this.pnlHeader.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlHeader.Name = "pnlHeader";
             this.pnlHeader.Size = new System.Drawing.Size(967, 46);
@@ -108,7 +105,7 @@
             this.pnlDashboard.Controls.Add(this.lblEnvelopeQty);
             this.pnlDashboard.Controls.Add(this.lblScannedWO);
             this.pnlDashboard.Controls.Add(this.lblTrayCount);
-            this.pnlDashboard.Location = new System.Drawing.Point(270, 173);
+            this.pnlDashboard.Location = new System.Drawing.Point(272, 174);
             this.pnlDashboard.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlDashboard.Name = "pnlDashboard";
             this.pnlDashboard.Size = new System.Drawing.Size(677, 61);
@@ -205,7 +202,7 @@
             this.btnPrintPallets.FlatAppearance.BorderSize = 0;
             this.btnPrintPallets.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPrintPallets.ForeColor = System.Drawing.Color.White;
-            this.btnPrintPallets.Location = new System.Drawing.Point(738, 637);
+            this.btnPrintPallets.Location = new System.Drawing.Point(740, 638);
             this.btnPrintPallets.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnPrintPallets.Name = "btnPrintPallets";
             this.btnPrintPallets.Size = new System.Drawing.Size(208, 28);
@@ -223,7 +220,7 @@
             this.btnRemovePallets.FlatAppearance.BorderSize = 0;
             this.btnRemovePallets.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRemovePallets.ForeColor = System.Drawing.Color.White;
-            this.btnRemovePallets.Location = new System.Drawing.Point(526, 637);
+            this.btnRemovePallets.Location = new System.Drawing.Point(528, 638);
             this.btnRemovePallets.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnRemovePallets.Name = "btnRemovePallets";
             this.btnRemovePallets.Size = new System.Drawing.Size(208, 28);
@@ -234,7 +231,7 @@
             // 
             // txtPBJobNumber
             // 
-            this.txtPBJobNumber.Location = new System.Drawing.Point(30, 122);
+            this.txtPBJobNumber.Location = new System.Drawing.Point(32, 123);
             this.txtPBJobNumber.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtPBJobNumber.Name = "txtPBJobNumber";
             this.txtPBJobNumber.Size = new System.Drawing.Size(90, 42);
@@ -246,7 +243,7 @@
             // txtPackDate
             // 
             this.txtPackDate.AutoSize = false;
-            this.txtPackDate.Location = new System.Drawing.Point(738, 130);
+            this.txtPackDate.Location = new System.Drawing.Point(740, 131);
             this.txtPackDate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtPackDate.Name = "txtPackDate";
             this.txtPackDate.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -259,7 +256,7 @@
             // lblPackDate
             // 
             this.lblPackDate.AutoSize = false;
-            this.lblPackDate.Location = new System.Drawing.Point(738, 106);
+            this.lblPackDate.Location = new System.Drawing.Point(740, 107);
             this.lblPackDate.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblPackDate.Name = "lblPackDate";
             this.lblPackDate.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -271,7 +268,7 @@
             // 
             // txtPBJobName
             // 
-            this.txtPBJobName.Location = new System.Drawing.Point(3, 50);
+            this.txtPBJobName.Location = new System.Drawing.Point(12, 54);
             this.txtPBJobName.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtPBJobName.Name = "txtPBJobName";
             this.txtPBJobName.Size = new System.Drawing.Size(322, 77);
@@ -280,39 +277,20 @@
             this.txtPBJobName.TabIndex = 50;
             this.txtPBJobName.Values.Text = "Job Name";
             // 
-            // kryptonGroup1
+            // pnlPalletNum
             // 
-            this.kryptonGroup1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.kryptonGroup1.Location = new System.Drawing.Point(0, 0);
-            // 
-            // kryptonGroup1.Panel
-            // 
-            this.kryptonGroup1.Panel.Controls.Add(this.pnlPalletNum);
-            this.kryptonGroup1.Panel.Controls.Add(this.pnlDetails);
-            this.kryptonGroup1.Panel.Controls.Add(this.btnClose);
-            this.kryptonGroup1.Panel.Controls.Add(this.pnlHeader);
-            this.kryptonGroup1.Panel.Controls.Add(this.pnlDashboard);
-            this.kryptonGroup1.Panel.Controls.Add(this.txtPBJobName);
-            this.kryptonGroup1.Panel.Controls.Add(this.btnPrintPallets);
-            this.kryptonGroup1.Panel.Controls.Add(this.lblPackDate);
-            this.kryptonGroup1.Panel.Controls.Add(this.btnRemovePallets);
-            this.kryptonGroup1.Panel.Controls.Add(this.txtPackDate);
-            this.kryptonGroup1.Panel.Controls.Add(this.txtPBJobNumber);
-            this.kryptonGroup1.Size = new System.Drawing.Size(973, 681);
-            this.kryptonGroup1.StateCommon.Back.Color1 = System.Drawing.Color.Transparent;
-            this.kryptonGroup1.StateCommon.Back.Color2 = System.Drawing.Color.Transparent;
-            this.kryptonGroup1.StateCommon.Back.ColorStyle = Krypton.Toolkit.PaletteColorStyle.Solid;
-            this.kryptonGroup1.StateCommon.Border.Color1 = System.Drawing.Color.Gray;
-            this.kryptonGroup1.StateCommon.Border.Color2 = System.Drawing.Color.Gray;
-            this.kryptonGroup1.StateCommon.Border.ColorStyle = Krypton.Toolkit.PaletteColorStyle.Solid;
-            this.kryptonGroup1.StateCommon.Border.Rounding = 7F;
-            this.kryptonGroup1.TabIndex = 0;
+            this.pnlPalletNum.Controls.Add(this.lvPallet);
+            this.pnlPalletNum.Location = new System.Drawing.Point(32, 174);
+            this.pnlPalletNum.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pnlPalletNum.Name = "pnlPalletNum";
+            this.pnlPalletNum.Size = new System.Drawing.Size(236, 454);
+            this.pnlPalletNum.TabIndex = 60;
             // 
             // pnlDetails
             // 
             this.pnlDetails.BackColor = System.Drawing.Color.White;
             this.pnlDetails.Controls.Add(this.lvPalletDetails);
-            this.pnlDetails.Location = new System.Drawing.Point(269, 235);
+            this.pnlDetails.Location = new System.Drawing.Point(271, 236);
             this.pnlDetails.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlDetails.Name = "pnlDetails";
             this.pnlDetails.Size = new System.Drawing.Size(677, 392);
@@ -327,7 +305,7 @@
             this.btnClose.FlatAppearance.BorderSize = 0;
             this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClose.ForeColor = System.Drawing.Color.White;
-            this.btnClose.Location = new System.Drawing.Point(848, 637);
+            this.btnClose.Location = new System.Drawing.Point(850, 638);
             this.btnClose.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(84, 28);
@@ -346,15 +324,6 @@
             // 
             this.printDocument1.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.printDocument1_PrintPage);
             // 
-            // pnlPalletNum
-            // 
-            this.pnlPalletNum.Controls.Add(this.lvPallet);
-            this.pnlPalletNum.Location = new System.Drawing.Point(30, 173);
-            this.pnlPalletNum.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pnlPalletNum.Name = "pnlPalletNum";
-            this.pnlPalletNum.Size = new System.Drawing.Size(236, 454);
-            this.pnlPalletNum.TabIndex = 60;
-            // 
             // lvPallet
             // 
             this.lvPallet.Location = new System.Drawing.Point(6, 5);
@@ -371,13 +340,33 @@
             this.lvPalletDetails.Size = new System.Drawing.Size(665, 381);
             this.lvPalletDetails.TabIndex = 0;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.pnlPalletNum);
+            this.groupBox1.Controls.Add(this.pnlHeader);
+            this.groupBox1.Controls.Add(this.pnlDetails);
+            this.groupBox1.Controls.Add(this.txtPBJobNumber);
+            this.groupBox1.Controls.Add(this.btnClose);
+            this.groupBox1.Controls.Add(this.txtPackDate);
+            this.groupBox1.Controls.Add(this.btnRemovePallets);
+            this.groupBox1.Controls.Add(this.pnlDashboard);
+            this.groupBox1.Controls.Add(this.lblPackDate);
+            this.groupBox1.Controls.Add(this.txtPBJobName);
+            this.groupBox1.Controls.Add(this.btnPrintPallets);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox1.Location = new System.Drawing.Point(0, 0);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(973, 681);
+            this.groupBox1.TabIndex = 1;
+            this.groupBox1.TabStop = false;
+            // 
             // ViewButtonDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(973, 681);
-            this.Controls.Add(this.kryptonGroup1);
+            this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "ViewButtonDialog";
@@ -387,13 +376,10 @@
             this.pnlHeader.ResumeLayout(false);
             this.pnlDashboard.ResumeLayout(false);
             this.pnlDashboard.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonGroup1.Panel)).EndInit();
-            this.kryptonGroup1.Panel.ResumeLayout(false);
-            this.kryptonGroup1.Panel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.kryptonGroup1)).EndInit();
-            this.kryptonGroup1.ResumeLayout(false);
-            this.pnlDetails.ResumeLayout(false);
             this.pnlPalletNum.ResumeLayout(false);
+            this.pnlDetails.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -418,12 +404,12 @@
         private Krypton.Toolkit.KryptonLabel txtScannedWO;
         private Krypton.Toolkit.KryptonLabel txtEnvelopeQty;
         private PalletNumListViewList lvPallet;
-        private Krypton.Toolkit.KryptonGroup kryptonGroup1;
         private System.Windows.Forms.Button btnClose;
         private Krypton.Toolkit.KryptonPrintDialog kryptonPrintDialog1;
         private System.Drawing.Printing.PrintDocument printDocument1;
         private System.Windows.Forms.Panel pnlDetails;
         private Pallets_Details.PalletDetailsListView lvPalletDetails;
         private System.Windows.Forms.Panel pnlPalletNum;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }

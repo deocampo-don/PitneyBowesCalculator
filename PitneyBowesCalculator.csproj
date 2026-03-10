@@ -123,7 +123,7 @@
       <DependentUpon>PackPalletDIalog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\SettingsDialog.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\SettingsDialog.Designer.cs">
       <DependentUpon>SettingsDialog.cs</DependentUpon>

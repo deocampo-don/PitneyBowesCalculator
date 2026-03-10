@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.PalletMainPanel = new Krypton.Toolkit.KryptonPanel();
-            this.RoundedGroupBox = new Krypton.Toolkit.KryptonGroupBox();
             this.PanelTableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.leftPanel = new Krypton.Toolkit.KryptonPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -46,10 +45,6 @@
             this.btnView = new Krypton.Toolkit.KryptonButton();
             ((System.ComponentModel.ISupportInitialize)(this.PalletMainPanel)).BeginInit();
             this.PalletMainPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.RoundedGroupBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.RoundedGroupBox.Panel)).BeginInit();
-            this.RoundedGroupBox.Panel.SuspendLayout();
-            this.RoundedGroupBox.SuspendLayout();
             this.PanelTableLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.leftPanel)).BeginInit();
             this.leftPanel.SuspendLayout();
@@ -64,7 +59,7 @@
             // 
             // PalletMainPanel
             // 
-            this.PalletMainPanel.Controls.Add(this.RoundedGroupBox);
+            this.PalletMainPanel.Controls.Add(this.PanelTableLayout);
             this.PalletMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.PalletMainPanel.Location = new System.Drawing.Point(0, 0);
             this.PalletMainPanel.Margin = new System.Windows.Forms.Padding(0);
@@ -73,28 +68,6 @@
             this.PalletMainPanel.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.PalletMainPanel.StateCommon.Color2 = System.Drawing.Color.Transparent;
             this.PalletMainPanel.TabIndex = 0;
-            // 
-            // RoundedGroupBox
-            // 
-            this.RoundedGroupBox.CaptionOverlap = 0D;
-            this.RoundedGroupBox.CaptionVisible = false;
-            this.RoundedGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RoundedGroupBox.Location = new System.Drawing.Point(0, 0);
-            this.RoundedGroupBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            // 
-            // RoundedGroupBox.Panel
-            // 
-            this.RoundedGroupBox.Panel.Controls.Add(this.PanelTableLayout);
-            this.RoundedGroupBox.Size = new System.Drawing.Size(1335, 79);
-            this.RoundedGroupBox.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
-            this.RoundedGroupBox.StateCommon.Back.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
-            this.RoundedGroupBox.StateCommon.Border.Color1 = System.Drawing.Color.LightGray;
-            this.RoundedGroupBox.StateCommon.Border.Color2 = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
-            this.RoundedGroupBox.StateCommon.Border.Draw = Krypton.Toolkit.InheritBool.True;
-            this.RoundedGroupBox.StateCommon.Border.Rounding = 7F;
-            this.RoundedGroupBox.StateCommon.Border.Width = 1;
-            this.RoundedGroupBox.TabIndex = 1;
-            this.RoundedGroupBox.Values.Heading = "\r\n";
             // 
             // PanelTableLayout
             // 
@@ -105,16 +78,16 @@
             this.PanelTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 34.59427F));
             this.PanelTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 8F));
             this.PanelTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35.42152F));
-            this.PanelTableLayout.Controls.Add(this.leftPanel, 0, 0);
             this.PanelTableLayout.Controls.Add(this.midPanel, 2, 0);
             this.PanelTableLayout.Controls.Add(this.rightPanel, 4, 0);
+            this.PanelTableLayout.Controls.Add(this.leftPanel, 0, 0);
             this.PanelTableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
             this.PanelTableLayout.Location = new System.Drawing.Point(0, 0);
             this.PanelTableLayout.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.PanelTableLayout.Name = "PanelTableLayout";
             this.PanelTableLayout.RowCount = 1;
             this.PanelTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.PanelTableLayout.Size = new System.Drawing.Size(1329, 73);
+            this.PanelTableLayout.Size = new System.Drawing.Size(1335, 79);
             this.PanelTableLayout.TabIndex = 1;
             // 
             // leftPanel
@@ -124,7 +97,7 @@
             this.leftPanel.Location = new System.Drawing.Point(3, 2);
             this.leftPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.leftPanel.Name = "leftPanel";
-            this.leftPanel.Size = new System.Drawing.Size(381, 69);
+            this.leftPanel.Size = new System.Drawing.Size(383, 75);
             this.leftPanel.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.leftPanel.TabIndex = 6;
             // 
@@ -141,7 +114,7 @@
             this.tableLayoutPanel2.RowCount = 2;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(381, 69);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(383, 75);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // lblPbJobName
@@ -150,7 +123,7 @@
             this.lblPbJobName.Location = new System.Drawing.Point(3, 2);
             this.lblPbJobName.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblPbJobName.Name = "lblPbJobName";
-            this.lblPbJobName.Size = new System.Drawing.Size(375, 30);
+            this.lblPbJobName.Size = new System.Drawing.Size(377, 33);
             this.lblPbJobName.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblPbJobName.TabIndex = 4;
             this.lblPbJobName.Values.Text = "PB JOB NAME";
@@ -158,10 +131,10 @@
             // lblAxRef
             // 
             this.lblAxRef.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblAxRef.Location = new System.Drawing.Point(3, 36);
+            this.lblAxRef.Location = new System.Drawing.Point(3, 39);
             this.lblAxRef.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblAxRef.Name = "lblAxRef";
-            this.lblAxRef.Size = new System.Drawing.Size(375, 31);
+            this.lblAxRef.Size = new System.Drawing.Size(377, 34);
             this.lblAxRef.TabIndex = 3;
             this.lblAxRef.Values.Text = "23412";
             // 
@@ -169,10 +142,10 @@
             // 
             this.midPanel.Controls.Add(this.tableLayoutPanel1);
             this.midPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.midPanel.Location = new System.Drawing.Point(419, 2);
+            this.midPanel.Location = new System.Drawing.Point(421, 2);
             this.midPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.midPanel.Name = "midPanel";
-            this.midPanel.Size = new System.Drawing.Size(440, 69);
+            this.midPanel.Size = new System.Drawing.Size(443, 75);
             this.midPanel.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.midPanel.TabIndex = 3;
             // 
@@ -189,7 +162,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(440, 69);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(443, 75);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // lblEnvelopeQty
@@ -198,17 +171,17 @@
             this.lblEnvelopeQty.Location = new System.Drawing.Point(3, 2);
             this.lblEnvelopeQty.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblEnvelopeQty.Name = "lblEnvelopeQty";
-            this.lblEnvelopeQty.Size = new System.Drawing.Size(434, 30);
+            this.lblEnvelopeQty.Size = new System.Drawing.Size(437, 33);
             this.lblEnvelopeQty.TabIndex = 0;
             this.lblEnvelopeQty.Values.Text = "Envelope Qty:";
             // 
             // lblScannedWOs
             // 
             this.lblScannedWOs.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblScannedWOs.Location = new System.Drawing.Point(3, 36);
+            this.lblScannedWOs.Location = new System.Drawing.Point(3, 39);
             this.lblScannedWOs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblScannedWOs.Name = "lblScannedWOs";
-            this.lblScannedWOs.Size = new System.Drawing.Size(434, 31);
+            this.lblScannedWOs.Size = new System.Drawing.Size(437, 34);
             this.lblScannedWOs.TabIndex = 1;
             this.lblScannedWOs.Values.Text = "Scanned Work Orders:";
             // 
@@ -216,10 +189,10 @@
             // 
             this.rightPanel.Controls.Add(this.tlButtons);
             this.rightPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.rightPanel.Location = new System.Drawing.Point(873, 5);
+            this.rightPanel.Location = new System.Drawing.Point(878, 5);
             this.rightPanel.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.rightPanel.Name = "rightPanel";
-            this.rightPanel.Size = new System.Drawing.Size(453, 63);
+            this.rightPanel.Size = new System.Drawing.Size(454, 69);
             this.rightPanel.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.rightPanel.TabIndex = 4;
             // 
@@ -241,7 +214,7 @@
             this.tlButtons.Padding = new System.Windows.Forms.Padding(0, 5, 11, 5);
             this.tlButtons.RowCount = 1;
             this.tlButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlButtons.Size = new System.Drawing.Size(453, 63);
+            this.tlButtons.Size = new System.Drawing.Size(454, 69);
             this.tlButtons.TabIndex = 0;
             // 
             // btnAddPallet
@@ -252,7 +225,7 @@
             this.btnAddPallet.Location = new System.Drawing.Point(0, 5);
             this.btnAddPallet.Margin = new System.Windows.Forms.Padding(0);
             this.btnAddPallet.Name = "btnAddPallet";
-            this.btnAddPallet.Size = new System.Drawing.Size(159, 53);
+            this.btnAddPallet.Size = new System.Drawing.Size(160, 59);
             this.btnAddPallet.StateCommon.Back.Color1 = System.Drawing.Color.LimeGreen;
             this.btnAddPallet.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(80)))), ((int)(((byte)(164)))));
             this.btnAddPallet.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
@@ -275,10 +248,10 @@
             this.btnPackPallet.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnPackPallet.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnPackPallet.Enabled = false;
-            this.btnPackPallet.Location = new System.Drawing.Point(176, 5);
+            this.btnPackPallet.Location = new System.Drawing.Point(177, 5);
             this.btnPackPallet.Margin = new System.Windows.Forms.Padding(0);
             this.btnPackPallet.Name = "btnPackPallet";
-            this.btnPackPallet.Size = new System.Drawing.Size(152, 53);
+            this.btnPackPallet.Size = new System.Drawing.Size(152, 59);
             this.btnPackPallet.StateCommon.Back.Color1 = System.Drawing.Color.Silver;
             this.btnPackPallet.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(136)))), ((int)(((byte)(255)))));
             this.btnPackPallet.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
@@ -299,10 +272,10 @@
             this.btnView.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
             this.btnView.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnView.Location = new System.Drawing.Point(344, 5);
+            this.btnView.Location = new System.Drawing.Point(345, 5);
             this.btnView.Margin = new System.Windows.Forms.Padding(0);
             this.btnView.Name = "btnView";
-            this.btnView.Size = new System.Drawing.Size(98, 53);
+            this.btnView.Size = new System.Drawing.Size(98, 59);
             this.btnView.StateCommon.Back.Color1 = System.Drawing.Color.Silver;
             this.btnView.StateCommon.Border.Color1 = System.Drawing.Color.White;
             this.btnView.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
@@ -321,17 +294,13 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.Transparent;
+            this.BackColor = System.Drawing.Color.White;
             this.Controls.Add(this.PalletMainPanel);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "PalletRowControl";
             this.Size = new System.Drawing.Size(1335, 79);
             ((System.ComponentModel.ISupportInitialize)(this.PalletMainPanel)).EndInit();
             this.PalletMainPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.RoundedGroupBox.Panel)).EndInit();
-            this.RoundedGroupBox.Panel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.RoundedGroupBox)).EndInit();
-            this.RoundedGroupBox.ResumeLayout(false);
             this.PanelTableLayout.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.leftPanel)).EndInit();
             this.leftPanel.ResumeLayout(false);
@@ -351,7 +320,6 @@
         #endregion
 
         private Krypton.Toolkit.KryptonPanel PalletMainPanel;
-        private Krypton.Toolkit.KryptonGroupBox RoundedGroupBox;
         private System.Windows.Forms.TableLayoutPanel PanelTableLayout;
         private Krypton.Toolkit.KryptonPanel leftPanel;
         private Krypton.Toolkit.KryptonPanel midPanel;
