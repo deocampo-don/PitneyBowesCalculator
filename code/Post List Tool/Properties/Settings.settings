@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Post_List_Tool.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="CPSConnectionString" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">server=FRSDSQLCL1V0004.corp.idemia.com\CPSLIVE02;database=UKTE_BANK;Trusted_Connection=True;connection timeout=100</Value>
+    </Setting>
+    <Setting Name="Printername" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\uktePRINT1P0001.in.idemia.com\uktepr022</Value>
+    </Setting>
+    <Setting Name="FontSize" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="Fontname" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Arial</Value>
+    </Setting>
+    <Setting Name="RM_Shipment_methods" Type="System.String" Scope="User">
+      <Value Profile="(Default)">47,50,51,54,108,41,69,19</Value>
+    </Setting>
+    <Setting Name="BackupPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">T:\</Value>
+    </Setting>
+    <Setting Name="StartUPScreen" Type="System.String" Scope="User">
+      <Value Profile="(Default)">UK Mail</Value>
+    </Setting>
+    <Setting Name="UKM_Shipment_Methods" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>

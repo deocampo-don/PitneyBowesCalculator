@@ -1,0 +1,31 @@
+# Version History
+
+## [1.2.0] - 2025-01-10
+### Added
+- Push notifications.
+- Social media integration.
+
+### Changed
+- Updated user interface for better user experience.
+
+### Fixed
+- Bug fixes in the search functionality.
+
+## [1.1.0] - 2024-09-10
+### Added
+- Search functionality.
+- User profile page.
+
+### Changed
+- Improved application performance.
+
+### Fixed
+- Minor bug fixes in the login feature.
+
+## [1.0.0] - 2024-02-10
+### Added
+- Initial release of the application.
+- User login feature.
+- Basic user interface.
+
+

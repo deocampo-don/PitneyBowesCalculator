@@ -1,0 +1,345 @@
+﻿namespace WindowsFormsApp1
+{
+    partial class PalletRowControl
+    {
+        /// <summary> 
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary> 
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Component Designer generated code
+
+        /// <summary> 
+        /// Required method for Designer support - do not modify 
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.PanelTableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.midPanel = new Krypton.Toolkit.KryptonPanel();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.lblEnvelopeQty = new Krypton.Toolkit.KryptonLabel();
+            this.lblScannedWOs = new Krypton.Toolkit.KryptonLabel();
+            this.rightPanel = new Krypton.Toolkit.KryptonPanel();
+            this.tlButtons = new System.Windows.Forms.TableLayoutPanel();
+            this.btnAddPallet = new Krypton.Toolkit.KryptonButton();
+            this.btnPackPallet = new Krypton.Toolkit.KryptonButton();
+            this.btnView = new Krypton.Toolkit.KryptonButton();
+            this.leftPanel = new Krypton.Toolkit.KryptonPanel();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.lblPbJobName = new Krypton.Toolkit.KryptonLabel();
+            this.lblAxRef = new Krypton.Toolkit.KryptonLabel();
+            this.roundedPanel1 = new RoundedPanel();
+            this.PanelTableLayout.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.midPanel)).BeginInit();
+            this.midPanel.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.rightPanel)).BeginInit();
+            this.rightPanel.SuspendLayout();
+            this.tlButtons.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.leftPanel)).BeginInit();
+            this.leftPanel.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
+            this.roundedPanel1.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // PanelTableLayout
+            // 
+            this.PanelTableLayout.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(232)))), ((int)(((byte)(222)))), ((int)(((byte)(248)))));
+            this.PanelTableLayout.ColumnCount = 5;
+            this.PanelTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.98421F));
+            this.PanelTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 22F));
+            this.PanelTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 34.59427F));
+            this.PanelTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 6F));
+            this.PanelTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35.42152F));
+            this.PanelTableLayout.Controls.Add(this.midPanel, 2, 0);
+            this.PanelTableLayout.Controls.Add(this.rightPanel, 4, 0);
+            this.PanelTableLayout.Controls.Add(this.leftPanel, 0, 0);
+            this.PanelTableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.PanelTableLayout.Location = new System.Drawing.Point(2, 2);
+            this.PanelTableLayout.Margin = new System.Windows.Forms.Padding(0);
+            this.PanelTableLayout.Name = "PanelTableLayout";
+            this.PanelTableLayout.Padding = new System.Windows.Forms.Padding(5);
+            this.PanelTableLayout.RowCount = 1;
+            this.PanelTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.PanelTableLayout.Size = new System.Drawing.Size(1078, 75);
+            this.PanelTableLayout.TabIndex = 1;
+            // 
+            // midPanel
+            // 
+            this.midPanel.Controls.Add(this.tableLayoutPanel1);
+            this.midPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.midPanel.Location = new System.Drawing.Point(340, 7);
+            this.midPanel.Margin = new System.Windows.Forms.Padding(2);
+            this.midPanel.Name = "midPanel";
+            this.midPanel.Size = new System.Drawing.Size(355, 61);
+            this.midPanel.StateCommon.Color1 = System.Drawing.Color.Transparent;
+            this.midPanel.TabIndex = 3;
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel1.Controls.Add(this.lblEnvelopeQty, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.lblScannedWOs, 0, 1);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(2);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(355, 61);
+            this.tableLayoutPanel1.TabIndex = 0;
+            // 
+            // lblEnvelopeQty
+            // 
+            this.lblEnvelopeQty.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblEnvelopeQty.Location = new System.Drawing.Point(2, 2);
+            this.lblEnvelopeQty.Margin = new System.Windows.Forms.Padding(2);
+            this.lblEnvelopeQty.Name = "lblEnvelopeQty";
+            this.lblEnvelopeQty.Size = new System.Drawing.Size(351, 26);
+            this.lblEnvelopeQty.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblEnvelopeQty.TabIndex = 0;
+            this.lblEnvelopeQty.Values.Text = "Envelope Qty:";
+            // 
+            // lblScannedWOs
+            // 
+            this.lblScannedWOs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblScannedWOs.Location = new System.Drawing.Point(2, 32);
+            this.lblScannedWOs.Margin = new System.Windows.Forms.Padding(2);
+            this.lblScannedWOs.Name = "lblScannedWOs";
+            this.lblScannedWOs.Size = new System.Drawing.Size(351, 27);
+            this.lblScannedWOs.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblScannedWOs.TabIndex = 1;
+            this.lblScannedWOs.Values.Text = "Scanned Work Orders:";
+            // 
+            // rightPanel
+            // 
+            this.rightPanel.Controls.Add(this.tlButtons);
+            this.rightPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rightPanel.Location = new System.Drawing.Point(705, 9);
+            this.rightPanel.Margin = new System.Windows.Forms.Padding(2, 4, 2, 4);
+            this.rightPanel.Name = "rightPanel";
+            this.rightPanel.Size = new System.Drawing.Size(366, 57);
+            this.rightPanel.StateCommon.Color1 = System.Drawing.Color.Transparent;
+            this.rightPanel.TabIndex = 4;
+            // 
+            // tlButtons
+            // 
+            this.tlButtons.ColumnCount = 5;
+            this.tlButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 39.06549F));
+            this.tlButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 13F));
+            this.tlButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 37.1724F));
+            this.tlButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 12F));
+            this.tlButtons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 23.76211F));
+            this.tlButtons.Controls.Add(this.btnAddPallet, 0, 0);
+            this.tlButtons.Controls.Add(this.btnPackPallet, 2, 0);
+            this.tlButtons.Controls.Add(this.btnView, 4, 0);
+            this.tlButtons.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tlButtons.Location = new System.Drawing.Point(0, 0);
+            this.tlButtons.Margin = new System.Windows.Forms.Padding(2);
+            this.tlButtons.Name = "tlButtons";
+            this.tlButtons.Padding = new System.Windows.Forms.Padding(0, 4, 8, 4);
+            this.tlButtons.RowCount = 1;
+            this.tlButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlButtons.Size = new System.Drawing.Size(366, 57);
+            this.tlButtons.TabIndex = 0;
+            // 
+            // btnAddPallet
+            // 
+            this.btnAddPallet.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            this.btnAddPallet.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddPallet.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnAddPallet.Location = new System.Drawing.Point(1, 5);
+            this.btnAddPallet.Margin = new System.Windows.Forms.Padding(1);
+            this.btnAddPallet.Name = "btnAddPallet";
+            this.btnAddPallet.Size = new System.Drawing.Size(128, 47);
+            this.btnAddPallet.StateCommon.Back.Color1 = System.Drawing.Color.LimeGreen;
+            this.btnAddPallet.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(103)))), ((int)(((byte)(80)))), ((int)(((byte)(164)))));
+            this.btnAddPallet.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnAddPallet.StateCommon.Border.Rounding = 5F;
+            this.btnAddPallet.StateCommon.Border.Width = 1;
+            this.btnAddPallet.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.btnAddPallet.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddPallet.StateCommon.Content.ShortText.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnAddPallet.StateCommon.Content.ShortText.TextV = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnAddPallet.TabIndex = 0;
+            this.btnAddPallet.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.btnAddPallet.Values.Text = "New Pallet";
+            this.btnAddPallet.Click += new System.EventHandler(this.btnAddPallet_Click);
+            // 
+            // btnPackPallet
+            // 
+            this.btnPackPallet.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            this.btnPackPallet.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnPackPallet.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnPackPallet.Enabled = false;
+            this.btnPackPallet.Location = new System.Drawing.Point(144, 5);
+            this.btnPackPallet.Margin = new System.Windows.Forms.Padding(1);
+            this.btnPackPallet.Name = "btnPackPallet";
+            this.btnPackPallet.Size = new System.Drawing.Size(121, 47);
+            this.btnPackPallet.StateCommon.Back.Color1 = System.Drawing.Color.Silver;
+            this.btnPackPallet.StateCommon.Border.Color1 = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(136)))), ((int)(((byte)(255)))));
+            this.btnPackPallet.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnPackPallet.StateCommon.Border.Rounding = 5F;
+            this.btnPackPallet.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.btnPackPallet.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.btnPackPallet.StateCommon.Content.ShortText.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnPackPallet.StateCommon.Content.ShortText.TextV = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnPackPallet.TabIndex = 1;
+            this.btnPackPallet.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.btnPackPallet.Values.Text = "Pack Pallet";
+            this.btnPackPallet.Click += new System.EventHandler(this.btnPackPallet_Click);
+            // 
+            // btnView
+            // 
+            this.btnView.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            this.btnView.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnView.Location = new System.Drawing.Point(279, 5);
+            this.btnView.Margin = new System.Windows.Forms.Padding(1);
+            this.btnView.Name = "btnView";
+            this.btnView.Size = new System.Drawing.Size(78, 47);
+            this.btnView.StateCommon.Back.Color1 = System.Drawing.Color.Silver;
+            this.btnView.StateCommon.Border.Color1 = System.Drawing.Color.White;
+            this.btnView.StateCommon.Border.DrawBorders = ((Krypton.Toolkit.PaletteDrawBorders)((((Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom) 
+            | Krypton.Toolkit.PaletteDrawBorders.Left) 
+            | Krypton.Toolkit.PaletteDrawBorders.Right)));
+            this.btnView.StateCommon.Border.Rounding = 5F;
+            this.btnView.StateCommon.Content.ShortText.Color1 = System.Drawing.Color.White;
+            this.btnView.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.btnView.StateCommon.Content.ShortText.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnView.StateCommon.Content.ShortText.TextV = Krypton.Toolkit.PaletteRelativeAlign.Center;
+            this.btnView.TabIndex = 2;
+            this.btnView.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            this.btnView.Values.Text = "View";
+            this.btnView.Click += new System.EventHandler(this.kryptonButton3_Click);
+            // 
+            // leftPanel
+            // 
+            this.leftPanel.Controls.Add(this.tableLayoutPanel2);
+            this.leftPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.leftPanel.Location = new System.Drawing.Point(7, 7);
+            this.leftPanel.Margin = new System.Windows.Forms.Padding(2);
+            this.leftPanel.Name = "leftPanel";
+            this.leftPanel.Size = new System.Drawing.Size(307, 61);
+            this.leftPanel.StateCommon.Color1 = System.Drawing.Color.Transparent;
+            this.leftPanel.TabIndex = 6;
+            // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.ColumnCount = 1;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.Controls.Add(this.lblPbJobName, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.lblAxRef, 0, 1);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(307, 61);
+            this.tableLayoutPanel2.TabIndex = 0;
+            // 
+            // lblPbJobName
+            // 
+            this.lblPbJobName.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblPbJobName.Location = new System.Drawing.Point(2, 2);
+            this.lblPbJobName.Margin = new System.Windows.Forms.Padding(2);
+            this.lblPbJobName.Name = "lblPbJobName";
+            this.lblPbJobName.Size = new System.Drawing.Size(303, 26);
+            this.lblPbJobName.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
+            this.lblPbJobName.TabIndex = 4;
+            this.lblPbJobName.Values.Text = "PB JOB NAME";
+            // 
+            // lblAxRef
+            // 
+            this.lblAxRef.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblAxRef.Location = new System.Drawing.Point(2, 32);
+            this.lblAxRef.Margin = new System.Windows.Forms.Padding(2);
+            this.lblAxRef.Name = "lblAxRef";
+            this.lblAxRef.Size = new System.Drawing.Size(303, 27);
+            this.lblAxRef.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
+            this.lblAxRef.TabIndex = 3;
+            this.lblAxRef.Values.Text = "23412";
+            this.lblAxRef.Click += new System.EventHandler(this.lblAxRef_Click);
+            // 
+            // roundedPanel1
+            // 
+            this.roundedPanel1.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.roundedPanel1.BorderColor = System.Drawing.Color.Transparent;
+            this.roundedPanel1.BorderRadius = 10;
+            this.roundedPanel1.BorderSize = 3;
+            this.roundedPanel1.Controls.Add(this.PanelTableLayout);
+            this.roundedPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.roundedPanel1.Location = new System.Drawing.Point(0, 0);
+            this.roundedPanel1.Margin = new System.Windows.Forms.Padding(0);
+            this.roundedPanel1.Name = "roundedPanel1";
+            this.roundedPanel1.Padding = new System.Windows.Forms.Padding(2);
+            this.roundedPanel1.Size = new System.Drawing.Size(1082, 79);
+            this.roundedPanel1.TabIndex = 7;
+            // 
+            // PalletRowControl
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.Transparent;
+            this.Controls.Add(this.roundedPanel1);
+            this.Margin = new System.Windows.Forms.Padding(1);
+            this.Name = "PalletRowControl";
+            this.Padding = new System.Windows.Forms.Padding(0, 0, 10, 0);
+            this.Size = new System.Drawing.Size(1092, 79);
+            this.PanelTableLayout.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.midPanel)).EndInit();
+            this.midPanel.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.rightPanel)).EndInit();
+            this.rightPanel.ResumeLayout(false);
+            this.tlButtons.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.leftPanel)).EndInit();
+            this.leftPanel.ResumeLayout(false);
+            this.tableLayoutPanel2.ResumeLayout(false);
+            this.tableLayoutPanel2.PerformLayout();
+            this.roundedPanel1.ResumeLayout(false);
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+        private System.Windows.Forms.TableLayoutPanel PanelTableLayout;
+        private Krypton.Toolkit.KryptonPanel leftPanel;
+        private Krypton.Toolkit.KryptonPanel midPanel;
+        private Krypton.Toolkit.KryptonPanel rightPanel;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private Krypton.Toolkit.KryptonLabel lblEnvelopeQty;
+        private Krypton.Toolkit.KryptonLabel lblScannedWOs;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private Krypton.Toolkit.KryptonLabel lblPbJobName;
+        private Krypton.Toolkit.KryptonLabel lblAxRef;
+        private System.Windows.Forms.TableLayoutPanel tlButtons;
+        private Krypton.Toolkit.KryptonButton btnAddPallet;
+        private Krypton.Toolkit.KryptonButton btnView;
+        private Krypton.Toolkit.KryptonButton btnPackPallet;
+        private RoundedPanel roundedPanel1;
+    }
+}

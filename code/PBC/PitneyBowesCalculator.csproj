@@ -1,0 +1,70 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net9.0-windows</TargetFramework>
+		<OutputType>WinExe</OutputType>
+		<RootNamespace>WindowsFormsApp1</RootNamespace>
+		<AssemblyName>WindowsFormsApp1</AssemblyName>
+		
+
+		<PublishUrl>C:\Users\donjadeo\OneDrive - myidemia\Bureau\</PublishUrl>
+
+
+		<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+		<ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
+		<PublishSingleFile>true</PublishSingleFile>
+		<SelfContained>false</SelfContained>
+
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<UseWindowsForms>true</UseWindowsForms>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Krypton.Navigator" Version="100.25.11.328" />
+		<PackageReference Include="Krypton.Toolkit" Version="100.25.11.328" />
+		<PackageReference Include="Krypton.Toolkit.Suite.Extended.Panels" Version="100.25.11.328" />
+		<PackageReference Include="MadMilkman.Ini" Version="1.0.6.0" />
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.3" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Dialogs\SettingsDialog.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Packed And Ready\PackedListView.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Packed And Ready\PackedRowControl.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Packed And Ready\View Button\Pallet Details List\PalletDetailsListView.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Packed And Ready\View Button\Pallet Details List\PalletDetailsRowControl.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Packed And Ready\View Button\Pallet Number Buttons\PalletNumListRowControl.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Packed And Ready\View Button\Pallet Number Buttons\PalletNumListViewList.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Picked Up\PickedUpRowControl.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Picked Up\PickedUpListView.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Pallet List\PalletListView.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="Pallet List\PalletRowControl.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<Compile Update="View\WorkOrderRowControl.cs">
+			<SubType>UserControl</SubType>
+		</Compile>
+		<None Include="WindowsFormsApp1_TemporaryKey.pfx" />
+	</ItemGroup>
+</Project>
