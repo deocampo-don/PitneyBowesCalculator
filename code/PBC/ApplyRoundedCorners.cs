@@ -56,7 +56,19 @@ public class RoundedPanel : Panel
     protected override void OnResize(EventArgs eventargs)
     {
         base.OnResize(eventargs);
-        Invalidate(); // forces redraw when resized
+
+        Rectangle rect = new Rectangle(
+            BorderSize,
+            BorderSize,
+            Width - BorderSize * 2 - 1,
+            Height - BorderSize * 2 - 1);
+
+        using (GraphicsPath path = GetRoundedPath(rect, BorderRadius))
+        {
+            Region = new Region(path);
+        }
+
+        Invalidate();
     }
 
     protected override void OnPaintBackground(PaintEventArgs e)
@@ -74,7 +86,6 @@ public class RoundedPanel : Panel
         using (GraphicsPath path = GetRoundedPath(rect, BorderRadius))
         using (Pen pen = new Pen(BorderColor, BorderSize))
         {
-            Region = new Region(path);
             e.Graphics.DrawPath(pen, path);
         }
     }

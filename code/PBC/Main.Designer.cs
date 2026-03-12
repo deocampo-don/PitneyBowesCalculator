@@ -905,7 +905,7 @@ namespace WindowsFormsApp1
             Name = "Main";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "iu8";
-            Load += Form1_Load;
+            Load += Form1_Shown;
             ((System.ComponentModel.ISupportInitialize)pnlHeader).EndInit();
             pnlHeader.ResumeLayout(false);
             flowLayoutPanel1.ResumeLayout(false);

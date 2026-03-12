@@ -151,6 +151,7 @@ namespace WindowsFormsApp1
             if (result.Success)
             {
                 MessageBox.Show("Settings saved.");
+                this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             else

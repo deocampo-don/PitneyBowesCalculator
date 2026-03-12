@@ -284,8 +284,6 @@ namespace WindowsFormsApp1
         }
 
 
-
-
         public void Bind(PbJobModel model)
         {
             _model = model;
@@ -324,6 +322,85 @@ namespace WindowsFormsApp1
         // -----------------------------
 
 
+        private async void btnAddPallet_Click(object sender, EventArgs e)
+        {
+            if (_model == null)
+                return;
+
+            using (var dlg = new AddToPalletDialog(0, 0))
+            {
+                if (dlg.ShowDialog(this) != DialogResult.OK)
+                    return;
+
+                if (!dlg.ScannedWorkOrders.Any())
+                {
+                    MessageBox.Show("No scanned data.");
+                    return;
+                }
+
+                try
+                {
+                    var scannedBarcodes = dlg.ScannedWorkOrders
+                        .Select(x => x.Barcode)
+                        .ToList();
+
+                    // 🔹 Check duplicates against DB BEFORE creating pallet
+                    var existing = await RqliteClient.GetExistingBarcodesAsync(scannedBarcodes);
+
+                    var duplicates = existing.ToList();
+                    var validWorkOrders = dlg.ScannedWorkOrders
+                        .Where(x => !duplicates.Contains(x.Barcode))
+                        .ToList();
+
+                    if (!validWorkOrders.Any())
+                    {
+                        MessageBox.Show("All scanned barcodes are duplicates.");
+                        return;
+                    }
+
+                    // 🔹 NOW create/get pallet only if needed
+                    int palletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
+
+                    var pallet = _model.Pallets.FirstOrDefault(p => p.PalletId == palletId);
+
+                    if (pallet == null)
+                    {
+                        pallet = new Pallet
+                        {
+                            PalletId = palletId,
+                            PBJobId = _model.JobId
+                        };
+
+                        _model.Pallets.Add(pallet);
+                    }
+
+                    // save valid items
+                    await RqliteClient.SaveWorkOrdersAsync(pallet.PalletId, validWorkOrders);
+
+                    pallet.WorkOrders =
+                        await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
+
+                    if (duplicates.Any())
+                    {
+                        MessageBox.Show(
+                            $"Inserted: {validWorkOrders.Count}\nDuplicates skipped: {duplicates.Count}\n\n" +
+                            string.Join("\n", duplicates),
+                            "Duplicate Barcodes",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning
+                        );
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error saving pallet: " + ex.Message);
+                    return;
+                }
+            }
+
+            UpdateButtonsState();
+            PalletChanged?.Invoke(this, _model);
+        }
 
         //private async void btnAddPallet_Click(object sender, EventArgs e)
         //{
@@ -348,6 +425,67 @@ namespace WindowsFormsApp1
 
         //            _model.Pallets.Add(pallet);
         //        }
+
+        //        // ⭐ get current totals for dialog
+        //        int envelopeQty = pallet.PalletEnvelopeQty;
+        //        int scannedWO = pallet.PalletScannedWO;
+
+        //        using (var dlg = new AddToPalletDialog(envelopeQty, scannedWO))
+        //        {
+        //            if (dlg.ShowDialog(this) != DialogResult.OK)
+        //                return;
+
+        //            if (!dlg.ScannedWorkOrders.Any())
+        //            {
+        //                MessageBox.Show("No scanned data.");
+        //                return;
+        //            }
+
+        //            try
+        //            {
+        //                var scannedBarcodes = dlg.ScannedWorkOrders
+        //                    .Select(x => x.Barcode)
+        //                    .ToList();
+
+        //                int scanned = scannedBarcodes.Count;
+
+        //                // ⭐ Attempt insert (duplicates ignored by DB)
+        //                await RqliteClient.SaveWorkOrdersAsync(
+        //                    pallet.PalletId,
+        //                    dlg.ScannedWorkOrders
+        //                );
+
+        //                // ⭐ Reload from DB (source of truth)
+        //                pallet.WorkOrders =
+        //                    await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
+
+        //                var insertedBarcodes = pallet.WorkOrders
+        //                    .Select(x => x.Barcode)
+        //                    .ToHashSet();
+
+        //                var duplicates = scannedBarcodes
+        //                    .Where(b => insertedBarcodes.Contains(b) == false)
+        //                    .ToList();
+
+        //                int inserted = scanned - duplicates.Count;
+
+        //                if (duplicates.Any())
+        //                {
+        //                    MessageBox.Show(
+        //                        $"Inserted: {inserted}\nDuplicates skipped: {duplicates.Count}\n\n" +
+        //                        string.Join("\n", duplicates),
+        //                        "Duplicate Barcodes",
+        //                        MessageBoxButtons.OK,
+        //                        MessageBoxIcon.Warning
+        //                    );
+        //                }
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                MessageBox.Show("Error saving pallet: " + ex.Message);
+        //                return;
+        //            }
+        //        }
         //    }
         //    catch (Exception ex)
         //    {
@@ -355,160 +493,10 @@ namespace WindowsFormsApp1
         //        return;
         //    }
 
-        //    using (var dlg = new AddToPalletDialog())
-        //    {
-        //        if (dlg.ShowDialog(this) != DialogResult.OK)
-        //            return;
-
-        //        if (!dlg.ScannedWorkOrders.Any())
-        //        {
-        //            MessageBox.Show("No scanned data.");
-        //            return;
-        //        }
-
-        //        try
-        //        {
-        //            var scannedBarcodes = dlg.ScannedWorkOrders
-        //                .Select(x => x.Barcode)
-        //                .ToList();
-
-        //            // Check duplicates
-        //            var existingBarcodes =
-        //                await RqliteClient.GetExistingBarcodesAsync(scannedBarcodes);
-
-        //            // Filter new workorders
-        //            var newWorkOrders = dlg.ScannedWorkOrders
-        //                .Where(x => !existingBarcodes.Contains(x.Barcode))
-        //                .ToList();
-
-        //            int scanned = scannedBarcodes.Count;
-        //            int duplicates = existingBarcodes.Count;
-        //            int inserted = newWorkOrders.Count;
-
-        //            if (newWorkOrders.Any())
-        //            {
-        //                await RqliteClient.SaveWorkOrdersAsync(
-        //                    pallet.PalletId,
-        //                    newWorkOrders
-        //                );
-        //            }
-
-        //            // Reload pallet from DB (source of truth)
-        //            pallet.WorkOrders =
-        //                await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
-
-        //            // Inform user
-        //            if (duplicates > 0)
-        //            {
-        //                MessageBox.Show(
-        //                    $"Inserted: {inserted}\nDuplicates skipped: {duplicates}\n\n" +
-        //                    string.Join("\n", existingBarcodes),
-        //                    "Duplicate Barcodes",
-        //                    MessageBoxButtons.OK,
-        //                    MessageBoxIcon.Warning
-        //                );
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            MessageBox.Show("Error saving pallet: " + ex.Message);
-        //            return;
-        //        }
-        //    }
-
         //    UpdateButtonsState();
         //    PalletChanged?.Invoke(this, _model);
         //}
-        private async void btnAddPallet_Click(object sender, EventArgs e)
-        {
-            if (_model == null)
-                return;
 
-            using (var dlg = new AddToPalletDialog())
-            {
-                if (dlg.ShowDialog(this) != DialogResult.OK)
-                    return;
-
-                if (!dlg.ScannedWorkOrders.Any())
-                {
-                    MessageBox.Show("No scanned data.");
-                    return;
-                }
-
-                Pallet pallet;
-
-                try
-                {
-                    int palletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
-
-                    pallet = _model.Pallets.FirstOrDefault(p => p.PalletId == palletId);
-
-                    if (pallet == null)
-                    {
-                        pallet = new Pallet
-                        {
-                            PalletId = palletId,
-                            PBJobId = _model.JobId
-                        };
-
-                        _model.Pallets.Add(pallet);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error preparing pallet: " + ex.Message);
-                    return;
-                }
-
-                try
-                {
-                    var scannedBarcodes = dlg.ScannedWorkOrders
-                        .Select(x => x.Barcode)
-                        .ToList();
-
-                    int scanned = scannedBarcodes.Count;
-
-                    // ⭐ Attempt insert (duplicates ignored by DB)
-                    await RqliteClient.SaveWorkOrdersAsync(
-                        pallet.PalletId,
-                        dlg.ScannedWorkOrders
-                    );
-
-                    // ⭐ Reload from DB (source of truth)
-                    pallet.WorkOrders =
-                        await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
-
-                    var insertedBarcodes = pallet.WorkOrders
-                        .Select(x => x.Barcode)
-                        .ToHashSet();
-
-                    var duplicates = scannedBarcodes
-                        .Where(b => insertedBarcodes.Contains(b) == false)
-                        .ToList();
-
-                    int inserted = scanned - duplicates.Count;
-
-                    if (duplicates.Any())
-                    {
-                        MessageBox.Show(
-                            $"Inserted: {inserted}\nDuplicates skipped: {duplicates.Count}\n\n" +
-                            string.Join("\n", duplicates),
-                            "Duplicate Barcodes",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning
-                        );
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error saving pallet: " + ex.Message);
-                    return;
-                }
-            }
-
-            UpdateButtonsState();
-            PalletChanged?.Invoke(this, _model);
-        }
         private async void btnPackPallet_Click(object sender, EventArgs e)
         {
             if (_model == null)

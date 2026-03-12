@@ -43,35 +43,99 @@ namespace WindowsFormsApp1
         public Main()
         {
             InitializeComponent();
-         
-
+        
             // UI Setup ONLY
             ApplyTabStyles();
             WireCheckSetToNavigator();
             InitializeTitleBarButtons();
 
-
             // UI event wiring
             UiEvents();
-     
 
-             StartPosition = FormStartPosition.Manual;
+
+            //StartPosition = FormStartPosition.Manual;
+            //var screen = Screen.FromPoint(Cursor.Position);
+            //Bounds = screen.WorkingArea;
+            //WindowState = FormWindowState.Normal;
+
+            StartPosition = FormStartPosition.Manual;
 
             var mouseScreen = Screen.FromPoint(Cursor.Position);
+            Location = mouseScreen.WorkingArea.Location;
+            WindowState = FormWindowState.Maximized;
 
-            this.Location = mouseScreen.WorkingArea.Location;
 
-            this.WindowState = FormWindowState.Maximized;
             lvBuild.EnableDoubleBuffer();
             packedListView2.EnableDoubleBuffer();
             pickedUpListView.EnableDoubleBuffer();
         }
 
+        private async void Form1_Shown(object sender, EventArgs e)
+        {
+            SyncNavigatorWithCheckedTab();
+            try
+            {
+                await InitializeRqliteAsync();
+                await LoadCPSConfig();
+                await StartApplicationAsync();
+            }
+            catch (Exception ex)
+            {
+                ShowDatabaseError(ex);
+            }
+        }
         // -----------------------------
         // ⭐ rqlite Initialization
         // -----------------------------
+        //private async Task InitializeRqliteAsync()
+        //{
+        //    if (RqliteClient.httpClient == null)
+        //    {
+        //        ServicePointManager.Expect100Continue = false;
+
+        //        var handler = new HttpClientHandler
+        //        {
+        //            ServerCertificateCustomValidationCallback =
+        //                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        //        };
+
+        //        var client = new HttpClient(handler)
+        //        {
+        //            BaseAddress = new Uri(Program.AppINI._rqClientAddress.Trim()),
+        //            Timeout = TimeSpan.FromSeconds(30)
+        //        };
+
+        //        RqliteClient.httpClient = client;
+        //        RqliteClient.DefaultEndPoint = Program.AppINI._rqClientAddress.Trim();
+        //    }
+        //}
         private async Task InitializeRqliteAsync()
         {
+            while (true)
+            {
+                if (!string.IsNullOrWhiteSpace(Program.AppINI._rqClientAddress) &&
+                    Program.AppINI._rqClientMaxRetries > 0 &&
+                    Program.AppINI._rqClientDelayMs > 0 && Program.AppINI._appRefresh>0)
+                    break;
+
+                var result = MessageBox.Show(
+                    "Rqlite is not configured.\n\nOpen settings now?",
+                    "Configuration Missing",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (result == DialogResult.No)
+                    throw new InvalidOperationException("Rqlite configuration missing.");
+
+                using (var dlg = new SettingsDialog())
+                {
+                    dlg.ShowDialog();
+                }
+
+                // reload INI after saving
+                Program.AppINI.GetINIVars(out _);
+            }
+
             if (RqliteClient.httpClient == null)
             {
                 ServicePointManager.Expect100Continue = false;
@@ -92,8 +156,6 @@ namespace WindowsFormsApp1
                 RqliteClient.DefaultEndPoint = Program.AppINI._rqClientAddress.Trim();
             }
         }
-
-
         public static async Task LoadCPSConfig()
         {
             DbCpsConfig = await RqliteClient.LoadCpsConfigFromDB();
@@ -376,22 +438,8 @@ namespace WindowsFormsApp1
         // -----------------------------
         // Form Events
         // -----------------------------
-        private async void Form1_Load(object sender, EventArgs e)
-        {
-            SyncNavigatorWithCheckedTab();
-
-            try
-            {
-                await InitializeRqliteAsync();
-                await StartApplicationAsync();
-                await LoadCPSConfig();
-            }
-            catch (Exception ex)
-            {
-                ShowDatabaseError(ex);
-            }
-        }
-
+    
+       
         private async Task StartApplicationAsync()
         {
             if (!await RqliteClient.IsDatabaseAvailableAsync())
@@ -430,11 +478,7 @@ namespace WindowsFormsApp1
                 }
             }
         }
-
-
-    
-
-      
+ 
         private void PalletListView_PalletChanged(object sender, PbJobModel job)
         {
             RefreshAllViews();
@@ -717,12 +761,6 @@ namespace WindowsFormsApp1
                 ShowDatabaseError(ex);
             }
         }
-
-        // -----------------------------
-        // Settings
-        // -----------------------------
-
-
         // -----------------------------
         // Actions
         // -----------------------------
@@ -778,15 +816,24 @@ namespace WindowsFormsApp1
             packedListView2.SetAllSelected(      chkbxSelectAll.Checked);
         }
 
-        private void btnSettings_Click(object sender, EventArgs e)
+        private async void btnSettings_Click(object sender, EventArgs e)
         {
             using (var dlg = new SettingsDialog())
             {
                 dlg.ShowDialog(this);
+
+                if (!dlg.SettingsChanged)
+                    return;
             }
+
+            // reload configs
+            await InitializeRqliteAsync();
+            await LoadCPSConfig();
             StartBackgroundPolling();
         }
     }
+
+
 }
 
 public static class ControlExtensions

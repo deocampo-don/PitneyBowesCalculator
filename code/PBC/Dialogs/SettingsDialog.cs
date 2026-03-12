@@ -14,7 +14,8 @@ namespace WindowsFormsApp1.Dialogs
     public partial class SettingsDialog : Form
     {
 
-        public static event Action SettingsUpdated;
+        public bool SettingsChanged { get; private set; }
+
         public SettingsDialog()
         {
             InitializeComponent();
@@ -43,7 +44,10 @@ namespace WindowsFormsApp1.Dialogs
 
                     using (var frm = new SettingsDialogAdmin())
                     {
-                        frm.ShowDialog();
+                        if (frm.ShowDialog() == DialogResult.OK)
+                        {
+                            SettingsChanged = true;
+                        }
                     }
                 }
             }
@@ -119,6 +123,8 @@ namespace WindowsFormsApp1.Dialogs
             }
 
             MessageBox.Show("Settings saved.");
+            SettingsChanged = true;
+            this.DialogResult = DialogResult.OK;
             Close();
         }
 

@@ -478,8 +478,16 @@ WHERE Id = {jobId}
     public static async Task DeletePbJobAsync(int jobId)
     {
         string sql = $@"
-        DELETE FROM {TableJobs}
-        WHERE Id = {jobId};
+    DELETE FROM WORKORDER
+    WHERE PalletId IN (
+        SELECT PalletId FROM PALLET WHERE PBJobId = {jobId}
+    );
+
+    DELETE FROM PALLET
+    WHERE PBJobId = {jobId};
+
+    DELETE FROM {TableJobs}
+    WHERE Id = {jobId};
     ";
 
         await ExecuteAsync(sql);

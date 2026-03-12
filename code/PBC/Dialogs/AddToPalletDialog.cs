@@ -21,7 +21,9 @@ namespace WindowsFormsApp1.Dialogs
         private readonly HashSet<string> _scannedCodes =
             new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private string _preparedCpsQuery;
-        public AddToPalletDialog()
+        private int _baseEnvelopeQty;
+        private int _baseScannedWO;
+        public AddToPalletDialog(int envelopeQty, int scannedWO)
         {
             InitializeComponent();
             txtEnvelopeQty.Text = "0";
@@ -38,9 +40,123 @@ namespace WindowsFormsApp1.Dialogs
                 await Main.LoadCPSConfig();
                 PrepareCpsQuery();
             };
-            
+            _baseEnvelopeQty = envelopeQty;
+            _baseScannedWO = scannedWO;
+            txtEnvelopeQty.Text = envelopeQty.ToString("N0");
+            txtScannedWO.Text = scannedWO.ToString();
+
 
         }
+        //private async void TbWoBarcode_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    if (e.KeyCode != Keys.Enter)
+        //        return;
+
+        //    e.Handled = true;
+        //    e.SuppressKeyPress = true;
+
+        //    var barcodeValue = tbWoBarcode.Text?.Trim();
+
+        //    if (string.IsNullOrWhiteSpace(barcodeValue))
+        //        return;
+
+        //    if (_scannedCodes.Contains(barcodeValue))
+        //    {
+        //        System.Media.SystemSounds.Beep.Play();
+        //        tbWoBarcode.SelectAll();
+        //        MessageBox.Show("You've already scanned this barcode!");
+        //        return;
+        //    }
+
+        //    var checkValue = await IsValueValid(barcodeValue);
+
+        //    if (!checkValue.IsValid)
+        //    {
+        //        MessageBox.Show(checkValue.Message);
+        //        tbWoBarcode.SelectAll();
+        //        return;
+        //    }
+
+        //    bool isCPSBarcodeScanned = (Apos != -1) && (Bpos != -1);
+
+        //    if (!isCPSBarcodeScanned)
+        //    {
+        //        MessageBox.Show("Invalid CPS barcode.");
+        //        tbWoBarcode.SelectAll();
+        //        return;
+        //    }
+
+        //    string woID = barcodeValue.Substring(Apos + 1, Bpos - Apos - 1).ToUpper();
+        //    string woNSID = barcodeValue.Substring(0, Apos).ToUpper();
+
+        //    int envQty = 0;
+        //    string workOrderCode = "";
+
+        //    try
+        //    {
+        //        if (string.IsNullOrEmpty(Main.CPSConnectionString))
+        //        {
+        //            MessageBox.Show("CPS Database Connection String is empty!");
+        //            return;
+        //        }
+        //        Utils.showStatusAndSpinner(lbStatus, pbSpinner, "Checking...");
+        //        string sqlQuery = _preparedCpsQuery;
+
+        //        using (var connection = new SqlConnection(Main.CPSConnectionString))
+        //        {
+        //            await connection.OpenAsync();
+
+        //            using (var command = new SqlCommand(sqlQuery, connection))
+        //            {
+        //                command.Parameters.AddWithValue("@woID", woID);
+        //                command.Parameters.AddWithValue("@woNSID", woNSID);
+
+        //                using (var reader = await command.ExecuteReaderAsync())
+        //                {
+        //                    if (reader.HasRows && await reader.ReadAsync())
+        //                    {
+        //                        workOrderCode = reader["WOName"]?.ToString() ?? "";
+        //                        envQty = Convert.ToInt32(reader["items"]);
+
+        //                        Utils.hideStatusAndSpinner(lbStatus, pbSpinner, workOrderCode);
+        //                    }
+        //                    else
+        //                    {
+        //                        MessageBox.Show("Scanned Work Order not found.");
+        //                        pbSpinner.Visible = false;
+        //                        lbStatus.Visible = false;
+        //                        return;
+        //                    }
+        //                }
+        //            }
+        //        }
+
+        //        var workOrder = new WorkOrder(workOrderCode, envQty)
+        //        {
+        //            Barcode = barcodeValue
+        //        };
+
+        //        workOrder.RecordScan();
+
+        //        _sessionWorkOrders.Add(workOrder);
+        //        _scannedCodes.Add(barcodeValue);
+
+        //        txtEnvelopeQty.Text =
+        //            _sessionWorkOrders.Sum(x => x.Quantity).ToString("N0");
+
+        //        txtScannedWO.Text =
+        //            _sessionWorkOrders.Count.ToString();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Error scanning barcode:\n" + ex.Message);
+        //    }
+        //    finally
+        //    {
+        //        tbWoBarcode.Clear();
+        //        tbWoBarcode.Focus();
+        //    }
+        //}
         private async void TbWoBarcode_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter)
@@ -95,6 +211,7 @@ namespace WindowsFormsApp1.Dialogs
                 }
                 Utils.showStatusAndSpinner(lbStatus, pbSpinner, "Checking...");
                 string sqlQuery = _preparedCpsQuery;
+               
 
                 using (var connection = new SqlConnection(Main.CPSConnectionString))
                 {
@@ -111,7 +228,7 @@ namespace WindowsFormsApp1.Dialogs
                             {
                                 workOrderCode = reader["WOName"]?.ToString() ?? "";
                                 envQty = Convert.ToInt32(reader["items"]);
-                               
+
                                 Utils.hideStatusAndSpinner(lbStatus, pbSpinner, workOrderCode);
                             }
                             else
@@ -135,11 +252,14 @@ namespace WindowsFormsApp1.Dialogs
                 _sessionWorkOrders.Add(workOrder);
                 _scannedCodes.Add(barcodeValue);
 
+                int sessionEnv = _sessionWorkOrders.Sum(x => x.Quantity);
+                int sessionWO = _sessionWorkOrders.Count;
+
                 txtEnvelopeQty.Text =
-                    _sessionWorkOrders.Sum(x => x.Quantity).ToString("N0");
+                    (_baseEnvelopeQty + sessionEnv).ToString("N0");
 
                 txtScannedWO.Text =
-                    _sessionWorkOrders.Count.ToString();
+                    (_baseScannedWO + sessionWO).ToString();
             }
             catch (Exception ex)
             {

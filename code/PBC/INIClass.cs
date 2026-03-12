@@ -65,9 +65,9 @@ namespace WindowsFormsApp1
                 configFile.Sections.Add(
     new IniSection(configFile, "APP",
         new IniKey(configFile, "startUpScreen", ""),
-        new IniKey(configFile, "rqClientAddress", "https://10.32.101.160:4004"),
-        new IniKey(configFile, "rqClientMaxRetries", "3"),
-        new IniKey(configFile, "rqClientDelayMs", "1000"),
+        new IniKey(configFile, "rqClientAddress", ""),
+        new IniKey(configFile, "rqClientMaxRetries", ""),
+        new IniKey(configFile, "rqClientDelayMs", ""),
 
         new IniKey(configFile, "logFileDir", ".\\logs"),
         new IniKey(configFile, "logFileName", ".\\appERR"),
@@ -76,7 +76,7 @@ namespace WindowsFormsApp1
         new IniKey(configFile, "defaultPrinter", ""),
         new IniKey(configFile, "printerIP", ""),
         new IniKey(configFile, "printerPort", ""),
-        new IniKey(configFile, "appRefresh", "5000"),
+        new IniKey(configFile, "appRefresh", ""),
         new IniKey(configFile, "SkipFormAutoPrint", "False")
 ));
 
