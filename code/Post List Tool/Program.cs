@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace Post_List_Tool
 {
-    static class Program
+    public static class Program
     {
         [STAThread]
         static void Main()

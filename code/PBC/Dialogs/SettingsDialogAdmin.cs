@@ -22,8 +22,9 @@ namespace WindowsFormsApp1
         public SettingsDialogAdmin()
         {
             InitializeComponent();
-            FormHelper.ApplyRoundedCorners(this, 20);
-            //this.TransparencyKey = Color.White;
+            FormHelper.ApplyRoundedCorners(this);
+            ShadowHelper.ApplyShadow(this);
+          
         }
 
         private async void SettingsDialog_Load(object sender, EventArgs e)

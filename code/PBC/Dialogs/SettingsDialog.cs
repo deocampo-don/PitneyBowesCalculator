@@ -19,7 +19,8 @@ namespace WindowsFormsApp1.Dialogs
         public SettingsDialog()
         {
             InitializeComponent();
-
+            FormHelper.ApplyRoundedCorners(this);
+            ShadowHelper.ApplyShadow(this);
             tbDefPrint.Text = Program.AppINI._defaultPrinter;
             tbPrinterIP.Text = Program.AppINI._printerIP;
             tbPrinterPort.Text = Program.AppINI._printerPort;
@@ -30,7 +31,7 @@ namespace WindowsFormsApp1.Dialogs
             tbClientMaxRetry.Text = Program.AppINI._rqClientMaxRetries.ToString();
             tbClientDelay.Text = Program.AppINI._rqClientDelayMs.ToString();
             this.TopLevel = true;
-            FormHelper.ApplyRoundedCorners(this, 20);
+         
         }
 
 

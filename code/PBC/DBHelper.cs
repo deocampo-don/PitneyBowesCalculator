@@ -140,6 +140,32 @@ public static class RqliteClient
             Success = true,
             RowsAffected = result?.results?.Sum(r => r.rows_affected) ?? 0
         };
+      
+    }
+    private static async Task<object?> ExecuteScalarAsync(string sql)
+    {
+        var json = JsonConvert.SerializeObject(new[] { sql });
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await httpClient.PostAsync(
+            DefaultEndPoint + "/db/query?level=strong",
+            content
+        );
+
+        var body = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+            throw new Exception(body);
+
+        var result = JsonConvert.DeserializeObject<QueryResponse>(body);
+
+        var value = result?.results?
+            .FirstOrDefault()?
+            .values?
+            .FirstOrDefault()?
+            .FirstOrDefault();
+
+        return value;
     }
     private static string Escape(string value)
     {
@@ -477,20 +503,25 @@ WHERE Id = {jobId}
 
     public static async Task DeletePbJobAsync(int jobId)
     {
-        string sql = $@"
-    DELETE FROM WORKORDER
-    WHERE PalletId IN (
-        SELECT PalletId FROM PALLET WHERE PBJobId = {jobId}
-    );
+        // Delete workorders first
+        await ExecuteAsync($@"
+        DELETE FROM WORKORDERS
+        WHERE PalletId IN (
+            SELECT PalletId FROM PALLET WHERE PBJobId = {jobId}
+        );
+    ");
 
-    DELETE FROM PALLET
-    WHERE PBJobId = {jobId};
+        // Delete pallets
+        await ExecuteAsync($@"
+        DELETE FROM PALLET
+        WHERE PBJobId = {jobId};
+    ");
 
-    DELETE FROM {TableJobs}
-    WHERE Id = {jobId};
-    ";
-
-        await ExecuteAsync(sql);
+        // Delete job
+        await ExecuteAsync($@"
+        DELETE FROM {TableJobs}
+        WHERE Id = {jobId};
+    ");
     }
     public static async Task SetJobReadyAsync(int jobId)
     {
@@ -523,6 +554,50 @@ WHERE Id = {jobId};
 ";
 
         await ExecuteAsync(sql);
+    }
+    public static async Task UndoPackedPalletAsync(List<int> palletIds, int jobId)
+    {
+        var ids = string.Join(",", palletIds);
+
+        string sql = $@"
+UPDATE {TablePallets}
+SET State = 'NotReady',
+    PackedAt = NULL
+WHERE PalletId IN ({ids})
+AND State = 'Ready';
+
+UPDATE {TableJobs}
+SET LastUpdated = datetime('now','localtime')
+WHERE Id = {jobId};
+";
+
+        await ExecuteAsync(sql);
+    }
+    public static async Task<int> TogglePalletReadyAsync(
+    int jobId,
+    PalletState fromState,
+    PalletState toState)
+    {
+        string sql1 = $@"
+UPDATE {TablePallets}
+SET State = {(int)toState}
+WHERE PBJobId = {jobId}
+AND State = {(int)fromState};
+";
+
+        var result = await ExecuteAsync(sql1);
+
+        if (result.RowsAffected > 0)
+        {
+            string sql2 = $@"
+UPDATE {TableJobs}
+SET LastUpdated = datetime('now','localtime')
+WHERE Id = {jobId};
+";
+            await ExecuteAsync(sql2);
+        }
+
+        return result.RowsAffected;
     }
     public static async Task<int> UpdatePalletPackingAsync(
      int palletId,
@@ -567,26 +642,26 @@ WHERE Id = (
 
         var idList = string.Join(",", palletIds);
 
-        string sql = $@"
-        -- update parent jobs first
-        UPDATE {TableJobs}
-        SET LastUpdated = datetime('now','localtime')
-        WHERE JobId IN (
-            SELECT DISTINCT JobId
-            FROM {TablePallets}
-            WHERE PalletId IN ({idList})
-        );
+        await ExecuteAsync($@"
+DELETE FROM {TablePalletWorkOrders}
+WHERE PalletId IN ({idList});
+");
 
-        DELETE FROM {TablePalletWorkOrders}
-        WHERE PalletId IN ({idList});
+        await ExecuteAsync($@"
+DELETE FROM {TablePallets}
+WHERE Id IN ({idList});
+");
 
-        DELETE FROM {TablePallets}
-        WHERE PalletId IN ({idList});
-    ";
-
-        await ExecuteAsync(sql);
+        await ExecuteAsync($@"
+UPDATE {TableJobs}
+SET LastUpdated = datetime('now','localtime')
+WHERE Id IN (
+    SELECT PBJobId
+    FROM {TablePallets}
+    WHERE Id IN ({idList})
+);
+");
     }
-
 
     public class CpsSettings
     {
@@ -666,7 +741,7 @@ VALUES
         return result.Records.Count > 0;
     }
 
-    public static async Task ShipJobsAsync(IEnumerable<int> jobIds)
+    public static async Task ShipPalletsAsync(IEnumerable<int> jobIds)
     {
         if (jobIds == null || !jobIds.Any())
             return;
@@ -679,22 +754,12 @@ UPDATE PALLET
 SET ShippedAt = '{shippedAt}',
     State = {(int)PalletState.Shipped}
 WHERE PBJobId IN ({idList})
-AND State = {(int)PalletState.Packed}
-AND NOT EXISTS (
-    SELECT 1
-    FROM PALLET p2
-    WHERE p2.PBJobId = PALLET.PBJobId
-    AND p2.State IN (
-        {(int)PalletState.NotReady},
-        {(int)PalletState.Ready},
-        {(int)PalletState.Packed_NotReady}
-    )
-);
+AND State = {(int)PalletState.Ready}
+AND ShippedAt IS NULL;
 
 UPDATE PBJOB
 SET LastUpdated = datetime('now','localtime')
-WHERE Id IN ({idList})
-AND changes() > 0;
+WHERE Id IN ({idList});
 ";
 
         await ExecuteAsync(sql);
@@ -704,9 +769,55 @@ AND changes() > 0;
     // MERGE PALLETS (MOVE WO ONLY, DELETE SOURCE PALLETS)
     // =====================================================
 
+    //    public static async Task MergePalletsIntoAsync(
+    //    IEnumerable<int> sourcePalletIds,
+    //    int targetPalletId)
+    //    {
+    //        if (sourcePalletIds == null || !sourcePalletIds.Any())
+    //            return;
+
+    //        var sources = sourcePalletIds
+    //            .Where(x => x != targetPalletId)
+    //            .Distinct()
+    //            .ToList();
+
+    //        if (!sources.Any())
+    //            return;
+
+    //        var idList = string.Join(",", sources);
+
+    //        string sql = $@"
+
+    //-- 1️⃣ Move workorders
+    //UPDATE {TablePalletWorkOrders}
+    //SET PalletId = {targetPalletId}
+    //WHERE PalletId IN ({idList});
+
+    //-- 2️⃣ Delete source pallets (but not shipped)
+    //DELETE FROM {TablePallets}
+    //WHERE Id IN ({idList})
+    //AND State != {(int)PalletState.Shipped};
+
+    //-- 3️⃣ Reset target pallet state (contents changed)
+    //UPDATE {TablePallets}
+    //SET State = {(int)PalletState.NotReady}
+    //WHERE Id = {targetPalletId};
+
+    //-- 4️⃣ Update parent job timestamp
+    //UPDATE {TableJobs}
+    //SET LastUpdated = datetime('now','localtime')
+    //WHERE Id = (
+    //    SELECT PBJobId
+    //    FROM {TablePallets}
+    //    WHERE Id = {targetPalletId}
+    //);
+    //";
+
+    //        await ExecuteAsync(sql);
+    //    }
     public static async Task MergePalletsIntoAsync(
-    IEnumerable<int> sourcePalletIds,
-    int targetPalletId)
+        IEnumerable<int> sourcePalletIds,
+        int targetPalletId)
     {
         if (sourcePalletIds == null || !sourcePalletIds.Any())
             return;
@@ -723,22 +834,17 @@ AND changes() > 0;
 
         string sql = $@"
 
--- 1️⃣ Move workorders
 UPDATE {TablePalletWorkOrders}
 SET PalletId = {targetPalletId}
 WHERE PalletId IN ({idList});
 
--- 2️⃣ Delete source pallets (but not shipped)
 DELETE FROM {TablePallets}
-WHERE Id IN ({idList})
-AND State != {(int)PalletState.Shipped};
+WHERE Id IN ({idList});
 
--- 3️⃣ Reset target pallet state (contents changed)
 UPDATE {TablePallets}
 SET State = {(int)PalletState.NotReady}
 WHERE Id = {targetPalletId};
 
--- 4️⃣ Update parent job timestamp
 UPDATE {TableJobs}
 SET LastUpdated = datetime('now','localtime')
 WHERE Id = (
@@ -748,7 +854,31 @@ WHERE Id = (
 );
 ";
 
-        await ExecuteAsync(sql);
+        Debug.WriteLine("=== MERGE PALLETS SQL ===");
+        Debug.WriteLine(sql);
+
+        var result = await ExecuteAsync(sql);
+
+        Debug.WriteLine($"Rows affected: {result.RowsAffected}");
+    }
+
+    public static async Task<int?> GetActivePalletIdAsync(int jobId)
+    {
+        string sql = $@"
+SELECT Id
+FROM {TablePallets}
+WHERE PBJobId = {jobId}
+AND State = {(int)PalletState.NotReady}
+AND PackedAt IS NULL
+LIMIT 1;
+";
+
+        var result = await ExecuteScalarAsync(sql);
+
+        if (result == null)
+            return null;
+
+        return Convert.ToInt32(result);
     }
 
     // ======================
@@ -1351,6 +1481,8 @@ WHERE Id = {jobId};
     public static async Task<RqliteWriteResult> SaveWorkOrdersAsync(
     int palletId,
     List<WorkOrder> workOrders)
+
+
     {
         if (workOrders == null || !workOrders.Any())
             return new RqliteWriteResult { Success = true, RowsAffected = 0 };

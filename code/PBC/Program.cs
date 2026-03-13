@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace WindowsFormsApp1
 {
-    internal static class Program
+    public static class Program
     {
         public static INIClass AppINI;
 
@@ -41,7 +41,7 @@ namespace WindowsFormsApp1
                 return;
             }
 
-            Application.Run(new Main());
+            Application.Run(new PBCMain());
         }
     }
 }

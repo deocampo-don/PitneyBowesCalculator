@@ -21,7 +21,8 @@ namespace WindowsFormsApp1
         public CreatePBJobDialog()
         {
             InitializeComponent();
-            FormHelper.ApplyRoundedCorners(this, 20);
+            FormHelper.ApplyRoundedCorners(this);
+            ShadowHelper.ApplyShadow(this);
             this.KeyPreview = true; this.KeyDown += RoundedModal_KeyDown;
         }
         public CreatePBJobDialog(PbJobModel job) : this()

@@ -2,7 +2,7 @@
 
 namespace WindowsFormsApp1
 {
-    partial class Main
+    partial class PBCMain
     {
         /// <summary>
         /// Required designer variable.
@@ -891,7 +891,7 @@ namespace WindowsFormsApp1
             btnSettings.Values.Text = "";
             btnSettings.Click += btnSettings_Click;
             // 
-            // Main
+            // PBCMain
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -902,7 +902,7 @@ namespace WindowsFormsApp1
             Controls.Add(pnlHeader);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            Name = "Main";
+            Name = "PBCMain";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "iu8";
             Load += Form1_Shown;

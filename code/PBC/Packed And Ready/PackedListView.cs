@@ -15,29 +15,51 @@ namespace WindowsFormsApp1.Packed_And_Ready
         }
         public event EventHandler<PbJobModel> PackedDataChanged;
 
+        //public void SetItems(IEnumerable<PbJobModel> items)
+        //{
+        //    packedFlowRow.SuspendLayout();
+        //    packedFlowRow.Controls.Clear();
+
+        //    var list = items.ToList();
+        //    for (int i = 0; i < list.Count; i++)
+        //    {
+        //        var job = list[i]; // capture properly
+
+        //        var row = new PackedRowControl();
+        //        row.Bind(job);
+        //        AddRow(row);
+
+        //        row.ViewDialogClosed += (_, __) =>
+        //        {
+        //            PackedDataChanged?.Invoke(this, job);
+        //        };
+        //    }
+
+        //    packedFlowRow.ResumeLayout();
+        //}
         public void SetItems(IEnumerable<PbJobModel> items)
         {
             packedFlowRow.SuspendLayout();
             packedFlowRow.Controls.Clear();
 
             var list = items.ToList();
+
             for (int i = 0; i < list.Count; i++)
             {
-                var job = list[i]; // capture properly
+                var job = list[i]; // capture correctly
 
                 var row = new PackedRowControl();
                 row.Bind(job);
-                AddRow(row);
 
                 row.ViewDialogClosed += (_, __) =>
                 {
                     PackedDataChanged?.Invoke(this, job);
                 };
+
+                AddRow(row);
             }
 
-
-
-            packedFlowRow.ResumeLayout(); 
+            packedFlowRow.ResumeLayout();
         }
 
         public void BeginUpdate()
@@ -62,17 +84,21 @@ namespace WindowsFormsApp1.Packed_And_Ready
         {
             return packedFlowRow.Controls
                 .OfType<PackedRowControl>()
-                .Where(r =>
+                .Select(r => r.BoundJob)
+                .Where(job =>
                 {
-                    var job = r.GetModel();
+                    var activePallets = job.Pallets?
+                        .Where(p =>
+                            p.State != PalletState.NotReady &&
+                            p.State != PalletState.Shipped)
+                        .ToList();
 
-                    bool allPacked =
-                        job.Pallets.Any() &&
-                        job.Pallets.All(p => p.State == PalletState.Packed);
-
-                    return r.IsReady() && allPacked;
+                    return activePallets != null &&
+                           activePallets.Count > 0 &&
+                           activePallets.All(p =>
+                               p.State == PalletState.Ready &&
+                               p.PackedAt.HasValue);
                 })
-                .Select(r => r.GetModel())
                 .ToList();
         }
 

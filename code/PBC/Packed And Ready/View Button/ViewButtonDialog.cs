@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Linq;
@@ -346,11 +347,14 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
         private async void btnRemovePallet_Click_1(object sender, EventArgs e)
         {
+           
+
             var selectedIndices = lvPallet.GetSelectedIndices();
 
             if (selectedIndices == null || selectedIndices.Count == 0)
             {
-                MessageBox.Show("Please select at least one pallet using the checkbox.");
+                Debug.WriteLine("No pallets selected.");
+                MessageBox.Show("Please select at least one pallet.");
                 return;
             }
 
@@ -358,91 +362,121 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                 .Select(i => _job.Pallets[i])
                 .ToList();
 
-            var selectedPacked = selectedPallets
-                .Where(p => p.State == PalletState.Packed)
-                .ToList();
-
-            var selectedUnpacked = selectedPallets
-                .Where(p => p.State == PalletState.NotReady)
-                .ToList();
-
-            var ongoing = _job.Pallets
-                .FirstOrDefault(p => p.State == PalletState.NotReady);
-
-            using (var dlg = new RemovePallets(ongoing != null))
+          
+            foreach (var p in selectedPallets)
             {
-                if (dlg.ShowDialog(this) != DialogResult.OK)
-                    return;
+                Debug.WriteLine(
+                    $"PalletId={p.PalletId}, State={p.State}, PackedAt={p.PackedAt}, IsShipped={p.IsShipped}");
+            }
 
-                try
+            if (!selectedPallets.All(p => p.State == PalletState.Ready))
+            {
+    
+                MessageBox.Show(
+                    "Only packed pallets (Ready) can be removed.",
+                    "Invalid Selection",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            var palletIds = selectedPallets
+                .Select(p => p.PalletId)
+                .Where(id => id > 0)
+                .ToList();
+
+            Debug.WriteLine("PalletIds selected: " + string.Join(",", palletIds));
+
+            if (!palletIds.Any())
+            {
+                Debug.WriteLine("Invalid pallet selection.");
+                MessageBox.Show("Invalid pallet selection.");
+                return;
+            }
+
+            try
+            {
+          
+
+                var activePalletId = await RqliteClient.GetActivePalletIdAsync(_job.JobId);
+
+           
+
+                bool hasActivePallet = activePalletId != null;
+
+      
+
+                using (var dlg = new RemovePallets(hasActivePallet))
                 {
-                    // =======================
-                    // MERGE
-                    // =======================
-                    if (dlg.Action == RemovePallets.RemoveAction.Merge)
+                 
+
+                    if (dlg.ShowDialog(this) != DialogResult.OK)
                     {
-                        if (ongoing == null)
-                        {
-                            MessageBox.Show("No active pallet available to merge into.");
-                            return;
-                        }
-
-                        if (selectedUnpacked.Any())
-                        {
-                            MessageBox.Show(
-                                "You cannot merge because the ongoing pallet is also selected.\n\nPlease uncheck the unpacked pallet.",
-                                "Invalid Merge",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Warning);
-                            return;
-                        }
-
-                        var sourceIds = selectedPacked
-                            .Select(p => p.PalletId)
-                            .ToList();
-
-                        if (!sourceIds.Any())
-                        {
-                            MessageBox.Show("Only packed pallets can be merged.");
-                            return;
-                        }
-
-                        await RqliteClient.MergePalletsIntoAsync(
-                            sourceIds,
-                            ongoing.PalletId);
-
-                        DataChanged = true;
-                        Close();
+             
                         return;
                     }
 
-                    // =======================
-                    // DELETE
-                    // =======================
-                    if (dlg.Action == RemovePallets.RemoveAction.Delete)
+                  
+
+                    switch (dlg.Action)
                     {
-                        var palletIds = selectedPallets
-                            .Select(p => p.PalletId)
-                            .Where(id => id > 0)
-                            .ToList();
+                        case RemovePallets.RemoveAction.Merge:
 
-                        if (!palletIds.Any())
-                        {
-                            MessageBox.Show("Invalid pallet selection.");
+                      
+
+                            if (activePalletId == null)
+                            {
+                            
+                                MessageBox.Show("Active pallet no longer exists. Please refresh.");
+                                return;
+                            }
+
+                            await RqliteClient.MergePalletsIntoAsync(
+                                palletIds,
+                                activePalletId.Value);
+
+                         
+                            break;
+
+                        case RemovePallets.RemoveAction.Delete:
+
+                       
+
+                            await RqliteClient.DeletePalletsAsync(palletIds);
+
+                     
+                            break;
+
+                        case RemovePallets.RemoveAction.UndoPack:
+
+                    
+
+                            await RqliteClient.UndoPackedPalletAsync(
+                                palletIds,
+                                _job.JobId);
+
+                        
+                            break;
+
+                        default:
+                        
                             return;
-                        }
-
-                        await RqliteClient.DeletePalletsAsync(palletIds);
-
-                        DataChanged = true;
-                        Close();
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error processing pallets:\n\n" + ex.Message);
-                }
+
+             
+                DataChanged = true;
+
+             
+                Close();
+            }
+            catch (Exception ex)
+            {
+           
+                MessageBox.Show("Error processing pallets:\n\n" + ex.Message);
             }
         }
+      
     }
-}
+    }
+

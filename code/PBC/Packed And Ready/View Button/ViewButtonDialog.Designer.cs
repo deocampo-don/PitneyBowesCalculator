@@ -111,10 +111,11 @@
             // txtPackedTime
             // 
             txtPackedTime.AutoSize = false;
-            txtPackedTime.Location = new System.Drawing.Point(513, 32);
+            txtPackedTime.Location = new System.Drawing.Point(501, 32);
             txtPackedTime.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             txtPackedTime.Name = "txtPackedTime";
-            txtPackedTime.Size = new System.Drawing.Size(73, 22);
+            txtPackedTime.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            txtPackedTime.Size = new System.Drawing.Size(85, 22);
             txtPackedTime.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
             txtPackedTime.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             txtPackedTime.TabIndex = 59;
@@ -161,7 +162,7 @@
             lblPackedTime.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             lblPackedTime.Name = "lblPackedTime";
             lblPackedTime.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            lblPackedTime.Size = new System.Drawing.Size(267, 22);
+            lblPackedTime.Size = new System.Drawing.Size(254, 22);
             lblPackedTime.StateCommon.ShortText.Color1 = System.Drawing.Color.Black;
             lblPackedTime.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             lblPackedTime.TabIndex = 4;

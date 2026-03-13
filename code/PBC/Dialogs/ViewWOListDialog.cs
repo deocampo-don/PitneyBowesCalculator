@@ -16,7 +16,9 @@ namespace WindowsFormsApp1
         public ViewWOListDialog()
         {
             InitializeComponent();
-            FormHelper.ApplyRoundedCorners(this, 20);
+            FormHelper.ApplyRoundedCorners(this);
+            ShadowHelper.ApplyShadow(this);
+
         }
 
         public void SetItems(string jobName, string jobNum, IEnumerable<WorkOrder> items)

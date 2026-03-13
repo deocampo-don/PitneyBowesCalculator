@@ -21,6 +21,8 @@ namespace WindowsFormsApp1.Dialogs
         public LoginDialog(string frm)
         {
             InitializeComponent();
+            FormHelper.ApplyRoundedCorners(this);
+            ShadowHelper.ApplyShadow(this);
             this.DialogMode = frm;
         }
         private void LoginDialog_Load(object sender, EventArgs e)

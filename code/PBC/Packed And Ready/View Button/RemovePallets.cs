@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -15,6 +14,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         public enum RemoveAction
         {
             None,
+            UndoPack,
             Delete,
             Merge
         }
@@ -50,8 +50,14 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
             pnlHeader.MouseDown += pnlHeader_MouseDown;
 
-            // Extra buttons hidden by default
+            // Default UI state
             btnCancel1.Visible = false;
+
+            if (!_hasActivePallet)
+            {
+                // No merge scenario
+                btnNo1.Visible = false;
+            }
         }
 
         /* -------------------------------------------------------------
@@ -71,10 +77,10 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
          * ------------------------------------------------------------- */
         private async void btnYes1_Click(object sender, EventArgs e)
         {
-            // CASE 1: No active pallet → delete immediately
+            // CASE 1: No active pallet → undo pack
             if (!_hasActivePallet)
             {
-                Action = RemoveAction.Delete;
+                Action = RemoveAction.UndoPack;
                 DialogResult = DialogResult.OK;
                 Close();
                 return;
@@ -84,8 +90,10 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             if (!firstYesClicked)
             {
                 firstYesClicked = true;
+
                 await RunExpandAnimationAsync();
                 SwitchToMergeUI();
+
                 return;
             }
 
@@ -100,16 +108,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
          * ------------------------------------------------------------- */
         private void btnNo1_Click(object sender, EventArgs e)
         {
-            // If no active pallet → NO means cancel
-            if (!_hasActivePallet)
-            {
-                DialogResult = DialogResult.Cancel;
-                Close();
-                return;
-            }
-
-            // If active pallet exists and animation not yet shown → NO means cancel
-            if (!firstYesClicked)
+            // If user presses NO before merge options appear → cancel
+            if (!_hasActivePallet || !firstYesClicked)
             {
                 DialogResult = DialogResult.Cancel;
                 Close();
@@ -140,6 +140,22 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         /* -------------------------------------------------------------
          * ANIMATION
          * ------------------------------------------------------------- */
+        //private async Task RunExpandAnimationAsync()
+        //{
+        //    int targetHeight = 330;
+        //    int step = 10;
+        //    int delay = 3;
+
+        //    int bottom = Top + Height;
+
+        //    while (Height < targetHeight)
+        //    {
+        //        Height = Math.Min(Height + step, targetHeight);
+        //        Top = bottom - Height;
+
+        //        await Task.Delay(delay);
+        //    }
+        //}
         private async Task RunExpandAnimationAsync()
         {
             int targetHeight = 330;
@@ -152,10 +168,15 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             {
                 Height = Math.Min(Height + step, targetHeight);
                 Top = bottom - Height;
+
                 await Task.Delay(delay);
             }
-        }
 
+            // Force layout refresh
+            groupBox1.Refresh();
+            panel1.Refresh();
+            Refresh();
+        }
         /* -------------------------------------------------------------
          * SWITCH UI TO MERGE MODE
          * ------------------------------------------------------------- */

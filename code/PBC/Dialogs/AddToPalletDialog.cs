@@ -23,9 +23,12 @@ namespace WindowsFormsApp1.Dialogs
         private string _preparedCpsQuery;
         private int _baseEnvelopeQty;
         private int _baseScannedWO;
+        private bool _scanInProgress = false;
         public AddToPalletDialog(int envelopeQty, int scannedWO)
         {
             InitializeComponent();
+            FormHelper.ApplyRoundedCorners(this);
+            ShadowHelper.ApplyShadow(this);
             txtEnvelopeQty.Text = "0";
             txtScannedWO.Text = "0";
             tbWoBarcode.Text = string.Empty;
@@ -37,7 +40,7 @@ namespace WindowsFormsApp1.Dialogs
             PrepareCpsQuery();
             SettingsDialogAdmin.OnCpsConfigUpdated += async () =>
             {
-                await Main.LoadCPSConfig();
+                await PBCMain.LoadCPSConfig();
                 PrepareCpsQuery();
             };
             _baseEnvelopeQty = envelopeQty;
@@ -47,120 +50,16 @@ namespace WindowsFormsApp1.Dialogs
 
 
         }
-        //private async void TbWoBarcode_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    if (e.KeyCode != Keys.Enter)
-        //        return;
 
-        //    e.Handled = true;
-        //    e.SuppressKeyPress = true;
-
-        //    var barcodeValue = tbWoBarcode.Text?.Trim();
-
-        //    if (string.IsNullOrWhiteSpace(barcodeValue))
-        //        return;
-
-        //    if (_scannedCodes.Contains(barcodeValue))
-        //    {
-        //        System.Media.SystemSounds.Beep.Play();
-        //        tbWoBarcode.SelectAll();
-        //        MessageBox.Show("You've already scanned this barcode!");
-        //        return;
-        //    }
-
-        //    var checkValue = await IsValueValid(barcodeValue);
-
-        //    if (!checkValue.IsValid)
-        //    {
-        //        MessageBox.Show(checkValue.Message);
-        //        tbWoBarcode.SelectAll();
-        //        return;
-        //    }
-
-        //    bool isCPSBarcodeScanned = (Apos != -1) && (Bpos != -1);
-
-        //    if (!isCPSBarcodeScanned)
-        //    {
-        //        MessageBox.Show("Invalid CPS barcode.");
-        //        tbWoBarcode.SelectAll();
-        //        return;
-        //    }
-
-        //    string woID = barcodeValue.Substring(Apos + 1, Bpos - Apos - 1).ToUpper();
-        //    string woNSID = barcodeValue.Substring(0, Apos).ToUpper();
-
-        //    int envQty = 0;
-        //    string workOrderCode = "";
-
-        //    try
-        //    {
-        //        if (string.IsNullOrEmpty(Main.CPSConnectionString))
-        //        {
-        //            MessageBox.Show("CPS Database Connection String is empty!");
-        //            return;
-        //        }
-        //        Utils.showStatusAndSpinner(lbStatus, pbSpinner, "Checking...");
-        //        string sqlQuery = _preparedCpsQuery;
-
-        //        using (var connection = new SqlConnection(Main.CPSConnectionString))
-        //        {
-        //            await connection.OpenAsync();
-
-        //            using (var command = new SqlCommand(sqlQuery, connection))
-        //            {
-        //                command.Parameters.AddWithValue("@woID", woID);
-        //                command.Parameters.AddWithValue("@woNSID", woNSID);
-
-        //                using (var reader = await command.ExecuteReaderAsync())
-        //                {
-        //                    if (reader.HasRows && await reader.ReadAsync())
-        //                    {
-        //                        workOrderCode = reader["WOName"]?.ToString() ?? "";
-        //                        envQty = Convert.ToInt32(reader["items"]);
-
-        //                        Utils.hideStatusAndSpinner(lbStatus, pbSpinner, workOrderCode);
-        //                    }
-        //                    else
-        //                    {
-        //                        MessageBox.Show("Scanned Work Order not found.");
-        //                        pbSpinner.Visible = false;
-        //                        lbStatus.Visible = false;
-        //                        return;
-        //                    }
-        //                }
-        //            }
-        //        }
-
-        //        var workOrder = new WorkOrder(workOrderCode, envQty)
-        //        {
-        //            Barcode = barcodeValue
-        //        };
-
-        //        workOrder.RecordScan();
-
-        //        _sessionWorkOrders.Add(workOrder);
-        //        _scannedCodes.Add(barcodeValue);
-
-        //        txtEnvelopeQty.Text =
-        //            _sessionWorkOrders.Sum(x => x.Quantity).ToString("N0");
-
-        //        txtScannedWO.Text =
-        //            _sessionWorkOrders.Count.ToString();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show("Error scanning barcode:\n" + ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        tbWoBarcode.Clear();
-        //        tbWoBarcode.Focus();
-        //    }
-        //}
         private async void TbWoBarcode_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter)
                 return;
+
+            if (_scanInProgress)
+                return;
+
+            _scanInProgress = true;
 
             e.Handled = true;
             e.SuppressKeyPress = true;
@@ -168,56 +67,53 @@ namespace WindowsFormsApp1.Dialogs
             var barcodeValue = tbWoBarcode.Text?.Trim();
 
             if (string.IsNullOrWhiteSpace(barcodeValue))
+            {
+                _scanInProgress = false;
                 return;
+            }
 
             if (_scannedCodes.Contains(barcodeValue))
             {
                 System.Media.SystemSounds.Beep.Play();
                 tbWoBarcode.SelectAll();
                 MessageBox.Show("You've already scanned this barcode!");
+                _scanInProgress = false;
                 return;
             }
-
-            var checkValue = await IsValueValid(barcodeValue);
-
-            if (!checkValue.IsValid)
-            {
-                MessageBox.Show(checkValue.Message);
-                tbWoBarcode.SelectAll();
-                return;
-            }
-
-            bool isCPSBarcodeScanned = (Apos != -1) && (Bpos != -1);
-
-            if (!isCPSBarcodeScanned)
-            {
-                MessageBox.Show("Invalid CPS barcode.");
-                tbWoBarcode.SelectAll();
-                return;
-            }
-
-            string woID = barcodeValue.Substring(Apos + 1, Bpos - Apos - 1).ToUpper();
-            string woNSID = barcodeValue.Substring(0, Apos).ToUpper();
-
-            int envQty = 0;
-            string workOrderCode = "";
 
             try
             {
-                if (string.IsNullOrEmpty(Main.CPSConnectionString))
+                var checkValue = await IsValueValid(barcodeValue);
+
+                if (!checkValue.IsValid)
                 {
-                    MessageBox.Show("CPS Database Connection String is empty!");
+                    MessageBox.Show(checkValue.Message);
+                    tbWoBarcode.SelectAll();
                     return;
                 }
-                Utils.showStatusAndSpinner(lbStatus, pbSpinner, "Checking...");
-                string sqlQuery = _preparedCpsQuery;
-               
 
-                using (var connection = new SqlConnection(Main.CPSConnectionString))
+                bool isCPSBarcodeScanned = (Apos != -1) && (Bpos != -1);
+
+                if (!isCPSBarcodeScanned)
+                {
+                    MessageBox.Show("Invalid CPS barcode.");
+                    tbWoBarcode.SelectAll();
+                    return;
+                }
+
+                string woID = barcodeValue.Substring(Apos + 1, Bpos - Apos - 1).ToUpper();
+                string woNSID = barcodeValue.Substring(0, Apos).ToUpper();
+
+                int envQty = 0;
+                string workOrderCode = "";
+
+                Utils.showStatusAndSpinner(lbStatus, pbSpinner, "Checking...");
+
+                using (var connection = new SqlConnection(PBCMain.CPSConnectionString))
                 {
                     await connection.OpenAsync();
 
-                    using (var command = new SqlCommand(sqlQuery, connection))
+                    using (var command = new SqlCommand(_preparedCpsQuery, connection))
                     {
                         command.Parameters.AddWithValue("@woID", woID);
                         command.Parameters.AddWithValue("@woNSID", woNSID);
@@ -228,19 +124,17 @@ namespace WindowsFormsApp1.Dialogs
                             {
                                 workOrderCode = reader["WOName"]?.ToString() ?? "";
                                 envQty = Convert.ToInt32(reader["items"]);
-
-                                Utils.hideStatusAndSpinner(lbStatus, pbSpinner, workOrderCode);
                             }
                             else
                             {
                                 MessageBox.Show("Scanned Work Order not found.");
-                                pbSpinner.Visible = false;
-                                lbStatus.Visible = false;
                                 return;
                             }
                         }
                     }
                 }
+
+                Utils.hideStatusAndSpinner(lbStatus, pbSpinner, workOrderCode);
 
                 var workOrder = new WorkOrder(workOrderCode, envQty)
                 {
@@ -255,11 +149,8 @@ namespace WindowsFormsApp1.Dialogs
                 int sessionEnv = _sessionWorkOrders.Sum(x => x.Quantity);
                 int sessionWO = _sessionWorkOrders.Count;
 
-                txtEnvelopeQty.Text =
-                    (_baseEnvelopeQty + sessionEnv).ToString("N0");
-
-                txtScannedWO.Text =
-                    (_baseScannedWO + sessionWO).ToString();
+                txtEnvelopeQty.Text = (_baseEnvelopeQty + sessionEnv).ToString("N0");
+                txtScannedWO.Text = (_baseScannedWO + sessionWO).ToString();
             }
             catch (Exception ex)
             {
@@ -269,6 +160,7 @@ namespace WindowsFormsApp1.Dialogs
             {
                 tbWoBarcode.Clear();
                 tbWoBarcode.Focus();
+                _scanInProgress = false;
             }
         }
 
@@ -296,11 +188,11 @@ namespace WindowsFormsApp1.Dialogs
 
         private void PrepareCpsQuery()
         {
-            if (string.IsNullOrWhiteSpace(Main.DbCpsConfig?.CpsQuery))
+            if (string.IsNullOrWhiteSpace(PBCMain.DbCpsConfig?.CpsQuery))
                 throw new Exception("CPS query is not configured.");
 
             _preparedCpsQuery = Utils.AddFilterClause(
-                Main.DbCpsConfig.CpsQuery,
+                PBCMain.DbCpsConfig.CpsQuery,
                 "PWO.ID = @woID AND PWO.NSID = @woNSID"
             );
         }

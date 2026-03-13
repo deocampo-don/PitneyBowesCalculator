@@ -2,23 +2,32 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 public static class FormHelper
 {
-    public static void ApplyRoundedCorners(Form form, int radius)
+    private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+    private const int DWMWCP_ROUND = 2;
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(
+        IntPtr hwnd,
+        int attr,
+        ref int attrValue,
+        int attrSize
+    );
+
+    public static void ApplyRoundedCorners(Form form)
     {
-        form.FormBorderStyle = FormBorderStyle.None;
+        int preference = DWMWCP_ROUND;
 
-        GraphicsPath path = new GraphicsPath();
-        path.StartFigure();
-        path.AddArc(new Rectangle(0, 0, radius, radius), 180, 90);
-        path.AddArc(new Rectangle(form.Width - radius, 0, radius, radius), 270, 90);
-        path.AddArc(new Rectangle(form.Width - radius, form.Height - radius, radius, radius), 0, 90);
-        path.AddArc(new Rectangle(0, form.Height - radius, radius, radius), 90, 90);
-        path.CloseFigure();
-
-        form.Region = new Region(path);
+        DwmSetWindowAttribute(
+            form.Handle,
+            DWMWA_WINDOW_CORNER_PREFERENCE,
+            ref preference,
+            sizeof(int)
+        );
     }
 }
 
@@ -102,5 +111,59 @@ public class RoundedPanel : Panel
 
         path.CloseFigure();
         return path;
+    }
+}
+
+public static class ShadowHelper
+{
+    private const int DWMWA_NCRENDERING_POLICY = 2;
+    private const int DWMNCRP_ENABLED = 2;
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(
+        IntPtr hwnd,
+        int attr,
+        ref int attrValue,
+        int attrSize
+    );
+
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmExtendFrameIntoClientArea(
+        IntPtr hwnd,
+        ref MARGINS margins
+    );
+
+    private struct MARGINS
+    {
+        public int cxLeftWidth;
+        public int cxRightWidth;
+        public int cyTopHeight;
+        public int cyBottomHeight;
+    }
+
+    public static void ApplyShadow(Form form)
+    {
+        if (!Environment.OSVersion.Version.ToString().StartsWith("6") &&
+            !Environment.OSVersion.Version.ToString().StartsWith("10"))
+            return;
+
+        int val = DWMNCRP_ENABLED;
+
+        DwmSetWindowAttribute(
+            form.Handle,
+            DWMWA_NCRENDERING_POLICY,
+            ref val,
+            Marshal.SizeOf(val)
+        );
+
+        MARGINS margins = new MARGINS()
+        {
+            cxLeftWidth = 1,
+            cxRightWidth = 1,
+            cyTopHeight = 1,
+            cyBottomHeight = 1
+        };
+
+        DwmExtendFrameIntoClientArea(form.Handle, ref margins);
     }
 }

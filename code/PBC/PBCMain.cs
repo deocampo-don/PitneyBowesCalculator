@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,7 @@ using WindowsFormsApp1.Properties;
 
 namespace WindowsFormsApp1
 {
-    public partial class Main : Form
+    public partial class PBCMain : Form
     {
         // -----------------------------
         // Fields
@@ -40,7 +41,7 @@ namespace WindowsFormsApp1
         // -----------------------------
         // Constructor
         // -----------------------------
-        public Main()
+        public PBCMain()
         {
             InitializeComponent();
         
@@ -51,12 +52,6 @@ namespace WindowsFormsApp1
 
             // UI event wiring
             UiEvents();
-
-
-            //StartPosition = FormStartPosition.Manual;
-            //var screen = Screen.FromPoint(Cursor.Position);
-            //Bounds = screen.WorkingArea;
-            //WindowState = FormWindowState.Normal;
 
             StartPosition = FormStartPosition.Manual;
 
@@ -84,31 +79,7 @@ namespace WindowsFormsApp1
                 ShowDatabaseError(ex);
             }
         }
-        // -----------------------------
-        // ⭐ rqlite Initialization
-        // -----------------------------
-        //private async Task InitializeRqliteAsync()
-        //{
-        //    if (RqliteClient.httpClient == null)
-        //    {
-        //        ServicePointManager.Expect100Continue = false;
 
-        //        var handler = new HttpClientHandler
-        //        {
-        //            ServerCertificateCustomValidationCallback =
-        //                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-        //        };
-
-        //        var client = new HttpClient(handler)
-        //        {
-        //            BaseAddress = new Uri(Program.AppINI._rqClientAddress.Trim()),
-        //            Timeout = TimeSpan.FromSeconds(30)
-        //        };
-
-        //        RqliteClient.httpClient = client;
-        //        RqliteClient.DefaultEndPoint = Program.AppINI._rqClientAddress.Trim();
-        //    }
-        //}
         private async Task InitializeRqliteAsync()
         {
             while (true)
@@ -484,13 +455,10 @@ namespace WindowsFormsApp1
             RefreshAllViews();
         }
 
-        private void PackedListView2_PackedDataChanged(object sender, PbJobModel job)
+        private async void PackedListView2_PackedDataChanged(object sender, PbJobModel job)
         {
-            RefreshAllViews();
+            await RefreshSingleJobAsync(job.JobId);
         }
-
- 
-
         private void ShowDatabaseError(Exception ex)
         {
             MessageBox.Show(
@@ -580,44 +548,45 @@ namespace WindowsFormsApp1
            
             lvBuild?.SetItems(_pbJobs);
             var activeJobs = _pbJobs
-                .Select(job =>
-                {
-                    var activePallets = job.Pallets
-                        .Where(p => p.State != PalletState.Shipped)
-                        .Select(p => new Pallet
-                        {
-                            PalletId = p.PalletId,
-                            PBJobId = p.PBJobId,
-                            PalletNumber = p.PalletNumber,
-                            PackedAt = p.PackedAt,
-                            ShippedAt = p.ShippedAt,
-                            TrayCount = p.TrayCount,
-                            State = p.State,
-                            WorkOrders = p.WorkOrders
-                                .Select(w => new WorkOrder(w.WorkOrderCode, w.Quantity)
-                                {
-                                    Id = w.Id,
-                                    PalletId = w.PalletId
-                                })
-                                .ToList()
-                        })
-                        .ToList();
+     .Select(job =>
+     {
+         var activePallets = job.Pallets
+             .Where(p => p.State == PalletState.Ready ||
+                         p.State == PalletState.Packed_NotReady)
+             .Select(p => new Pallet
+             {
+                 PalletId = p.PalletId,
+                 PBJobId = p.PBJobId,
+                 PalletNumber = p.PalletNumber,
+                 PackedAt = p.PackedAt,
+                 ShippedAt = p.ShippedAt,
+                 TrayCount = p.TrayCount,
+                 State = p.State,
+                 WorkOrders = p.WorkOrders
+                     .Select(w => new WorkOrder(w.WorkOrderCode, w.Quantity)
+                     {
+                         Id = w.Id,
+                         PalletId = w.PalletId
+                     })
+                     .ToList()
+             })
+             .ToList();
 
-                    if (!activePallets.Any())
-                        return null;
+         if (!activePallets.Any())
+             return null;
 
-                    return new PbJobModel
-                    {
-                        JobId = job.JobId,
-                        JobName = job.JobName,
-                        JobNumber = job.JobNumber,
-                        IsTemp = job.IsTemp,
-                        LastUpdated = job.LastUpdated,
-                        Pallets = activePallets
-                    };
-                })
-                .Where(j => j != null)
-                .ToList();
+         return new PbJobModel
+         {
+             JobId = job.JobId,
+             JobName = job.JobName,
+             JobNumber = job.JobNumber,
+             IsTemp = job.IsTemp,
+             LastUpdated = job.LastUpdated,
+             Pallets = activePallets
+         };
+     })
+     .Where(j => j != null)
+     .ToList();
 
             packedListView2?.SetItems(activeJobs);
 
@@ -729,15 +698,60 @@ namespace WindowsFormsApp1
         // -----------------------------
         // Ship Pallets Bar
         // -----------------------------
+        //private async void btnShipPallets_Click(object sender, EventArgs e)
+        //{
+        //    var selectedJobs = packedListView2.GetReadyJobs();
+
+        //    if (!selectedJobs.Any())
+        //    {
+        //        MessageBox.Show("No jobs selected.");
+        //        return;
+        //    }
+
+        //    var confirm = MessageBox.Show(
+        //        $"Ship {selectedJobs.Count} job(s)?",
+        //        "Confirm Shipment",
+        //        MessageBoxButtons.YesNo,
+        //        MessageBoxIcon.Question);
+
+        //    if (confirm != DialogResult.Yes)
+        //        return;
+
+        //    try
+        //    {
+        //        foreach (var job in selectedJobs)
+        //        {         
+        //            await RqliteClient.ShipJobsAsync(new[] { job.JobId });
+        //            await LoadJobsAsync();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ShowDatabaseError(ex);
+        //    }
+        //}
+
+
         private async void btnShipPallets_Click(object sender, EventArgs e)
         {
-            var selectedJobs = packedListView2.GetReadyJobs();
+            Debug.WriteLine("=== Ship Button Clicked ===");
+
+            var selectedJobs = packedListView2.GetReadyJobs().ToList();
+
+            Debug.WriteLine($"Ready jobs found: {selectedJobs.Count}");
 
             if (!selectedJobs.Any())
             {
+                Debug.WriteLine("No jobs selected.");
                 MessageBox.Show("No jobs selected.");
                 return;
             }
+
+            var jobIds = selectedJobs
+                .Select(j => j.JobId)
+                .ToArray();
+
+            Debug.WriteLine($"Job IDs: {string.Join(",", jobIds)}");
 
             var confirm = MessageBox.Show(
                 $"Ship {selectedJobs.Count} job(s)?",
@@ -746,18 +760,30 @@ namespace WindowsFormsApp1
                 MessageBoxIcon.Question);
 
             if (confirm != DialogResult.Yes)
+            {
+                Debug.WriteLine("User cancelled shipment.");
                 return;
+            }
 
             try
             {
-                foreach (var job in selectedJobs)
-                {         
-                    await RqliteClient.ShipJobsAsync(new[] { job.JobId });
-                    await LoadJobsAsync();
-                }
+                Debug.WriteLine("Calling ShipPalletsAsync...");
+
+                await RqliteClient.ShipPalletsAsync(jobIds);
+
+                Debug.WriteLine("ShipPalletsAsync completed.");
+
+                Debug.WriteLine("Reloading jobs...");
+                await LoadJobsAsync();
+
+                Debug.WriteLine("LoadJobsAsync completed.");
+                Debug.WriteLine("=== Ship Process Finished ===");
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("ERROR during shipment:");
+                Debug.WriteLine(ex.ToString());
+
                 ShowDatabaseError(ex);
             }
         }

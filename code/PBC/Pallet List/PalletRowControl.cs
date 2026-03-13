@@ -327,7 +327,18 @@ namespace WindowsFormsApp1
             if (_model == null)
                 return;
 
-            using (var dlg = new AddToPalletDialog(0, 0))
+            // 1️⃣ Find working pallet
+            var pallet = _model.Pallets
+                .FirstOrDefault(p =>
+                    p.State == PalletState.NotReady &&
+                    p.PackedAt == null &&
+                    p.ShippedAt == null);
+
+            // 2️⃣ Get totals
+            int baseEnvelope = pallet?.WorkOrders.Sum(w => w.Quantity) ?? 0;
+            int baseScannedWO = pallet?.WorkOrders.Count ?? 0;
+
+            using (var dlg = new AddToPalletDialog(baseEnvelope, baseScannedWO))
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK)
                     return;
@@ -344,10 +355,11 @@ namespace WindowsFormsApp1
                         .Select(x => x.Barcode)
                         .ToList();
 
-                    // 🔹 Check duplicates against DB BEFORE creating pallet
+                    // 3️⃣ Check duplicates
                     var existing = await RqliteClient.GetExistingBarcodesAsync(scannedBarcodes);
 
                     var duplicates = existing.ToList();
+
                     var validWorkOrders = dlg.ScannedWorkOrders
                         .Where(x => !duplicates.Contains(x.Barcode))
                         .ToList();
@@ -358,27 +370,27 @@ namespace WindowsFormsApp1
                         return;
                     }
 
-                    // 🔹 NOW create/get pallet only if needed
-                    int palletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
-
-                    var pallet = _model.Pallets.FirstOrDefault(p => p.PalletId == palletId);
-
+                    // 4️⃣ Create pallet only if needed
                     if (pallet == null)
                     {
+                        int palletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
+
                         pallet = new Pallet
                         {
                             PalletId = palletId,
-                            PBJobId = _model.JobId
+                            PBJobId = _model.JobId,
+                            WorkOrders = new List<WorkOrder>(),
+                            State = PalletState.NotReady
                         };
 
                         _model.Pallets.Add(pallet);
                     }
 
-                    // save valid items
+                    // 5️⃣ Insert work orders
                     await RqliteClient.SaveWorkOrdersAsync(pallet.PalletId, validWorkOrders);
 
-                    pallet.WorkOrders =
-                        await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
+                    // 6️⃣ Reload pallet
+                    pallet.WorkOrders = await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
 
                     if (duplicates.Any())
                     {

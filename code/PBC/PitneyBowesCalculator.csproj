@@ -62,7 +62,7 @@
 		<Compile Update="Pallet List\PalletRowControl.cs">
 			<SubType>UserControl</SubType>
 		</Compile>
-		<Compile Update="View\WorkOrderRowControl.cs">
+		<Compile Update="Pallet List\View\WorkOrderRowControl.cs">
 			<SubType>UserControl</SubType>
 		</Compile>
 		<None Include="WindowsFormsApp1_TemporaryKey.pfx" />

@@ -11,7 +11,7 @@ using WindowsFormsApp1;
 
 namespace WindowsFormsApp1
 {
-    internal class INIClass
+    public class INIClass
     {
         const string crlf = "\r\n";
         const string quote = "\"";
@@ -28,11 +28,12 @@ namespace WindowsFormsApp1
         internal string _fontName { get; set; }
         internal bool _SkipFormAutoPrint { get; set; }
         internal string _startUpScreen { get; set; }
+        public string StartUpScreen => _startUpScreen;
         internal string _rqClientAddress { get; set; }
         internal int _rqClientMaxRetries { get; set; }
         internal int _rqClientDelayMs { get; set; }
 
-        internal INIClass(string iniFileName)
+        public INIClass(string iniFileName)
         {
             _iniFileName = iniFileName;
             _logFileDir = string.Empty;
@@ -48,7 +49,7 @@ namespace WindowsFormsApp1
             _SkipFormAutoPrint = false;
         }
 
-        internal bool BuildNewIni(out string errMsg)
+        public bool BuildNewIni(out string errMsg)
         {
             string fileName = _iniFileName;
             bool result = true;
@@ -92,7 +93,7 @@ namespace WindowsFormsApp1
 
             return result;
         }
-        internal bool UpdateIni(out string errMsg)
+        public bool UpdateIni(out string errMsg)
         {
             bool result = true;
             errMsg = string.Empty;
