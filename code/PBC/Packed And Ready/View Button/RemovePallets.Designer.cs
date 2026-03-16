@@ -82,7 +82,7 @@
             lblHeader.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             lblHeader.AutoSize = true;
             lblHeader.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            lblHeader.Location = new System.Drawing.Point(6, 55);
+            lblHeader.Location = new System.Drawing.Point(19, 58);
             lblHeader.Name = "lblHeader";
             lblHeader.Size = new System.Drawing.Size(258, 32);
             lblHeader.TabIndex = 3;
@@ -93,7 +93,7 @@
             label1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             label1.AutoSize = true;
             label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label1.Location = new System.Drawing.Point(9, 99);
+            label1.Location = new System.Drawing.Point(20, 98);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(350, 21);
             label1.TabIndex = 4;
@@ -104,7 +104,7 @@
             label2.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             label2.AutoSize = true;
             label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label2.Location = new System.Drawing.Point(9, 119);
+            label2.Location = new System.Drawing.Point(20, 119);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(246, 21);
             label2.TabIndex = 5;

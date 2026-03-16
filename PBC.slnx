@@ -1,7 +1,4 @@
 <Solution>
-  <Folder Name="/Solution Items/">
-    <File Path="../../../../Downloads/launcherBg.jpg" />
-  </Folder>
   <Project Path="code/Launcher/Launcher.csproj" Id="b022937c-4f61-484e-bddf-22b56ac04648" />
   <Project Path="code/PBC/PitneyBowesCalculator.csproj" />
   <Project Path="code/Post List Tool/Post List Tool.csproj" />

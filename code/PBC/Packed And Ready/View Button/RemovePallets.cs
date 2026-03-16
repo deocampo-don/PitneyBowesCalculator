@@ -45,7 +45,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         public RemovePallets(bool hasActivePallet)
         {
             InitializeComponent();
-
+            FormHelper.ApplyRoundedCorners(this);
+            ShadowHelper.ApplyShadow(this);
             _hasActivePallet = hasActivePallet;
 
             pnlHeader.MouseDown += pnlHeader_MouseDown;

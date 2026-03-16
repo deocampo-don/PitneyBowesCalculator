@@ -37,58 +37,6 @@ namespace WindowsFormsApp1.Packed_And_Ready
 
         }
 
-
-        /* -------------------------------------------------------------
-         * DATA BINDING
-         * ------------------------------------------------------------- */
-
-        /// <summary>
-        /// Binds a PB job model to the row and updates all UI fields.
-        /// </summary>
-        //public void Bind(PbJobModel job)
-        //{
-        //    if (job == null)
-        //        return;
-
-        //    BoundJob = job;
-        //    _modelpbjob = job;
-
-        //    txtPBJobName.Text = job.JobName ?? string.Empty;
-        //    txtPBJobNum.Text = job.JobNumber.ToString();
-
-        //    txtEnvelopeQty.Text = job.TotalEnvelopeOfJob.ToString();
-        //    txtPallets.Text = (job.Pallets?.Count ?? 0).ToString();
-        //    txtTrays.Text = job.TotalTraysOfJob.ToString();
-
-        //    // ===== PACK DATE =====
-        //    var hasPackedPallet = job.Pallets?.Any(p => p.PackedAt.HasValue) == true;
-
-        //    txtPackDate.Text = hasPackedPallet
-        //        ? job.EffectivePackDate.ToString("MM/dd/yyyy")
-        //        : "--/--/----";
-
-        //    bool isReady =
-        //              job.Pallets != null &&
-        //              job.Pallets.Count > 0 &&
-        //              job.Pallets.All(p => p.State == PalletState.Packed);
-
-
-
-        //        if (isReady)
-        //        {
-        //            txtStatus.Text = "Ready to Ship";
-        //            txtStatus.StateCommon.ShortText.Color1 =
-        //                ColorTranslator.FromHtml("#34C759"); // green
-        //        }
-        //        else
-        //        {
-        //            txtStatus.Text = "Not Ready";
-        //            txtStatus.StateCommon.ShortText.Color1 =
-        //                ColorTranslator.FromHtml("#FF383C"); // red
-        //        }
-
-        //}
-
         public void Bind(PbJobModel job)
         {
             if (job == null)

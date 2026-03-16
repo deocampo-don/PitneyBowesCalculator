@@ -70,18 +70,12 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                 chkBox.Checked = false;   // safety
                 chkBox.Enabled = false;
             }
-
-
         }
 
 
         /* -------------------------------------------------------------
          * UI EVENT HANDLERS
          * ------------------------------------------------------------- */
-
-
-
-
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public bool IsSelected
@@ -90,16 +84,11 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             set => chkBox.Checked = value;
         }
 
-
         public int PalletIndex => _palletIndex;
 
         private void btnPalletNum_Click(object sender, System.EventArgs e)
         {
-            // TODO: Raise an event or call a callback to notify parent control
-            // Example: Show pallet details, highlight row, etc.
-
-            PalletClicked?.Invoke(_palletIndex);
-
+            PalletClicked?.Invoke(_palletIndex); 
         }
 
 
@@ -121,9 +110,9 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
         }
 
-
         private void chkBox_CheckedChanged(object sender, EventArgs e)
         {
+            SetSelected(chkBox.Checked); // apply violet style
             SelectionChanged?.Invoke(_palletIndex, chkBox.Checked);
         }
 

@@ -12,7 +12,8 @@ namespace WindowsFormsApp1.DIalogs
         public PackPalletDIalog()
         {
             InitializeComponent();
-
+            FormHelper.ApplyRoundedCorners(this);
+            ShadowHelper.ApplyShadow(this);
             // Default UI state
             tbTrays.Text = "0";
             tbTrays.SelectAll();

@@ -25,7 +25,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterParent; // optional: ensure centered
-            CSSDesign.ApplyRoundedCorners(this, 20);
+            FormHelper.ApplyRoundedCorners(this);
+            ShadowHelper.ApplyShadow(this);
             CSSDesign.MakeRounded(btnNo, 15);
             CSSDesign.MakeRounded(btnYes, 15);
             Paint += RemovePallets_Paint;

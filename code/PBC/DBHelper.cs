@@ -557,22 +557,31 @@ WHERE Id = {jobId};
     }
     public static async Task UndoPackedPalletAsync(List<int> palletIds, int jobId)
     {
+        if (palletIds == null || palletIds.Count == 0)
+        {
+            Debug.WriteLine("UndoPackedPalletAsync: palletIds is empty.");
+            return;
+        }
+
         var ids = string.Join(",", palletIds);
+
+        Debug.WriteLine($"UndoPackedPalletAsync: palletIds = {ids}");
+        Debug.WriteLine($"UndoPackedPalletAsync: jobId = {jobId}");
 
         string sql = $@"
 UPDATE {TablePallets}
-SET State = 'NotReady',
+SET State = {(int)PalletState.NotReady},
     PackedAt = NULL
-WHERE PalletId IN ({ids})
-AND State = 'Ready';
+WHERE PalletNumber IN ({ids})
+AND State = {(int)PalletState.Ready};
 
 UPDATE {TableJobs}
 SET LastUpdated = datetime('now','localtime')
 WHERE Id = {jobId};
 ";
 
-        await ExecuteAsync(sql);
-    }
+        var result = await ExecuteAsync(sql);
+   }
     public static async Task<int> TogglePalletReadyAsync(
     int jobId,
     PalletState fromState,

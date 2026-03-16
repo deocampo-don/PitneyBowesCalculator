@@ -1,12 +1,20 @@
-﻿using System;
+﻿using Jds2;
+using Jds2.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+
+
 
 namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 {
@@ -16,10 +24,13 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
          * FIELDS & DATA STORAGE
          * ------------------------------------------------------------- */
 
-        List<Bitmap> pages;
-        int currentPage = 0;
-
         private PbJobModel _job;
+        private List<Pallet> palletsToPrint;
+        private int palletPrintIndex = 0;
+        private int workOrderIndex = 0;
+        private int currentPage = 1;
+        private int totalPages = 1;
+
         public bool DataChanged { get; private set; }
 
         /* -------------------------------------------------------------
@@ -147,7 +158,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
          * ------------------------------------------------------------- */
 
 
-     
+
 
         /* -------------------------------------------------------------
          * PALLET CLICK
@@ -195,159 +206,141 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
       * PRINTING
       * ------------------------------------------------------------- */
 
-        private void printDocument1_PrintPage(object sender, PrintPageEventArgs e)
+
+        private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
         {
-            if (pages == null || currentPage >= pages.Count)
+            if (palletsToPrint == null || palletPrintIndex >= palletsToPrint.Count)
             {
                 e.HasMorePages = false;
-                currentPage = 0;
                 return;
             }
 
-            Bitmap img = pages[currentPage];
+            Pallet pallet = palletsToPrint[palletPrintIndex];
 
-            // Fit-to-page (preserve aspect) using min scale
-            float scale = Math.Min(
-                (float)e.MarginBounds.Width / img.Width,
-                (float)e.MarginBounds.Height / img.Height
+            int left = 60;
+            int colWorkOrder = left;
+            int colQty = 650;
+
+            int y = 50;
+            int bottomLimit = e.MarginBounds.Bottom - 60;
+
+            Font headerFont = new Font("Segoe UI", 18, FontStyle.Bold);
+            Font palletFont = new Font("Segoe UI", 14, FontStyle.Bold);
+            Font labelFont = new Font("Segoe UI", 10, FontStyle.Bold);
+            Font textFont = new Font("Segoe UI", 10);
+            Font footerFont = new Font("Segoe UI", 9);
+
+            Pen linePen = new Pen(Color.Black, 1);
+
+            /* ---------- HEADER ---------- */
+
+            e.Graphics.DrawString($"PB JOB {_job.JobNumber}", headerFont, Brushes.Black, left, y);
+            y += 45;
+
+            e.Graphics.DrawString($"PALLET #{palletPrintIndex + 1}", palletFont, Brushes.Black, left, y);
+            y += 30;
+
+            e.Graphics.DrawString("Printed:", labelFont, Brushes.Black, left, y);
+            e.Graphics.DrawString(DateTime.Now.ToString("MM/dd/yyyy  hh:mm tt"), textFont, Brushes.Black, left + 90, y);
+
+            e.Graphics.DrawString("Packed Date:", labelFont, Brushes.Black, 420, y);
+            e.Graphics.DrawString(
+                pallet.PackedAt?.ToString("MM/dd/yyyy  hh:mm tt") ?? "--",
+                textFont,
+                Brushes.Black,
+                540,
+                y
             );
 
-            int drawW = (int)(img.Width * scale);
-            int drawH = (int)(img.Height * scale);
+            y += 30;
 
-            // Optional: center horizontally
-            int drawX = e.MarginBounds.Left + (e.MarginBounds.Width - drawW) / 2;
-            int drawY = e.MarginBounds.Top;
+            e.Graphics.DrawLine(linePen, left, y, 700, y);
+            y += 25;
 
-            e.Graphics.DrawImage(img, new Rectangle(drawX, drawY, drawW, drawH));
+            /* ---------- PALLET SUMMARY ---------- */
 
-            currentPage++;
-            e.HasMorePages = currentPage < pages.Count;
-        }
+            e.Graphics.DrawString("Envelope Qty :", labelFont, Brushes.Black, left, y);
+            e.Graphics.DrawString(pallet.PalletEnvelopeQty.ToString(), textFont, Brushes.Black, left + 140, y);
 
+            e.Graphics.DrawString("Tray Count :", labelFont, Brushes.Black, 420, y);
+            e.Graphics.DrawString(pallet.TrayCount.ToString(), textFont, Brushes.Black, 540, y);
 
-        Bitmap CaptureControl(Control ctrl)
-        {
-            Bitmap bmp = new Bitmap(ctrl.Width, ctrl.Height);
-            ctrl.DrawToBitmap(bmp, new Rectangle(0, 0, ctrl.Width, ctrl.Height));
-            return bmp;
-        }
+            y += 25;
 
+            e.Graphics.DrawString("Scanned WO :", labelFont, Brushes.Black, left, y);
+            e.Graphics.DrawString(pallet.PalletScannedWO.ToString(), textFont, Brushes.Black, left + 140, y);
 
+            e.Graphics.DrawString("Packed Time :", labelFont, Brushes.Black, 420, y);
+            e.Graphics.DrawString(pallet.PackedAt?.ToString("hh:mm tt") ?? "", textFont, Brushes.Black, 540, y);
 
-        Bitmap CombineVertical(Bitmap top, Bitmap bottom)
-        {
-            Bitmap final = new Bitmap(
-                Math.Max(top.Width, bottom.Width),
-                top.Height + bottom.Height
-            );
+            y += 40;
 
-            using (Graphics g = Graphics.FromImage(final))
+            /* ---------- WORK ORDER HEADER ---------- */
+
+            e.Graphics.DrawString("WORK ORDERS", palletFont, Brushes.Black, left, y);
+            y += 30;
+
+            e.Graphics.DrawLine(linePen, left, y, 700, y);
+            y += 20;
+
+            // Column headers
+            e.Graphics.DrawString("WORK ORDER", labelFont, Brushes.Black, colWorkOrder, y);
+            e.Graphics.DrawString("QTY", labelFont, Brushes.Black, colQty, y);
+
+            y += 20;
+
+            e.Graphics.DrawLine(linePen, left, y, 700, y);
+            y += 20;
+
+            /* ---------- WORK ORDERS ---------- */
+
+            while (workOrderIndex < pallet.WorkOrders.Count)
             {
-                g.DrawImage(top, 0, 0);
-                g.DrawImage(bottom, 0, top.Height);
-            }
+                var wo = pallet.WorkOrders[workOrderIndex];
 
-            return final;
-        }
-
-        Bitmap CaptureScrollablePanel(FlowLayoutPanel flp)
-        {
-            // Ensure layout is up-to-date
-            flp.PerformLayout();
-            flp.Refresh();
-
-            int originalHeight = flp.Height;
-            bool originalAutoScroll = flp.AutoScroll;
-
-            try
-            {
-                // Disable scrolling so DrawToBitmap can "see" everything
-                flp.AutoScroll = false;
-
-                // Compute the real full content height (bottom-most control)
-                int fullHeight = 0;
-                foreach (Control c in flp.Controls)
+                if (y > bottomLimit)
                 {
-                    int bottom = c.Bottom + c.Margin.Bottom;
-                    if (bottom > fullHeight)
-                        fullHeight = bottom;
-                }
-                fullHeight += flp.Padding.Bottom;
-
-                // Expand temporarily to show all rows
-                if (fullHeight < flp.Height)
-                    fullHeight = flp.Height; // safety
-                flp.Height = fullHeight;
-
-                int fullWidth = Math.Max(flp.DisplayRectangle.Width, flp.Width);
-
-                Bitmap bmp = new Bitmap(fullWidth, fullHeight);
-                flp.DrawToBitmap(bmp, new Rectangle(0, 0, fullWidth, fullHeight));
-                return bmp;
-            }
-            finally
-            {
-                // Restore original state
-                flp.Height = originalHeight;
-                flp.AutoScroll = originalAutoScroll;
-                flp.PerformLayout();
-                flp.Refresh();
-            }
-        }
-
-
-        private void SliceIntoPages(Bitmap fullImage, int pageHeight)
-        {
-            pages = new List<Bitmap>();
-            int y = 0;
-
-            while (y < fullImage.Height)
-            {
-                int sliceHeight = Math.Min(pageHeight, fullImage.Height - y);
-
-                Bitmap page = new Bitmap(fullImage.Width, sliceHeight);
-
-                using (Graphics g = Graphics.FromImage(page))
-                {
-                    g.DrawImage(fullImage, new Rectangle(0, 0, page.Width, page.Height),
-                        new Rectangle(0, y, page.Width, sliceHeight), GraphicsUnit.Pixel);
+                    DrawFooter(e);
+                    e.HasMorePages = true;
+                    return;
                 }
 
-                pages.Add(page);
-                y += sliceHeight;
+                e.Graphics.DrawString(wo.WorkOrderCode, textFont, Brushes.Black, colWorkOrder, y);
+                e.Graphics.DrawString(wo.Quantity.ToString(), textFont, Brushes.Black, colQty, y);
+
+                y += 22;
+                workOrderIndex++;
             }
 
+            /* ---------- FOOTER ---------- */
+
+            DrawFooter(e);
+
+            workOrderIndex = 0;
+            palletPrintIndex++;
+
+            e.HasMorePages = palletPrintIndex < palletsToPrint.Count;
         }
 
-        private void btnPrintPallet_Click_1(object sender, EventArgs e)
+        private void DrawFooter(PrintPageEventArgs e)
         {
-            Bitmap bmpDashboard = CaptureControl(pnlDashboard); // header only
-            Bitmap bmpDetails = CaptureScrollablePanel(lvPalletDetails.ScrollContainer);
+            Font footerFont = new Font("Segoe UI", 9);
 
-            Bitmap full = CombineVertical(bmpDashboard, bmpDetails);
+            int footerLineY = e.MarginBounds.Bottom;
 
-            // Slice into reasonable page chunks (pixel units of the bitmap)
-            // 2200–2600 works well for portrait at typical printer DPI when later fit-to-page.
-            SliceIntoPages(full, 2400);
+            e.Graphics.DrawLine(Pens.Gray, e.MarginBounds.Left, footerLineY, e.MarginBounds.Right, footerLineY);
 
-            PrintDocument doc = new PrintDocument();
-            doc.PrintPage += printDocument1_PrintPage;
+            string pageText = $"Page {palletPrintIndex + 1} of {palletsToPrint.Count}";
+            SizeF size = e.Graphics.MeasureString(pageText, footerFont);
 
-            using (var preview = new PrintPreviewDialog
-            {
-                Document = doc,
-                Width = 1200,
-                Height = 800
-            })
-            {
-                preview.ShowDialog(this);
-            }
+            float x = e.MarginBounds.Right - size.Width;
+            float y = footerLineY + 5;
+
+            e.Graphics.DrawString(pageText, footerFont, Brushes.Black, x, y);
         }
 
         private async void btnRemovePallet_Click_1(object sender, EventArgs e)
         {
-           
 
             var selectedIndices = lvPallet.GetSelectedIndices();
 
@@ -362,16 +355,9 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                 .Select(i => _job.Pallets[i])
                 .ToList();
 
-          
-            foreach (var p in selectedPallets)
-            {
-                Debug.WriteLine(
-                    $"PalletId={p.PalletId}, State={p.State}, PackedAt={p.PackedAt}, IsShipped={p.IsShipped}");
-            }
-
             if (!selectedPallets.All(p => p.State == PalletState.Ready))
             {
-    
+
                 MessageBox.Show(
                     "Only packed pallets (Ready) can be removed.",
                     "Invalid Selection",
@@ -389,94 +375,327 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
             if (!palletIds.Any())
             {
-                Debug.WriteLine("Invalid pallet selection.");
+
                 MessageBox.Show("Invalid pallet selection.");
                 return;
             }
 
             try
             {
-          
 
                 var activePalletId = await RqliteClient.GetActivePalletIdAsync(_job.JobId);
-
-           
-
                 bool hasActivePallet = activePalletId != null;
-
-      
 
                 using (var dlg = new RemovePallets(hasActivePallet))
                 {
-                 
-
                     if (dlg.ShowDialog(this) != DialogResult.OK)
                     {
-             
+
                         return;
                     }
-
-                  
 
                     switch (dlg.Action)
                     {
                         case RemovePallets.RemoveAction.Merge:
-
-                      
-
                             if (activePalletId == null)
                             {
-                            
+
                                 MessageBox.Show("Active pallet no longer exists. Please refresh.");
                                 return;
                             }
-
                             await RqliteClient.MergePalletsIntoAsync(
                                 palletIds,
                                 activePalletId.Value);
-
-                         
                             break;
 
                         case RemovePallets.RemoveAction.Delete:
-
-                       
-
                             await RqliteClient.DeletePalletsAsync(palletIds);
 
-                     
                             break;
-
                         case RemovePallets.RemoveAction.UndoPack:
 
-                    
+                            // If there is no active pallet, only one pallet can be unpacked
+                            if (!hasActivePallet && palletIds.Count > 1)
+                            {
+                                MessageBox.Show(
+                                    "When there is no active pallet, only one pallet can be unpacked.",
+                                    "Invalid Operation",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Warning);
+                                return;
+                            }
 
                             await RqliteClient.UndoPackedPalletAsync(
                                 palletIds,
                                 _job.JobId);
-
-                        
                             break;
 
                         default:
-                        
+
                             return;
                     }
                 }
 
-             
+
                 DataChanged = true;
 
-             
+
                 Close();
             }
             catch (Exception ex)
             {
-           
+
                 MessageBox.Show("Error processing pallets:\n\n" + ex.Message);
             }
         }
-      
+
+        private async void btnPrintPallet_Click_1(object sender, EventArgs e)
+        {
+            btnPrintPallet.Enabled = false;
+
+            Utils.showStatusAndSpinner(lbStatus, pbSpinner, "Attempting to print...");
+
+            try
+            {
+                await PrintSelectedPalletsAsync();
+            }
+            finally
+            {
+                //Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Attempting to print...");
+                btnPrintPallet.Enabled = true;
+            }
+        }
+
+
+        private void SaveReportAsPdf(string filePath)
+        {
+            palletPrintIndex = 0;
+            workOrderIndex = 0;
+
+            PrintDocument doc = new PrintDocument();
+
+            doc.PrinterSettings.PrinterName = "Microsoft Print to PDF";
+            doc.PrinterSettings.PrintToFile = true;
+            doc.PrinterSettings.PrintFileName = filePath;
+
+            doc.PrintPage += PrintDocument_PrintPage;
+
+            doc.Print();
+        }
+
+        private void PrintPdf(string pdfPath)
+        {
+            var printerName = Program.AppINI._defaultPrinter;
+            var printerIp = Program.AppINI._printerIP;
+            var printerPort = Program.AppINI._printerPort;
+
+            if (!File.Exists(pdfPath))
+            {
+                MessageBox.Show("PDF file not found.");
+                return;
+            }
+
+            /* -------------------------------------------------------------
+               TRY NETWORK PRINTER FIRST
+            ------------------------------------------------------------- */
+
+            if (!string.IsNullOrWhiteSpace(printerIp) &&
+                !string.IsNullOrWhiteSpace(printerPort) &&
+                int.TryParse(printerPort, out int port))
+            {
+                try
+                {
+                    PrintPdfToNetworkPrinter(pdfPath, printerIp, port);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Network printer failed: " + ex.Message);
+                }
+            }
+
+            /* -------------------------------------------------------------
+               FALLBACK TO WINDOWS DEFAULT PRINTER
+            ------------------------------------------------------------- */
+
+            if (!string.IsNullOrWhiteSpace(printerName))
+            {
+                bool printerExists = PrinterSettings.InstalledPrinters
+                    .Cast<string>()
+                    .Any(p => p.Equals(printerName, StringComparison.OrdinalIgnoreCase));
+
+                if (printerExists)
+                {
+                    try
+                    {
+                        PrintPdfToDefaultPrinter(pdfPath);
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Default printer failed: " + ex.Message);
+                    }
+                }
+            }
+
+            /* -------------------------------------------------------------
+               NO PRINTER AVAILABLE
+            ------------------------------------------------------------- */
+
+            MessageBox.Show(
+     "Unable to print.\n\n" +
+     "No reachable network printer and no default printer configured. Configure printer in settings first!",
+     "Printing Error",
+     MessageBoxButtons.OK,
+     MessageBoxIcon.Warning);
+            Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Printer failed!");
+        }
+        private void PrintPdfToDefaultPrinter(string pdfPath)
+        {
+            var printerName = Program.AppINI._defaultPrinter;
+
+            if (string.IsNullOrWhiteSpace(printerName))
+            {
+                MessageBox.Show("No default printer configured.");
+                return;
+            }
+
+            if (!File.Exists(pdfPath))
+            {
+                MessageBox.Show("PDF file not found.");
+                return;
+            }
+
+            bool printerExists = PrinterSettings.InstalledPrinters
+                .Cast<string>()
+                .Any(p => p.Equals(printerName, StringComparison.OrdinalIgnoreCase));
+
+            if (!printerExists)
+            {
+                MessageBox.Show($"Printer '{printerName}' is not installed.");
+                return;
+            }
+
+            try
+            {
+                var printer = new Jds2.SimpleFreePdfPrinter();
+                printer.PrintPdfTo(printerName, pdfPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Printing failed:\n{ex.Message}");
+            }
+        }
+
+        private void PrintPdfToNetworkPrinter(string pdfPath, string printerIp, int printerPort)
+        {
+            if (!File.Exists(pdfPath))
+                throw new Exception("PDF file not found.");
+
+            byte[] fileBytes = File.ReadAllBytes(pdfPath);
+
+            using (TcpClient client = new TcpClient())
+            {
+                var result = client.BeginConnect(printerIp, printerPort, null, null);
+
+                bool success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5));
+
+                if (!success)
+                    throw new Exception("Printer connection timeout.");
+
+                client.EndConnect(result);
+
+                using (NetworkStream stream = client.GetStream())
+                {
+                    stream.Write(fileBytes, 0, fileBytes.Length);
+                    stream.Flush();
+                }
+            }
+        }
+        private async Task PrintSelectedPalletsAsync()
+        {
+            var selectedIndices = lvPallet.GetSelectedIndices();
+
+            if (selectedIndices == null || selectedIndices.Count == 0)
+            {
+                MessageBox.Show("Select pallet(s) to print.");
+                return;
+            }
+
+            palletsToPrint = selectedIndices
+                .Select(i => _job.Pallets[i])
+                .ToList();
+
+            string pdfPath = Path.Combine(
+                Path.GetTempPath(),
+                $"PBJob_{_job.JobNumber}_{DateTime.Now:yyyyMMddHHmmss}.pdf"
+            );
+
+            lbStatus.Text = "Generating PDF...";
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    SaveReportAsPdf(pdfPath);
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to generate PDF:\n\n" + ex.Message);
+                return;
+            }
+
+            /* -------------------------------------------------------------
+               WAIT FOR PDF DRIVER TO FINISH WRITING
+            ------------------------------------------------------------- */
+
+            int wait = 0;
+            while (!File.Exists(pdfPath) && wait < 5000)
+            {
+                await Task.Delay(100);
+                wait += 100;
+            }
+
+            if (!File.Exists(pdfPath))
+            {
+                MessageBox.Show("PDF was not generated.");
+                return;
+            }
+
+            /* -------------------------------------------------------------
+               OPEN PDF FOR USER VIEWING
+            ------------------------------------------------------------- */
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = pdfPath,
+                UseShellExecute = true
+            });
+
+            lbStatus.Text = "Sending to printer...";
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    PrintPdf(pdfPath);
+                });
+
+                //lbStatus.Text = "Printed successfully";
+            }
+            catch (Exception ex)
+            {
+                Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Printer not available!");
+                
+
+                MessageBox.Show(
+                    "Unable to print.\n\n" + ex.Message,
+                    "Printing Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+        }
     }
-    }
+}
 

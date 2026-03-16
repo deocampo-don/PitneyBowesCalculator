@@ -23,7 +23,7 @@ namespace WindowsFormsApp1
         // Fields
         // -----------------------------
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
-        private System.Windows.Forms.Timer _connectionStatusTimer;
+
         private Dictionary<int, PbJobModel> _jobsById = new Dictionary<int, PbJobModel>();
         private System.Windows.Forms.Timer _pollTimer;
         private bool _isPolling;
@@ -54,12 +54,9 @@ namespace WindowsFormsApp1
             UiEvents();
 
             StartPosition = FormStartPosition.Manual;
-
             var mouseScreen = Screen.FromPoint(Cursor.Position);
             Location = mouseScreen.WorkingArea.Location;
             WindowState = FormWindowState.Maximized;
-
-
             lvBuild.EnableDoubleBuffer();
             packedListView2.EnableDoubleBuffer();
             pickedUpListView.EnableDoubleBuffer();
@@ -80,6 +77,10 @@ namespace WindowsFormsApp1
             }
         }
 
+
+        // -----------------------------
+        // Loading Configs
+        // -----------------------------
         private async Task InitializeRqliteAsync()
         {
             while (true)
@@ -129,138 +130,21 @@ namespace WindowsFormsApp1
         }
         public static async Task LoadCPSConfig()
         {
-            DbCpsConfig = await RqliteClient.LoadCpsConfigFromDB();
-
-            // Fallback if DB has no config
-            if (DbCpsConfig == null)
+            try
             {
-                DbCpsConfig = new CpsConfig
-                {
-                    CpsDb = "OCS",
-                    CpsQuery = "cps_query.sql",
-                    CpsServer = "USCHSERV36.corp.idemia.com",
-                    TrustedConn = true,
-                    TrustedServerCert = true,
-                    ConnTimeOut = 100,
-                    SqlUser = "",
-                    SqlPwd = ""
-                };
+                var result = await Utils.LoadCPSConfig();
+
+                DbCpsConfig = result.config;
+                CPSConnectionString = result.connectionString;
             }
-
-            // Determine whether CpsQuery is a file or SQL text
-            string sqlQuery;
-
-            if (DbCpsConfig.CpsQuery.EndsWith(".sql", StringComparison.OrdinalIgnoreCase))
+            catch (Exception ex)
             {
-                string queryPath = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    "sql_query",
-                    DbCpsConfig.CpsQuery
-                );
-
-                if (!File.Exists(queryPath))
-                {
-                    MessageBox.Show($"SQL query file not found:\n{queryPath}");
-                    return;
-                }
-
-                sqlQuery = File.ReadAllText(queryPath);
-            }
-            else
-            {
-                sqlQuery = DbCpsConfig.CpsQuery;
-            }
-
-            // Store resolved query
-            DbCpsConfig.CpsQuery = sqlQuery;
-
-            // Decrypt password if present
-            
-
-            if (DbCpsConfig.TrustedConn)
-            {
-                CPSConnectionString =
-   $"Server={DbCpsConfig.CpsServer};" +
-   $"Database={DbCpsConfig.CpsDb};" +
-   $"Trusted_Connection=True;" +
-   $"TrustServerCertificate={DbCpsConfig.TrustedServerCert};" +
-   $"Connection Timeout={DbCpsConfig.ConnTimeOut};";
-            }
-            else
-            {
-                string password = Utils.Decrypt(DbCpsConfig.SqlPwd);
-                CPSConnectionString =
-  $"Server={DbCpsConfig.CpsServer};" +
-  $"Database={DbCpsConfig.CpsDb};" +
-  $"Trusted_Connection=False;" +
-  $"TrustServerCertificate={DbCpsConfig.TrustedServerCert};" +
-  $"Connection Timeout={DbCpsConfig.ConnTimeOut};" +
-  $"User Id={DbCpsConfig.SqlUser};" +
-  $"Password={password};";
+                MessageBox.Show("Cannot load cps config from database");
             }
         }
-
-        private void UiEvents()
-        {
-          
-            packedListView2.PackedDataChanged += PackedListView2_PackedDataChanged;
-            lvBuild.PalletChanged += PalletListView_PalletChanged;
-
-            lvBuild.DeleteRequested += async (_, job) =>
-            {
-                if (job == null) return;
-
-                try
-                {
-                    await RqliteClient.DeletePbJobAsync(job.JobId);
-                    _pbJobs.Remove(job);
-                    _jobsById.Remove(job.JobId);
-                    RemoveJobFromUI(job.JobId);
-                }
-                catch (Exception ex)
-                {
-                    ShowDatabaseError(ex);
-                }
-            };
-
-            lvBuild.EditRequested += async (_, job) =>
-            {
-               
-                using (var dialog = new CreatePBJobDialog(job))
-                {
-                    if (dialog.ShowDialog() == DialogResult.OK)
-                    {
-                        if (!int.TryParse(dialog.JobNumber, out int jobNumber))
-                        {
-                            MessageBox.Show("Invalid job number.");
-                            return;
-                        }
-
-                        var rows = await RqliteClient.UpdatePbJobAsync(
-    job.JobId,
-    dialog.JobName,
-    jobNumber,
-    dialog.IsTemp,
-    job.LastUpdated);
-
-                        if (rows == 0)
-                        {
-                            MessageBox.Show(
-                                "This job was modified by another workstation.\nPlease reopen and try again.",
-                                "Update Conflict",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Warning);
-
-                            await RefreshSingleJobAsync(job.JobId);
-                            return;
-                        }
-
-                        await RefreshSingleJobAsync(job.JobId);
-                    }
-                }
-            };
-        }
-
+        // -------------------------
+        // Polling
+        // -------------------------
         private void StartBackgroundPolling()
         {
             _pollTimer?.Stop();
@@ -268,7 +152,7 @@ namespace WindowsFormsApp1
 
             _pollTimer = new System.Windows.Forms.Timer();
             _pollTimer.Interval = Program.AppINI._appRefresh;
-     
+
             _pollTimer.Tick += async (_, __) =>
             {
                 if (_isPolling) return;
@@ -288,7 +172,7 @@ namespace WindowsFormsApp1
                 {
                     _pollTimer.Stop();
 
-                    Utils.showStatusAndSpinner(lbDbConnecting,pbConnectionSpinner, "Database Offline - Reconnecting...");
+                    Utils.showStatusAndSpinner(lbDbConnecting, pbConnectionSpinner, "Database Offline - Reconnecting...");
 
                     StartReconnectWatcher();
                 }
@@ -308,7 +192,7 @@ namespace WindowsFormsApp1
 
         private async Task PollForUpdatesAsync()
         {
-            
+
             if (WindowState == FormWindowState.Minimized)
                 return;
             if (Application.OpenForms.OfType<ViewButtonDialog>().Any())
@@ -384,33 +268,6 @@ namespace WindowsFormsApp1
                 }
             }
         }
-
-        private void RefreshSingleJobUI(PbJobModel job)
-        {
-            RemoveJobFromUI(job.JobId);
-
-            // Build and Packed always contain the job
-            lvBuild?.AddItem(job);
-            packedListView2?.AddItem(job);
-
-            // PickedUp only if shipped pallets exist  
-            if (job.Pallets.Any(p => p.ShippedAt.HasValue))
-            {
-                pickedUpListView?.AddItem(job);
-            }
-        }
-        private void RemoveJobFromUI(int jobId)
-        {
-            lvBuild?.RemoveItem(jobId);
-            packedListView2?.RemoveItem(jobId);
-            pickedUpListView?.RemoveItem(jobId);
-        }
-
-        // -----------------------------
-        // Form Events
-        // -----------------------------
-    
-       
         private async Task StartApplicationAsync()
         {
             if (!await RqliteClient.IsDatabaseAvailableAsync())
@@ -449,16 +306,7 @@ namespace WindowsFormsApp1
                 }
             }
         }
- 
-        private void PalletListView_PalletChanged(object sender, PbJobModel job)
-        {
-            RefreshAllViews();
-        }
 
-        private async void PackedListView2_PackedDataChanged(object sender, PbJobModel job)
-        {
-            await RefreshSingleJobAsync(job.JobId);
-        }
         private void ShowDatabaseError(Exception ex)
         {
             MessageBox.Show(
@@ -469,24 +317,79 @@ namespace WindowsFormsApp1
             );
         }
 
-        private void ApplySearchFilter()
-        {
-            if (_shipmentRows.Count == 0)
-                return;
-
-            var fromDate = dtPickUpFrom.Value.Date;
-            var toDate = dtPickUpTo.Value.Date.AddDays(1).AddTicks(-1);
-
-            var filtered = _shipmentRows
-                .Where(x => x.ShippedDate >= fromDate && x.ShippedDate <= toDate)
-                .ToList();
-
-            pickedUpListView.SetItems(filtered);
-        }
 
         // -----------------------------
         // UI Styling / Wiring
         // -----------------------------
+        private void UiEvents()
+        {
+
+            packedListView2.PackedDataChanged += PackedListView2_PackedDataChanged;
+            lvBuild.PalletChanged += PalletListView_PalletChanged;
+
+            lvBuild.DeleteRequested += async (_, job) =>
+            {
+                if (job == null) return;
+
+                try
+                {
+                    await RqliteClient.DeletePbJobAsync(job.JobId);
+                    _pbJobs.Remove(job);
+                    _jobsById.Remove(job.JobId);
+                    RemoveJobFromUI(job.JobId);
+                }
+                catch (Exception ex)
+                {
+                    ShowDatabaseError(ex);
+                }
+            };
+
+            lvBuild.EditRequested += async (_, job) =>
+            {
+
+                using (var dialog = new CreatePBJobDialog(job))
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        if (!int.TryParse(dialog.JobNumber, out int jobNumber))
+                        {
+                            MessageBox.Show("Invalid job number.");
+                            return;
+                        }
+
+                        var rows = await RqliteClient.UpdatePbJobAsync(
+    job.JobId,
+    dialog.JobName,
+    jobNumber,
+    dialog.IsTemp,
+    job.LastUpdated);
+
+                        if (rows == 0)
+                        {
+                            MessageBox.Show(
+                                "This job was modified by another workstation.\nPlease reopen and try again.",
+                                "Update Conflict",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+
+                            await RefreshSingleJobAsync(job.JobId);
+                            return;
+                        }
+
+                        await RefreshSingleJobAsync(job.JobId);
+                    }
+                }
+            };
+        }
+        private void PalletListView_PalletChanged(object sender, PbJobModel job)
+        {
+            RefreshAllViews();
+        }
+
+        private async void PackedListView2_PackedDataChanged(object sender, PbJobModel job)
+        {
+            await RefreshSingleJobAsync(job.JobId);
+        }
         private void ApplyTabStyles()
         {
             CSSDesign.ApplyTabColors(kcbPickedUp);
@@ -523,8 +426,6 @@ namespace WindowsFormsApp1
             CSSDesign.MakeTitleBarButton(btnSettings);
         }
 
-
-
         // -----------------------------
         // Data Loading (DB → UI)
         // -----------------------------
@@ -540,9 +441,31 @@ namespace WindowsFormsApp1
             RefreshAllViews();
         }
 
+
+
         // -----------------------------
         // View Refresh
         // -----------------------------
+        private void RefreshSingleJobUI(PbJobModel job)
+        {
+            RemoveJobFromUI(job.JobId);
+
+            // Build and Packed always contain the job
+            lvBuild?.AddItem(job);
+            packedListView2?.AddItem(job);
+
+            // PickedUp only if shipped pallets exist  
+            if (job.Pallets.Any(p => p.ShippedAt.HasValue))
+            {
+                pickedUpListView?.AddItem(job);
+            }
+        }
+        private void RemoveJobFromUI(int jobId)
+        {
+            lvBuild?.RemoveItem(jobId);
+            packedListView2?.RemoveItem(jobId);
+            pickedUpListView?.RemoveItem(jobId);
+        }
         private void RefreshAllViews()
         {
            
@@ -679,117 +602,73 @@ namespace WindowsFormsApp1
         }
 
 
-
         // -----------------------------
         // Window Buttons
         // -----------------------------
         private void btnClose_Click(object sender, EventArgs e) => Close();
-
         private void btnMinimize_Click_1(object sender, EventArgs e)
             =>
             WindowState = FormWindowState.Minimized;
-
         private void btnMaximize_Click_1(object sender, EventArgs e)
         {
             WindowState = (WindowState == FormWindowState.Maximized)
                 ? FormWindowState.Normal
                 : FormWindowState.Maximized;
         }
+
         // -----------------------------
-        // Ship Pallets Bar
+        // Actions
         // -----------------------------
-        //private async void btnShipPallets_Click(object sender, EventArgs e)
-        //{
-        //    var selectedJobs = packedListView2.GetReadyJobs();
-
-        //    if (!selectedJobs.Any())
-        //    {
-        //        MessageBox.Show("No jobs selected.");
-        //        return;
-        //    }
-
-        //    var confirm = MessageBox.Show(
-        //        $"Ship {selectedJobs.Count} job(s)?",
-        //        "Confirm Shipment",
-        //        MessageBoxButtons.YesNo,
-        //        MessageBoxIcon.Question);
-
-        //    if (confirm != DialogResult.Yes)
-        //        return;
-
-        //    try
-        //    {
-        //        foreach (var job in selectedJobs)
-        //        {         
-        //            await RqliteClient.ShipJobsAsync(new[] { job.JobId });
-        //            await LoadJobsAsync();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ShowDatabaseError(ex);
-        //    }
-        //}
-
-
         private async void btnShipPallets_Click(object sender, EventArgs e)
         {
-            Debug.WriteLine("=== Ship Button Clicked ===");
-
             var selectedJobs = packedListView2.GetReadyJobs().ToList();
-
-            Debug.WriteLine($"Ready jobs found: {selectedJobs.Count}");
-
             if (!selectedJobs.Any())
             {
-                Debug.WriteLine("No jobs selected.");
+               
                 MessageBox.Show("No jobs selected.");
                 return;
             }
-
             var jobIds = selectedJobs
                 .Select(j => j.JobId)
                 .ToArray();
-
-            Debug.WriteLine($"Job IDs: {string.Join(",", jobIds)}");
-
             var confirm = MessageBox.Show(
                 $"Ship {selectedJobs.Count} job(s)?",
                 "Confirm Shipment",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
-
             if (confirm != DialogResult.Yes)
             {
-                Debug.WriteLine("User cancelled shipment.");
+               
                 return;
             }
-
             try
             {
-                Debug.WriteLine("Calling ShipPalletsAsync...");
-
                 await RqliteClient.ShipPalletsAsync(jobIds);
-
-                Debug.WriteLine("ShipPalletsAsync completed.");
-
-                Debug.WriteLine("Reloading jobs...");
                 await LoadJobsAsync();
-
-                Debug.WriteLine("LoadJobsAsync completed.");
-                Debug.WriteLine("=== Ship Process Finished ===");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("ERROR during shipment:");
-                Debug.WriteLine(ex.ToString());
+          
 
                 ShowDatabaseError(ex);
             }
         }
-        // -----------------------------
-        // Actions
-        // -----------------------------
+
+        private void ApplySearchFilter()
+        {
+            if (_shipmentRows.Count == 0)
+                return;
+
+            var fromDate = dtPickUpFrom.Value.Date;
+            var toDate = dtPickUpTo.Value.Date.AddDays(1).AddTicks(-1);
+
+            var filtered = _shipmentRows
+                .Where(x => x.ShippedDate >= fromDate && x.ShippedDate <= toDate)
+                .ToList();
+
+            pickedUpListView.SetItems(filtered);
+        }
+
         private async void btnAddPBJob_Click(object sender, EventArgs e)
         {
             using (var dlg = new CreatePBJobDialog())

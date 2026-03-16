@@ -18,6 +18,14 @@
 		<UseWindowsForms>true</UseWindowsForms>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Resources\error1.png" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Include="Resources\error1.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="Krypton.Navigator" Version="100.25.11.328" />
 		<PackageReference Include="Krypton.Toolkit" Version="100.25.11.328" />
 		<PackageReference Include="Krypton.Toolkit.Suite.Extended.Panels" Version="100.25.11.328" />
@@ -25,6 +33,7 @@
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="SimpleFreePdfPrinter" Version="1.7.48" />
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.3" />
 	</ItemGroup>
@@ -65,6 +74,5 @@
 		<Compile Update="Pallet List\View\WorkOrderRowControl.cs">
 			<SubType>UserControl</SubType>
 		</Compile>
-		<None Include="WindowsFormsApp1_TemporaryKey.pfx" />
 	</ItemGroup>
 </Project>

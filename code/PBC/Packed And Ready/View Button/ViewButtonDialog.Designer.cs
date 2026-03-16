@@ -48,6 +48,8 @@
             pnlDetails = new System.Windows.Forms.Panel();
             lvPalletDetails = new WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details.PalletDetailsListView();
             groupBox1 = new System.Windows.Forms.GroupBox();
+            lbStatus = new Krypton.Toolkit.KryptonLabel();
+            pbSpinner = new System.Windows.Forms.PictureBox();
             btnRemovePallet = new Krypton.Toolkit.KryptonButton();
             btnPrintPallet = new Krypton.Toolkit.KryptonButton();
             ((System.ComponentModel.ISupportInitialize)pnlHeader).BeginInit();
@@ -56,6 +58,7 @@
             pnlPalletNum.SuspendLayout();
             pnlDetails.SuspendLayout();
             groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pbSpinner).BeginInit();
             SuspendLayout();
             // 
             // pnlHeader
@@ -286,6 +289,8 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(lbStatus);
+            groupBox1.Controls.Add(pbSpinner);
             groupBox1.Controls.Add(btnRemovePallet);
             groupBox1.Controls.Add(btnPrintPallet);
             groupBox1.Controls.Add(pnlPalletNum);
@@ -302,6 +307,25 @@
             groupBox1.Size = new System.Drawing.Size(851, 638);
             groupBox1.TabIndex = 1;
             groupBox1.TabStop = false;
+            // 
+            // lbStatus
+            // 
+            lbStatus.Location = new System.Drawing.Point(63, 599);
+            lbStatus.Name = "lbStatus";
+            lbStatus.Size = new System.Drawing.Size(117, 26);
+            lbStatus.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            lbStatus.TabIndex = 64;
+            lbStatus.Values.Text = "kryptonLabel1";
+            lbStatus.Visible = false;
+            // 
+            // pbSpinner
+            // 
+            pbSpinner.Location = new System.Drawing.Point(28, 596);
+            pbSpinner.Name = "pbSpinner";
+            pbSpinner.Size = new System.Drawing.Size(29, 30);
+            pbSpinner.TabIndex = 63;
+            pbSpinner.TabStop = false;
+            pbSpinner.Visible = false;
             // 
             // btnRemovePallet
             // 
@@ -361,6 +385,7 @@
             pnlDetails.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pbSpinner).EndInit();
             ResumeLayout(false);
 
         }
@@ -393,5 +418,7 @@
         private Krypton.Toolkit.Suite.Extended.Panels.KryptonButtonPanel kryptonButtonPanel1;
         private Krypton.Toolkit.KryptonButton btnPrintPallet;
         private Krypton.Toolkit.KryptonButton btnRemovePallet;
+        private System.Windows.Forms.PictureBox pbSpinner;
+        private Krypton.Toolkit.KryptonLabel lbStatus;
     }
 }
