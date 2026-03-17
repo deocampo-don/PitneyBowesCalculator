@@ -24,15 +24,21 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         public ShipPalletsConfirmationDialog()
         {
             InitializeComponent();
-            this.StartPosition = FormStartPosition.CenterParent; // optional: ensure centered
+
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.AcceptButton = btnYes;
+            this.CancelButton = btnNo;
+
+            btnYes.DialogResult = DialogResult.OK;
+            btnNo.DialogResult = DialogResult.Cancel;
+
             FormHelper.ApplyRoundedCorners(this);
             ShadowHelper.ApplyShadow(this);
             CSSDesign.MakeRounded(btnNo, 15);
             CSSDesign.MakeRounded(btnYes, 15);
+
             Paint += RemovePallets_Paint;
-
             pnlHeader.MouseDown += pnlHeader_MouseDown;
-
         }
 
         private void RemovePallets_Paint(object sender, PaintEventArgs e)
@@ -49,24 +55,9 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                 SendMessage(Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
             }
         }
-
-
-        private void btnYes_Click(object sender, EventArgs e)
-        {
-            this.DialogResult = DialogResult.OK;  // ✅ confirm
-            this.Close();
-        }
-
-        private void btnNo_Click(object sender, EventArgs e)
-        {
-            this.DialogResult = DialogResult.Cancel;  // ✅ cancel
-            this.Close();
-        }
-
-   
         private void btnExit_Click_1(object sender, EventArgs e)
         {
-            this.Close();
+            this.DialogResult = DialogResult.Cancel;
         }
     }
 }

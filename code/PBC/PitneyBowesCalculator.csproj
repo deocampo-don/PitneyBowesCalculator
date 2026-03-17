@@ -18,10 +18,30 @@
 		<UseWindowsForms>true</UseWindowsForms>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Resources\error.png" />
 	  <None Remove="Resources\error1.png" />
+	  <None Remove="Resources\info-50.png" />
+	  <None Remove="Resources\info_img_32.png" />
+	  <None Remove="Resources\success-50.png" />
+	  <None Remove="Resources\warning-50.png" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Content Include="Resources\error.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	  <Content Include="Resources\error1.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Resources\info-50.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Resources\info_img_32.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Resources\success-50.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Resources\warning-50.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>

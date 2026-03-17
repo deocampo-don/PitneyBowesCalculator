@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -44,7 +45,7 @@ namespace WindowsFormsApp1
         public PBCMain()
         {
             InitializeComponent();
-        
+
             // UI Setup ONLY
             ApplyTabStyles();
             WireCheckSetToNavigator();
@@ -87,7 +88,7 @@ namespace WindowsFormsApp1
             {
                 if (!string.IsNullOrWhiteSpace(Program.AppINI._rqClientAddress) &&
                     Program.AppINI._rqClientMaxRetries > 0 &&
-                    Program.AppINI._rqClientDelayMs > 0 && Program.AppINI._appRefresh>0)
+                    Program.AppINI._rqClientDelayMs > 0 && Program.AppINI._appRefresh > 0)
                     break;
 
                 var result = MessageBox.Show(
@@ -468,7 +469,7 @@ namespace WindowsFormsApp1
         }
         private void RefreshAllViews()
         {
-           
+
             lvBuild?.SetItems(_pbJobs);
             var activeJobs = _pbJobs
      .Select(job =>
@@ -622,25 +623,26 @@ namespace WindowsFormsApp1
         private async void btnShipPallets_Click(object sender, EventArgs e)
         {
             var selectedJobs = packedListView2.GetReadyJobs().ToList();
+
             if (!selectedJobs.Any())
             {
-               
                 MessageBox.Show("No jobs selected.");
                 return;
             }
+
             var jobIds = selectedJobs
                 .Select(j => j.JobId)
                 .ToArray();
-            var confirm = MessageBox.Show(
-                $"Ship {selectedJobs.Count} job(s)?",
-                "Confirm Shipment",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-            if (confirm != DialogResult.Yes)
+
+            // Show custom confirmation dialog
+            using (var dlg = new ShipPalletsConfirmationDialog())
             {
-               
-                return;
+                if (dlg.ShowDialog(this) != DialogResult.OK)
+                {
+                    return; // ❗ STOP if user cancels
+                }
             }
+
             try
             {
                 await RqliteClient.ShipPalletsAsync(jobIds);
@@ -648,8 +650,6 @@ namespace WindowsFormsApp1
             }
             catch (Exception ex)
             {
-          
-
                 ShowDatabaseError(ex);
             }
         }
@@ -715,10 +715,10 @@ namespace WindowsFormsApp1
             ApplySearchFilter();
         }
 
-        
+
         private void chkbxSelectAll_CheckedChanged_1(object sender, EventArgs e)
         {
-            packedListView2.SetAllSelected(      chkbxSelectAll.Checked);
+            packedListView2.SetAllSelected(chkbxSelectAll.Checked);
         }
 
         private async void btnSettings_Click(object sender, EventArgs e)
@@ -736,9 +736,59 @@ namespace WindowsFormsApp1
             await LoadCPSConfig();
             StartBackgroundPolling();
         }
+
+        private void cbPackedSelectAll_CheckedChanged(object sender, EventArgs e)
+        {
+            pickedUpListView.SetAllSelected(cbPackedSelectAll.Checked);
+        }
+
+        private async void btnPrintSummary_Click(object sender, EventArgs e)
+        {
+            var selectedJobs = pickedUpListView.GetSelectedJobs().ToList();
+
+            if (!selectedJobs.Any())
+            {
+                MessageDialogBox.ShowDialog(
+                    "No Selection",
+                    "Select at least one row to print.",
+                    MessageBoxButtons.OK,
+                    MessageType.Info
+                );
+                return;
+            }
+
+            try
+            {
+                PrintEngine.Print(e => PrintLayouts.DrawSummary(e, selectedJobs));
+            }
+            catch (Exception ex)
+            {
+                MessageDialogBox.ShowDialog(
+                    "Printing Error",
+                    ex.Message,
+                    MessageBoxButtons.OK,
+                    MessageType.Error
+                );
+            }
+        }
+
+        private void cbGenerateReport_Click(object sender, EventArgs e)
+        {
+            var jobs = pickedUpListView.GetAllJobs().ToList();
+
+            if (!jobs.Any())
+            {
+                MessageDialogBox.ShowDialog(
+                    "No Data",
+                    "No data available for the current filter.",
+                    MessageBoxButtons.OK,
+                    MessageType.Info
+                );
+                return;
+            }
+            Utils.GenerateReport(jobs,dtPickUpFrom,dtPickUpTo);
+        }
     }
-
-
 }
 
 public static class ControlExtensions

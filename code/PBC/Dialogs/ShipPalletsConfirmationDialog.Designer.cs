@@ -45,7 +45,7 @@
             pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             pnlHeader.Location = new System.Drawing.Point(0, 0);
             pnlHeader.Name = "pnlHeader";
-            pnlHeader.Size = new System.Drawing.Size(404, 30);
+            pnlHeader.Size = new System.Drawing.Size(433, 30);
             pnlHeader.TabIndex = 7;
             // 
             // btnExit
@@ -55,7 +55,7 @@
             btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnExit.ForeColor = System.Drawing.Color.Transparent;
             btnExit.Image = Properties.Resources.close_img;
-            btnExit.Location = new System.Drawing.Point(377, 6);
+            btnExit.Location = new System.Drawing.Point(404, 10);
             btnExit.Name = "btnExit";
             btnExit.Size = new System.Drawing.Size(17, 17);
             btnExit.TabIndex = 8;
@@ -69,31 +69,30 @@
             btnNo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnNo.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             btnNo.ForeColor = System.Drawing.Color.White;
-            btnNo.Location = new System.Drawing.Point(243, 120);
+            btnNo.Location = new System.Drawing.Point(248, 135);
             btnNo.Name = "btnNo";
-            btnNo.Size = new System.Drawing.Size(59, 34);
+            btnNo.Size = new System.Drawing.Size(70, 34);
             btnNo.TabIndex = 12;
             btnNo.Text = "No";
             btnNo.UseVisualStyleBackColor = false;
-            btnNo.Click += btnNo_Click;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label2.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
             label2.Location = new System.Drawing.Point(22, 88);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(182, 19);
+            label2.Size = new System.Drawing.Size(212, 21);
             label2.TabIndex = 11;
             label2.Text = "want to ship them out now?";
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label1.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
             label1.Location = new System.Drawing.Point(22, 69);
             label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(316, 19);
+            label1.Size = new System.Drawing.Size(373, 21);
             label1.TabIndex = 10;
             label1.Text = "Looks like all pallets are packed and ready. Do you";
             // 
@@ -114,20 +113,19 @@
             btnYes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnYes.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             btnYes.ForeColor = System.Drawing.Color.White;
-            btnYes.Location = new System.Drawing.Point(307, 120);
+            btnYes.Location = new System.Drawing.Point(324, 135);
             btnYes.Name = "btnYes";
-            btnYes.Size = new System.Drawing.Size(71, 34);
+            btnYes.Size = new System.Drawing.Size(84, 34);
             btnYes.TabIndex = 8;
             btnYes.Text = "Yes";
             btnYes.UseVisualStyleBackColor = false;
-            btnYes.Click += btnYes_Click;
             // 
             // ShipPalletsConfirmationDialog
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.White;
-            ClientSize = new System.Drawing.Size(404, 169);
+            ClientSize = new System.Drawing.Size(433, 190);
             Controls.Add(pnlHeader);
             Controls.Add(btnNo);
             Controls.Add(label2);

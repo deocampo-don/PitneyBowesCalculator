@@ -59,15 +59,15 @@ namespace WindowsFormsApp1
             pickedUpListView = new WindowsFormsApp1.Picked_Up.PickedUpListView();
             kryptonPanel6 = new Krypton.Toolkit.KryptonPanel();
             tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            cbPackedSelectAll = new System.Windows.Forms.CheckBox();
             kryptonLabel6 = new Krypton.Toolkit.KryptonLabel();
             kryptonLabel4 = new Krypton.Toolkit.KryptonLabel();
-            kryptonCheckBox1 = new Krypton.Toolkit.KryptonCheckBox();
             kryptonLabel3 = new Krypton.Toolkit.KryptonLabel();
             kryptonLabel5 = new Krypton.Toolkit.KryptonLabel();
             kryptonLabel7 = new Krypton.Toolkit.KryptonLabel();
             tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            kryptonButton2 = new Krypton.Toolkit.KryptonButton();
-            kryptonButton1 = new Krypton.Toolkit.KryptonButton();
+            btnPrintSummary = new Krypton.Toolkit.KryptonButton();
+            cbGenerateReport = new Krypton.Toolkit.KryptonButton();
             btnSearch = new Krypton.Toolkit.KryptonButton();
             kryptonPanel3 = new Krypton.Toolkit.KryptonPanel();
             kryptonTableLayoutPanel2 = new Krypton.Toolkit.KryptonTableLayoutPanel();
@@ -493,9 +493,9 @@ namespace WindowsFormsApp1
             tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 13.67863F));
             tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17.60824F));
             tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17.41826F));
+            tableLayoutPanel2.Controls.Add(cbPackedSelectAll, 0, 0);
             tableLayoutPanel2.Controls.Add(kryptonLabel6, 4, 0);
             tableLayoutPanel2.Controls.Add(kryptonLabel4, 2, 0);
-            tableLayoutPanel2.Controls.Add(kryptonCheckBox1, 0, 0);
             tableLayoutPanel2.Controls.Add(kryptonLabel3, 1, 0);
             tableLayoutPanel2.Controls.Add(kryptonLabel5, 3, 0);
             tableLayoutPanel2.Controls.Add(kryptonLabel7, 5, 0);
@@ -507,6 +507,17 @@ namespace WindowsFormsApp1
             tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             tableLayoutPanel2.Size = new System.Drawing.Size(1226, 30);
             tableLayoutPanel2.TabIndex = 0;
+            // 
+            // cbPackedSelectAll
+            // 
+            cbPackedSelectAll.Anchor = System.Windows.Forms.AnchorStyles.None;
+            cbPackedSelectAll.AutoSize = true;
+            cbPackedSelectAll.Location = new System.Drawing.Point(35, 8);
+            cbPackedSelectAll.Name = "cbPackedSelectAll";
+            cbPackedSelectAll.Size = new System.Drawing.Size(15, 14);
+            cbPackedSelectAll.TabIndex = 1;
+            cbPackedSelectAll.UseVisualStyleBackColor = true;
+            cbPackedSelectAll.CheckedChanged += cbPackedSelectAll_CheckedChanged;
             // 
             // kryptonLabel6
             // 
@@ -531,16 +542,6 @@ namespace WindowsFormsApp1
             kryptonLabel4.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 13.8F, System.Drawing.FontStyle.Bold);
             kryptonLabel4.TabIndex = 2;
             kryptonLabel4.Values.Text = "Envelope Qty";
-            // 
-            // kryptonCheckBox1
-            // 
-            kryptonCheckBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            kryptonCheckBox1.Location = new System.Drawing.Point(33, 8);
-            kryptonCheckBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            kryptonCheckBox1.Name = "kryptonCheckBox1";
-            kryptonCheckBox1.Size = new System.Drawing.Size(19, 13);
-            kryptonCheckBox1.TabIndex = 0;
-            kryptonCheckBox1.Values.Text = "";
             // 
             // kryptonLabel3
             // 
@@ -586,8 +587,8 @@ namespace WindowsFormsApp1
             tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            tableLayoutPanel1.Controls.Add(kryptonButton2, 3, 0);
-            tableLayoutPanel1.Controls.Add(kryptonButton1, 4, 0);
+            tableLayoutPanel1.Controls.Add(btnPrintSummary, 3, 0);
+            tableLayoutPanel1.Controls.Add(cbGenerateReport, 4, 0);
             tableLayoutPanel1.Controls.Add(btnSearch, 2, 0);
             tableLayoutPanel1.Controls.Add(kryptonPanel3, 0, 0);
             tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -600,44 +601,46 @@ namespace WindowsFormsApp1
             tableLayoutPanel1.Size = new System.Drawing.Size(1226, 61);
             tableLayoutPanel1.TabIndex = 0;
             // 
-            // kryptonButton2
+            // btnPrintSummary
             // 
-            kryptonButton2.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            kryptonButton2.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            kryptonButton2.Location = new System.Drawing.Point(805, 4);
-            kryptonButton2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            kryptonButton2.Name = "kryptonButton2";
-            kryptonButton2.Size = new System.Drawing.Size(194, 53);
-            kryptonButton2.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(232, 222, 248);
-            kryptonButton2.StateCommon.Border.DrawBorders = Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom | Krypton.Toolkit.PaletteDrawBorders.Left | Krypton.Toolkit.PaletteDrawBorders.Right;
-            kryptonButton2.StateCommon.Border.Rounding = 5F;
-            kryptonButton2.StateCommon.Content.Padding = new System.Windows.Forms.Padding(10, -1, -1, -1);
-            kryptonButton2.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 14F, System.Drawing.FontStyle.Bold);
-            kryptonButton2.StateCommon.Content.ShortText.Image = Properties.Resources.save_img_32;
-            kryptonButton2.TabIndex = 1;
-            kryptonButton2.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            kryptonButton2.Values.Image = Properties.Resources.print_img_32;
-            kryptonButton2.Values.Text = "Print Summary";
+            btnPrintSummary.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            btnPrintSummary.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            btnPrintSummary.Location = new System.Drawing.Point(805, 4);
+            btnPrintSummary.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            btnPrintSummary.Name = "btnPrintSummary";
+            btnPrintSummary.Size = new System.Drawing.Size(194, 53);
+            btnPrintSummary.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(232, 222, 248);
+            btnPrintSummary.StateCommon.Border.DrawBorders = Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom | Krypton.Toolkit.PaletteDrawBorders.Left | Krypton.Toolkit.PaletteDrawBorders.Right;
+            btnPrintSummary.StateCommon.Border.Rounding = 5F;
+            btnPrintSummary.StateCommon.Content.Padding = new System.Windows.Forms.Padding(10, -1, -1, -1);
+            btnPrintSummary.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 14F, System.Drawing.FontStyle.Bold);
+            btnPrintSummary.StateCommon.Content.ShortText.Image = Properties.Resources.save_img_32;
+            btnPrintSummary.TabIndex = 1;
+            btnPrintSummary.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            btnPrintSummary.Values.Image = Properties.Resources.print_img_32;
+            btnPrintSummary.Values.Text = "Print Summary";
+            btnPrintSummary.Click += btnPrintSummary_Click;
             // 
-            // kryptonButton1
+            // cbGenerateReport
             // 
-            kryptonButton1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            kryptonButton1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            kryptonButton1.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
-            kryptonButton1.Location = new System.Drawing.Point(1005, 4);
-            kryptonButton1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            kryptonButton1.Name = "kryptonButton1";
-            kryptonButton1.Size = new System.Drawing.Size(218, 53);
-            kryptonButton1.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(232, 222, 248);
-            kryptonButton1.StateCommon.Border.DrawBorders = Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom | Krypton.Toolkit.PaletteDrawBorders.Left | Krypton.Toolkit.PaletteDrawBorders.Right;
-            kryptonButton1.StateCommon.Border.Rounding = 5F;
-            kryptonButton1.StateCommon.Content.Padding = new System.Windows.Forms.Padding(10, -1, -1, -1);
-            kryptonButton1.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 14F, System.Drawing.FontStyle.Bold);
-            kryptonButton1.StateCommon.Content.ShortText.Image = Properties.Resources.save_img_32;
-            kryptonButton1.TabIndex = 0;
-            kryptonButton1.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            kryptonButton1.Values.Image = Properties.Resources.save_img_22;
-            kryptonButton1.Values.Text = "Generate Report";
+            cbGenerateReport.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            cbGenerateReport.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            cbGenerateReport.ButtonStyle = Krypton.Toolkit.ButtonStyle.NavigatorStack;
+            cbGenerateReport.Location = new System.Drawing.Point(1005, 4);
+            cbGenerateReport.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            cbGenerateReport.Name = "cbGenerateReport";
+            cbGenerateReport.Size = new System.Drawing.Size(218, 53);
+            cbGenerateReport.StateCommon.Back.Color1 = System.Drawing.Color.FromArgb(232, 222, 248);
+            cbGenerateReport.StateCommon.Border.DrawBorders = Krypton.Toolkit.PaletteDrawBorders.Top | Krypton.Toolkit.PaletteDrawBorders.Bottom | Krypton.Toolkit.PaletteDrawBorders.Left | Krypton.Toolkit.PaletteDrawBorders.Right;
+            cbGenerateReport.StateCommon.Border.Rounding = 5F;
+            cbGenerateReport.StateCommon.Content.Padding = new System.Windows.Forms.Padding(10, -1, -1, -1);
+            cbGenerateReport.StateCommon.Content.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 14F, System.Drawing.FontStyle.Bold);
+            cbGenerateReport.StateCommon.Content.ShortText.Image = Properties.Resources.save_img_32;
+            cbGenerateReport.TabIndex = 0;
+            cbGenerateReport.Values.DropDownArrowColor = System.Drawing.Color.Empty;
+            cbGenerateReport.Values.Image = Properties.Resources.save_img_22;
+            cbGenerateReport.Values.Text = "Generate Report";
+            cbGenerateReport.Click += cbGenerateReport_Click;
             // 
             // btnSearch
             // 
@@ -987,8 +990,8 @@ namespace WindowsFormsApp1
         private Krypton.Toolkit.KryptonButton btnSettings;
         private Krypton.Toolkit.KryptonPanel kryptonPanel2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private Krypton.Toolkit.KryptonButton kryptonButton1;
-        private Krypton.Toolkit.KryptonButton kryptonButton2;
+        private Krypton.Toolkit.KryptonButton cbGenerateReport;
+        private Krypton.Toolkit.KryptonButton btnPrintSummary;
         private Krypton.Toolkit.KryptonButton btnSearch;
         private Krypton.Toolkit.KryptonPanel kryptonPanel3;
         private Krypton.Toolkit.KryptonTableLayoutPanel kryptonTableLayoutPanel2;
@@ -1000,7 +1003,6 @@ namespace WindowsFormsApp1
         private System.Windows.Forms.DateTimePicker dtPickUpFrom;
         private Krypton.Toolkit.KryptonPanel kryptonPanel6;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private Krypton.Toolkit.KryptonCheckBox kryptonCheckBox1;
         private Krypton.Toolkit.KryptonLabel kryptonLabel3;
         private Krypton.Toolkit.KryptonLabel kryptonLabel6;
         private Krypton.Toolkit.KryptonLabel kryptonLabel4;
@@ -1018,6 +1020,7 @@ namespace WindowsFormsApp1
         private Krypton.Toolkit.KryptonLabel lbDbConnecting;
         private Krypton.Toolkit.KryptonPictureBox pbConnectionSpinner;
         private RoundedPanel roundedPanel1;
+        private System.Windows.Forms.CheckBox cbPackedSelectAll;
     }
 }
 

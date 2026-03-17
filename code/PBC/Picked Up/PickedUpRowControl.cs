@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using WindowsFormsApp1.Packed_And_Ready.View_Button;
@@ -58,6 +59,13 @@ namespace WindowsFormsApp1.Picked_Up
             }
         }
 
+    
+        public void SetChecked(bool value)
+        {
+
+            cbItem.Checked = value;
+        }
+
         [System.ComponentModel.Browsable(false)]
         [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public bool IsChecked
@@ -66,6 +74,9 @@ namespace WindowsFormsApp1.Picked_Up
             set => cbItem.Checked = value;
         }
 
-
+        private void Row_Click(object sender, EventArgs e)
+        {
+            IsChecked = !IsChecked;
+        }
     }
 }

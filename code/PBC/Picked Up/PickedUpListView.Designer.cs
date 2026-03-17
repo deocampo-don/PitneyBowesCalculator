@@ -44,7 +44,7 @@
             this.pickedScrollHost.Size = new System.Drawing.Size(693, 246);
             this.pickedScrollHost.StateCommon.Color1 = System.Drawing.Color.Transparent;
             this.pickedScrollHost.TabIndex = 0;
-            this.pickedScrollHost.Paint += new System.Windows.Forms.PaintEventHandler(this.pickedScrollHost_Paint);
+        
             // 
             // pickflowRows
             // 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp1.Packed_And_Ready;
 
 namespace WindowsFormsApp1.Picked_Up
 {
@@ -56,7 +57,20 @@ namespace WindowsFormsApp1.Picked_Up
             BeginInvoke(new Action(ResizeRowsToHost));
         }
 
+        public void SetAllSelected(bool isSelected)
+        {
+            foreach (var row in pickflowRows.Controls.OfType<PickedUpRowControl>())
+            {
+                row.IsChecked = isSelected;
+            }
+        }
 
+        public IEnumerable<PbJobModel> GetAllJobs()
+        {
+            return pickflowRows.Controls
+                .OfType<PickedUpRowControl>()
+                .Select(r => r.BoundJob);
+        }
         public void SetItems(IEnumerable<PbJobModel> items)
         {
             pickflowRows.SuspendLayout();
@@ -92,9 +106,12 @@ namespace WindowsFormsApp1.Picked_Up
                 c.Width = width;
             }
         }
-        private void pickedScrollHost_Paint(object sender, PaintEventArgs e)
+        public IEnumerable<PbJobModel> GetSelectedJobs()
         {
-
+            return pickflowRows.Controls
+                .OfType<PickedUpRowControl>()
+                .Where(row => row.IsChecked)
+                .Select(row => row.BoundJob);
         }
     }
 }

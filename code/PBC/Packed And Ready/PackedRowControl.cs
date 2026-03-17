@@ -34,7 +34,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
             InitializeComponent();
             
             chkbxStatus.Checked = true;
-
+            
         }
 
         public void Bind(PbJobModel job)

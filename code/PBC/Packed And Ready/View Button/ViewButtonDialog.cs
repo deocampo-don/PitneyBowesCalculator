@@ -346,9 +346,10 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
             if (selectedIndices == null || selectedIndices.Count == 0)
             {
-                Debug.WriteLine("No pallets selected.");
-                MessageBox.Show("Please select at least one pallet.");
-                return;
+               
+
+                MessageDialogBox.ShowDialog("Error", "Please select at least one pallet.", MessageBoxButtons.OK, MessageType.Info);
+                ;                return;
             }
 
             var selectedPallets = selectedIndices
@@ -416,12 +417,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
                             // If there is no active pallet, only one pallet can be unpacked
                             if (!hasActivePallet && palletIds.Count > 1)
-                            {
-                                MessageBox.Show(
-                                    "When there is no active pallet, only one pallet can be unpacked.",
-                                    "Invalid Operation",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Warning);
+                            { 
+                                MessageDialogBox.ShowDialog("Error", "When there is no active pallet, only one pallet can be unpacked. Select only one pallet and try again.", MessageBoxButtons.OK, MessageType.Info);
                                 return;
                             }
 
@@ -457,11 +454,46 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
             try
             {
-                await PrintSelectedPalletsAsync();
+                var selectedIndices = lvPallet.GetSelectedIndices();
+
+                if (selectedIndices == null || selectedIndices.Count == 0)
+                {
+                    MessageDialogBox.ShowDialog(
+                        "No Selection",
+                        "Select pallet(s) to print.",
+                        MessageBoxButtons.OK,
+                        MessageType.Info
+                    );
+                    return;
+                }
+
+                var selectedPallets = selectedIndices
+                    .Select(i => _job.Pallets[i])
+                    .ToList();
+
+                // 🔥 Use helper-based printing
+                await Task.Run(() =>
+                {
+                    PrintEngine.Print(e =>
+                        PrintLayouts.DrawPallets(e, _job, selectedPallets)
+                    );
+                });
+
+                Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Printed successfully!");
+            }
+            catch (Exception ex)
+            {
+                Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Printer not available!");
+
+                MessageDialogBox.ShowDialog(
+                    "Printing Error",
+                    ex.Message,
+                    MessageBoxButtons.OK,
+                    MessageType.Warning
+                );
             }
             finally
             {
-                //Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Attempting to print...");
                 btnPrintPallet.Enabled = true;
             }
         }
@@ -483,135 +515,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             doc.Print();
         }
 
-        private void PrintPdf(string pdfPath)
-        {
-            var printerName = Program.AppINI._defaultPrinter;
-            var printerIp = Program.AppINI._printerIP;
-            var printerPort = Program.AppINI._printerPort;
 
-            if (!File.Exists(pdfPath))
-            {
-                MessageBox.Show("PDF file not found.");
-                return;
-            }
 
-            /* -------------------------------------------------------------
-               TRY NETWORK PRINTER FIRST
-            ------------------------------------------------------------- */
-
-            if (!string.IsNullOrWhiteSpace(printerIp) &&
-                !string.IsNullOrWhiteSpace(printerPort) &&
-                int.TryParse(printerPort, out int port))
-            {
-                try
-                {
-                    PrintPdfToNetworkPrinter(pdfPath, printerIp, port);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Network printer failed: " + ex.Message);
-                }
-            }
-
-            /* -------------------------------------------------------------
-               FALLBACK TO WINDOWS DEFAULT PRINTER
-            ------------------------------------------------------------- */
-
-            if (!string.IsNullOrWhiteSpace(printerName))
-            {
-                bool printerExists = PrinterSettings.InstalledPrinters
-                    .Cast<string>()
-                    .Any(p => p.Equals(printerName, StringComparison.OrdinalIgnoreCase));
-
-                if (printerExists)
-                {
-                    try
-                    {
-                        PrintPdfToDefaultPrinter(pdfPath);
-                        return;
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine("Default printer failed: " + ex.Message);
-                    }
-                }
-            }
-
-            /* -------------------------------------------------------------
-               NO PRINTER AVAILABLE
-            ------------------------------------------------------------- */
-
-            MessageBox.Show(
-     "Unable to print.\n\n" +
-     "No reachable network printer and no default printer configured. Configure printer in settings first!",
-     "Printing Error",
-     MessageBoxButtons.OK,
-     MessageBoxIcon.Warning);
-            Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Printer failed!");
-        }
-        private void PrintPdfToDefaultPrinter(string pdfPath)
-        {
-            var printerName = Program.AppINI._defaultPrinter;
-
-            if (string.IsNullOrWhiteSpace(printerName))
-            {
-                MessageBox.Show("No default printer configured.");
-                return;
-            }
-
-            if (!File.Exists(pdfPath))
-            {
-                MessageBox.Show("PDF file not found.");
-                return;
-            }
-
-            bool printerExists = PrinterSettings.InstalledPrinters
-                .Cast<string>()
-                .Any(p => p.Equals(printerName, StringComparison.OrdinalIgnoreCase));
-
-            if (!printerExists)
-            {
-                MessageBox.Show($"Printer '{printerName}' is not installed.");
-                return;
-            }
-
-            try
-            {
-                var printer = new Jds2.SimpleFreePdfPrinter();
-                printer.PrintPdfTo(printerName, pdfPath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Printing failed:\n{ex.Message}");
-            }
-        }
-
-        private void PrintPdfToNetworkPrinter(string pdfPath, string printerIp, int printerPort)
-        {
-            if (!File.Exists(pdfPath))
-                throw new Exception("PDF file not found.");
-
-            byte[] fileBytes = File.ReadAllBytes(pdfPath);
-
-            using (TcpClient client = new TcpClient())
-            {
-                var result = client.BeginConnect(printerIp, printerPort, null, null);
-
-                bool success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5));
-
-                if (!success)
-                    throw new Exception("Printer connection timeout.");
-
-                client.EndConnect(result);
-
-                using (NetworkStream stream = client.GetStream())
-                {
-                    stream.Write(fileBytes, 0, fileBytes.Length);
-                    stream.Flush();
-                }
-            }
-        }
         private async Task PrintSelectedPalletsAsync()
         {
             var selectedIndices = lvPallet.GetSelectedIndices();
@@ -679,7 +584,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             {
                 await Task.Run(() =>
                 {
-                    PrintPdf(pdfPath);
+                    Utils.PrintPdf(pdfPath);
                 });
 
                 //lbStatus.Text = "Printed successfully";
@@ -687,7 +592,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             catch (Exception ex)
             {
                 Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Printer not available!");
-                
+
 
                 MessageBox.Show(
                     "Unable to print.\n\n" + ex.Message,
@@ -698,4 +603,3 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         }
     }
 }
-

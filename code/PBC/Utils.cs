@@ -1,5 +1,6 @@
 ﻿using Krypton.Toolkit;
 using MadMilkman.Ini;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,8 +12,10 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
@@ -20,7 +23,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.Properties;
-using Microsoft.Data.SqlClient;
 
 namespace WindowsFormsApp1
 {
@@ -273,6 +275,150 @@ namespace WindowsFormsApp1
                 return before.TrimEnd() + " WHERE " + clause + " " + after;
         }
 
+        public static void PrintPdf(string pdfPath)
+        {
+            var printerName = Program.AppINI._defaultPrinter;
+            var printerIp = Program.AppINI._printerIP;
+            var printerPort = Program.AppINI._printerPort;
+
+            if (!File.Exists(pdfPath))
+                throw new Exception("PDF file not found.");
+
+            /* -------------------------------------------------------------
+               TRY NETWORK PRINTER FIRST
+            ------------------------------------------------------------- */
+            if (!string.IsNullOrWhiteSpace(printerIp) &&
+                !string.IsNullOrWhiteSpace(printerPort) &&
+                int.TryParse(printerPort, out int port))
+            {
+                try
+                {
+                    PrintPdfToNetworkPrinter(pdfPath, printerIp, port);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Network printer failed: " + ex.Message);
+                }
+            }
+
+            /* -------------------------------------------------------------
+               FALLBACK TO WINDOWS DEFAULT PRINTER
+            ------------------------------------------------------------- */
+            if (!string.IsNullOrWhiteSpace(printerName))
+            {
+                bool printerExists = PrinterSettings.InstalledPrinters
+                    .Cast<string>()
+                    .Any(p => p.Equals(printerName, StringComparison.OrdinalIgnoreCase));
+
+                if (printerExists)
+                {
+                    try
+                    {
+                        var printer = new Jds2.SimpleFreePdfPrinter();
+                        printer.PrintPdfTo(printerName, pdfPath);
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Default printer failed: " + ex.Message);
+                    }
+                }
+            }
+
+            /* -------------------------------------------------------------
+               NO PRINTER AVAILABLE
+            ------------------------------------------------------------- */
+            MessageDialogBox.ShowDialog("Printing error", "No reachable network printer and no default printer configured.\n" + "Configure printer in settings first!", MessageBoxButtons.OK, MessageType.Error);
+            //throw new Exception(
+            //    "No reachable network printer and no default printer configured.\n\n" +
+            //    "Configure printer in settings first!"
+            //);
+        }
+
+        private static void PrintPdfToNetworkPrinter(string pdfPath, string ip, int port)
+        {
+            byte[] fileBytes = File.ReadAllBytes(pdfPath);
+
+            using (TcpClient client = new TcpClient())
+            {
+                var result = client.BeginConnect(ip, port, null, null);
+                bool success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5));
+
+                if (!success)
+                    throw new Exception("Printer connection timeout.");
+
+                client.EndConnect(result);
+
+                using (NetworkStream stream = client.GetStream())
+                {
+                    stream.Write(fileBytes, 0, fileBytes.Length);
+                    stream.Flush();
+                }
+            }
+        }
+        public static void GenerateReport(List<PbJobModel> jobs,DateTimePicker dvFrom, DateTimePicker dvTo)
+        {
+            if (jobs == null || !jobs.Any())
+                return;
+
+            // 🔥 Suggested filename using date range
+            string fileName = $"PB_Report_{dvFrom.Value:yyyyMMdd}_to_{dvTo.Value:yyyyMMdd}.csv";
+
+            using (var sfd = new SaveFileDialog())
+            {
+                sfd.Title = "Save Report";
+                sfd.Filter = "CSV files (*.csv)|*.csv";
+                sfd.FileName = fileName;
+                sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+                if (sfd.ShowDialog() != DialogResult.OK)
+                    return;
+
+                var lines = new List<string>();
+
+                // Header
+                lines.Add("PB Job,Envelope Qty,Trays,Pallets,Ship Date");
+
+                foreach (var job in jobs)
+                {
+                    lines.Add(string.Join(",",
+                        Safe($"{job.JobNumber} {job.JobName}"),
+                        job.TotalEnvelopeOfJob,
+                        job.TotalTraysOfJob,
+                        job.Pallets.Count,
+                        job.ShippedDate?.ToString("MM/dd/yyyy hh:mm tt")
+                    ));
+                }
+
+                // 🔥 Optional totals row
+                lines.Add("");
+                lines.Add(string.Join(",",
+                    "TOTAL",
+                    jobs.Sum(j => j.TotalEnvelopeOfJob),
+                    jobs.Sum(j => j.TotalTraysOfJob),
+                    jobs.Sum(j => j.Pallets.Count),
+                    ""
+                ));
+
+                File.WriteAllLines(sfd.FileName, lines);
+
+                // Open file after saving
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = sfd.FileName,
+                    UseShellExecute = true
+                });
+            }
+        }
+
+        private static string Safe(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return "";
+
+            return $"\"{value.Replace("\"", "\"\"")}\"";
+        }
         public static void hideStatusAndSpinner(KryptonLabel lb, PictureBox pb, string stat)
         {
             if (lb.InvokeRequired)
@@ -404,6 +550,8 @@ namespace WindowsFormsApp1
         }
     }
 
+
+
     public enum MessageType
     {
         Info,
@@ -434,9 +582,31 @@ namespace WindowsFormsApp1
             DialogResult dialogResult = DialogResult.OK;
             _dialogOpen = true;
 
+            switch (messageType)
+            {
+                case MessageType.Info:
+                    color = Color.FromArgb(133, 102, 193);
+                    icon = Image.FromFile("Resources/info-50.png");
+                    break;
+                case MessageType.Warning:
+                    color = Color.FromArgb(225, 173, 1);
+                    icon = Image.FromFile("Resources/warning-50.img");
+                    break;
+                case MessageType.Error:
+                    color = Color.FromArgb(228, 14, 15);
+                    icon = Image.FromFile("Resources/info-50.png");
+                    break;
+                case MessageType.Success:
+                    color = Color.FromArgb(67, 108, 20);
+                    icon = Image.FromFile("Resources/success-50.img");
+                    break;
+                default:
+                    break;
+            }
+
             this.Text = title;
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = color;
+            this.BackColor = Color.White;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -501,7 +671,7 @@ namespace WindowsFormsApp1
                 MaximumSize = new Size(400, 0),
                 TextAlign = ContentAlignment.MiddleLeft,
                 Font = new Font("Montserrat", 11, FontStyle.Bold),
-                ForeColor = Color.White,
+                ForeColor = Color.Black,
                 Margin = new Padding(10, 10, 10, 10)
             };
             contentLayout.Controls.Add(lblMessage, 1, 0);
@@ -603,4 +773,5 @@ namespace WindowsFormsApp1
         }
     }
 }
+
 

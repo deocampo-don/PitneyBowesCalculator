@@ -31,11 +31,11 @@
             tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             lblPallets = new Krypton.Toolkit.KryptonLabel();
             lblQty = new Krypton.Toolkit.KryptonLabel();
-            cbItem = new Krypton.Toolkit.KryptonCheckBox();
             lblPBNameCode = new Krypton.Toolkit.KryptonLabel();
             lblTrays = new Krypton.Toolkit.KryptonLabel();
             lblShipTime = new Krypton.Toolkit.KryptonLabel();
             btnView = new Krypton.Toolkit.KryptonButton();
+            cbItem = new System.Windows.Forms.CheckBox();
             tableLayoutPanel2.SuspendLayout();
             SuspendLayout();
             // 
@@ -53,11 +53,11 @@
             tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17.41826F));
             tableLayoutPanel2.Controls.Add(lblPallets, 4, 0);
             tableLayoutPanel2.Controls.Add(lblQty, 2, 0);
-            tableLayoutPanel2.Controls.Add(cbItem, 0, 0);
             tableLayoutPanel2.Controls.Add(lblPBNameCode, 1, 0);
             tableLayoutPanel2.Controls.Add(lblTrays, 3, 0);
             tableLayoutPanel2.Controls.Add(lblShipTime, 5, 0);
             tableLayoutPanel2.Controls.Add(btnView, 6, 0);
+            tableLayoutPanel2.Controls.Add(cbItem, 0, 0);
             tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
             tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
@@ -90,16 +90,6 @@
             lblQty.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 13.8F, System.Drawing.FontStyle.Bold);
             lblQty.TabIndex = 2;
             lblQty.Values.Text = "Envelope Qty";
-            // 
-            // cbItem
-            // 
-            cbItem.Anchor = System.Windows.Forms.AnchorStyles.None;
-            cbItem.Location = new System.Drawing.Point(33, 15);
-            cbItem.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            cbItem.Name = "cbItem";
-            cbItem.Size = new System.Drawing.Size(19, 13);
-            cbItem.TabIndex = 0;
-            cbItem.Values.Text = "";
             // 
             // lblPBNameCode
             // 
@@ -157,6 +147,17 @@
             btnView.Values.Text = "View";
             btnView.Click += btnView_Click;
             // 
+            // cbItem
+            // 
+            cbItem.Anchor = System.Windows.Forms.AnchorStyles.None;
+            cbItem.AutoSize = true;
+            cbItem.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            cbItem.Location = new System.Drawing.Point(35, 14);
+            cbItem.Name = "cbItem";
+            cbItem.Size = new System.Drawing.Size(15, 14);
+            cbItem.TabIndex = 7;
+            cbItem.UseVisualStyleBackColor = true;
+            // 
             // PickedUpRowControl
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -176,10 +177,10 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private Krypton.Toolkit.KryptonLabel lblPallets;
         private Krypton.Toolkit.KryptonLabel lblQty;
-        private Krypton.Toolkit.KryptonCheckBox cbItem;
         private Krypton.Toolkit.KryptonLabel lblPBNameCode;
         private Krypton.Toolkit.KryptonLabel lblTrays;
         private Krypton.Toolkit.KryptonLabel lblShipTime;
         private Krypton.Toolkit.KryptonButton btnView;
+        private System.Windows.Forms.CheckBox cbItem;
     }
 }
