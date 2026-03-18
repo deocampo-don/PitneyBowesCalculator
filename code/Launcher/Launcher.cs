@@ -57,14 +57,16 @@ namespace Launcher
 
                 if (!string.IsNullOrEmpty(err))
                 {
-                    MessageBox.Show("Failed to create config.ini\n" + err);
+                    //MessageBox.Show("Failed to create config.ini\n" + err);
+                    MessageDialogBox.ShowDialog("", "Failed to create config.ini\n" + err, MessageBoxButtons.OK, MessageType.Info);
                     return;
                 }
             }
 
             if (!launcherINI.GetINIVars(out err))
             {
-                MessageBox.Show("Failed to load configuration\n" + err);
+                //MessageBox.Show("Failed to load configuration\n" + err);
+                MessageDialogBox.ShowDialog("", "Failed to load configuration\n" + err, MessageBoxButtons.OK, MessageType.Info);
             }
         }
 
@@ -82,14 +84,17 @@ namespace Launcher
 
                 if (!string.IsNullOrEmpty(err))
                 {
-                    MessageBox.Show("Failed to create config.ini\n" + err);
+                    //MessageBox.Show("Failed to create config.ini\n" + err);
+                    MessageDialogBox.ShowDialog("", "Failed to create config.ini\n" + err, MessageBoxButtons.OK, MessageType.Info);
                     return;
                 }
             }
 
             if (!WindowsFormsApp1.Program.AppINI.GetINIVars(out err))
             {
-                MessageBox.Show("Failed to load configuration\n" + err);
+
+                //MessageBox.Show("Failed to load configuration\n" + err);
+                MessageDialogBox.ShowDialog("", "Failed to load configuration\n" + err, MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 

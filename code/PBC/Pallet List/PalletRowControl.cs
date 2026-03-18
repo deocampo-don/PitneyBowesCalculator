@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using System.Windows.Input;
 using WindowsFormsApp1.Dialogs;
 using WindowsFormsApp1.DIalogs;
 using WindowsFormsApp1.Models;
@@ -234,7 +235,8 @@ namespace WindowsFormsApp1
 
             if (activePallet == null)
             {
-                MessageBox.Show("No active pallet.");
+                //MessageBox.Show("No active pallet.");
+                MessageDialogBox.ShowDialog("", "No active pallet.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
@@ -271,11 +273,17 @@ namespace WindowsFormsApp1
             if (_model == null)
                 return;
 
-            var confirm = MessageBox.Show(
+        /*    var confirm = MessageBox.Show(
                 $"Delete PB Job \"{_model.JobName}\"?",
                 "Confirm Delete",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
+        */
+            var confirm = MessageDialogBox.ShowDialog(
+                "Confirm Delete",
+                $"Delete PB Job \"{_model.JobName}\"?",
+                MessageBoxButtons.YesNo,
+                MessageType.Warning);
 
             if (confirm != DialogResult.Yes)
                 return;
@@ -345,7 +353,8 @@ namespace WindowsFormsApp1
 
                 if (!dlg.ScannedWorkOrders.Any())
                 {
-                    MessageBox.Show("No scanned data.");
+                    //MessageBox.Show("No scanned data.");
+                    MessageDialogBox.ShowDialog("", "No scanned data.", MessageBoxButtons.OK, MessageType.Info);
                     return;
                 }
 
@@ -366,7 +375,8 @@ namespace WindowsFormsApp1
 
                     if (!validWorkOrders.Any())
                     {
-                        MessageBox.Show("All scanned barcodes are duplicates.");
+                        //MessageBox.Show("All scanned barcodes are duplicates.");
+                        MessageDialogBox.ShowDialog("", "All scanned barcodes are duplicates.", MessageBoxButtons.OK, MessageType.Error);
                         return;
                     }
 
@@ -394,18 +404,28 @@ namespace WindowsFormsApp1
 
                     if (duplicates.Any())
                     {
-                        MessageBox.Show(
+                    /*    MessageBox.Show(
                             $"Inserted: {validWorkOrders.Count}\nDuplicates skipped: {duplicates.Count}\n\n" +
                             string.Join("\n", duplicates),
                             "Duplicate Barcodes",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Warning
                         );
+                    */
+                        MessageDialogBox.ShowDialog(
+                            "Duplicate Barcodes",
+                            $"Inserted: {validWorkOrders.Count}\nDuplicates skipped: {duplicates.Count}\n\n" +
+                            string.Join("\n", duplicates),
+                            MessageBoxButtons.OK,
+                            MessageType.Warning
+                        );
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error saving pallet: " + ex.Message);
+                    //MessageBox.Show("Error saving pallet: " + ex.Message);
+                    MessageDialogBox.ShowDialog("", "Error saving pallet: " + ex.Message, MessageBoxButtons.OK, MessageType.Error);
+
                     return;
                 }
             }
@@ -519,14 +539,16 @@ namespace WindowsFormsApp1
 
             if (activePallet == null)
             {
-                MessageBox.Show("No active pallet to pack.");
+                //MessageBox.Show("No active pallet to pack.");
+                MessageDialogBox.ShowDialog("", "No active pallet to pack.", MessageBoxButtons.OK, MessageType.Error);
                 return;
             }
 
             if (activePallet.PalletEnvelopeQty == 0 &&
                 activePallet.PalletScannedWO == 0)
             {
-                MessageBox.Show("Cannot pack an empty pallet.");
+                //MessageBox.Show("Cannot pack an empty pallet.");
+                MessageDialogBox.ShowDialog("", "Cannot pack an empty pallet.", MessageBoxButtons.OK, MessageType.Error);
                 return;
             }
 
@@ -539,7 +561,8 @@ namespace WindowsFormsApp1
 
                 if (dlg.TrayCount <= 0)
                 {
-                    MessageBox.Show("Tray count must be greater than 0.");
+                    //MessageBox.Show("Tray count must be greater than 0.");
+                    MessageDialogBox.ShowDialog("", "Tray count must be greater than 0.", MessageBoxButtons.OK, MessageType.Error);
                     return;
                 }
 
@@ -555,11 +578,17 @@ namespace WindowsFormsApp1
 
                 if (rows == 0)
                 {
-                    MessageBox.Show(
+                /*    MessageBox.Show(
                         "This pallet was already packed by another workstation.",
                         "Pallet Already Packed",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
+                */
+                    MessageDialogBox.ShowDialog(
+                        "Pallet Already Packed",
+                        "This pallet was already packed by another workstation.",
+                        MessageBoxButtons.OK,
+                        MessageType.Warning);
 
                     PalletChanged?.Invoke(this, _model);
                     return;
@@ -571,7 +600,8 @@ namespace WindowsFormsApp1
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving pack data: " + ex.Message);
+                //MessageBox.Show("Error saving pack data: " + ex.Message);
+                MessageDialogBox.ShowDialog("", "Error saving pack data: " + ex.Message, MessageBoxButtons.OK, MessageType.Error);
                 return;
             }
 

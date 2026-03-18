@@ -40,11 +40,17 @@ namespace WindowsFormsApp1.DIalogs
         {
             if (!int.TryParse(tbTrays.Text.Trim(), out int trays) || trays <= 0)
             {
-                MessageBox.Show(
+            /*    MessageBox.Show(
                     "Please enter a valid tray quantity greater than 0.",
                     "Invalid Input",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
+            */
+                MessageDialogBox.ShowDialog(
+                    "Invalid Input",
+                    "Please enter a valid tray quantity greater than 0.",
+                    MessageBoxButtons.OK,
+                    MessageType.Warning);
 
                 tbTrays.Focus();
                 tbTrays.SelectAll();

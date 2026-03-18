@@ -41,7 +41,8 @@ namespace WindowsFormsApp1.Dialogs
             {
                 if (login.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show("Admin verified.");
+                    //MessageBox.Show("Admin verified.");
+                    MessageDialogBox.ShowDialog("", "Admin verified.", MessageBoxButtons.OK, MessageType.Info);
 
                     using (var frm = new SettingsDialogAdmin())
                     {
@@ -78,11 +79,18 @@ namespace WindowsFormsApp1.Dialogs
 
             if (errors.Count > 0)
             {
-                MessageBox.Show(
+            /*    MessageBox.Show(
                     "Please fix the following:\n\n" + string.Join("\n", errors),
                     "Validation",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
+            */
+                MessageDialogBox.ShowDialog(
+                  "Validation",
+                  "Please fix the following:\n\n" + string.Join("\n", errors),
+                  MessageBoxButtons.OK,
+                  MessageType.Warning
+              );
                 return;
             }
 
@@ -95,13 +103,21 @@ namespace WindowsFormsApp1.Dialogs
 
             if (!test.Success)
             {
-                MessageBox.Show(
-                    "RQ Client connection failed:\n\n" + test.Error,
+             /*  MessageBox.Show(
+                        "RQ Client connection failed:\n\n" + test.Error,
+                        "Connection Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+            */
+                MessageDialogBox.ShowDialog(
                     "Connection Error",
+                    "RQ Client connection failed:\n\n" + test.Error,
                     MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                    MessageType.Error
+                );
 
                 return;
+               
             }
 
             Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Connected");
@@ -119,11 +135,13 @@ namespace WindowsFormsApp1.Dialogs
             string err;
             if (!Program.AppINI.UpdateIni(out err))
             {
-                MessageBox.Show(err);
+                //MessageBox.Show(err);
+                MessageDialogBox.ShowDialog("", err, MessageBoxButtons.OK, MessageType.Error);
                 return;
             }
 
-            MessageBox.Show("Settings saved.");
+            //MessageBox.Show("Settings saved.");
+            MessageDialogBox.ShowDialog("", "Settings saved.", MessageBoxButtons.OK, MessageType.Info);
             SettingsChanged = true;
             this.DialogResult = DialogResult.OK;
             Close();

@@ -180,11 +180,20 @@ namespace WindowsFormsApp1.Packed_And_Ready
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+
+              /*MessageBox.Show(
                     ex.Message,
                     "Database Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+              */
+
+                MessageDialogBox.ShowDialog(
+                    "Database Error",
+                    ex.Message,
+                    MessageBoxButtons.OK,
+                    MessageType.Error
+                );
             }
         }
         public bool IsSelected()

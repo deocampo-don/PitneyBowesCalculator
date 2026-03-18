@@ -98,11 +98,19 @@ namespace WindowsFormsApp1
             
             if (missingFields.Count > 0)
             {
-                MessageBox.Show(
+            /*    MessageBox.Show(
                     "Please fix the following fields:\n\n" + string.Join("\n", missingFields),
                     "Validation",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
+            */
+
+                MessageDialogBox.ShowDialog(
+                    "Validation",
+                    "Please fix the following fields:\n\n" + string.Join("\n", missingFields),
+                    MessageBoxButtons.OK,
+                    MessageType.Warning
+                );
                 return;
             }
 
@@ -123,13 +131,22 @@ namespace WindowsFormsApp1
 
             if (!test.Success)
             {
-                MessageBox.Show(
+            /*    MessageBox.Show(
                     "SQL connection failed:\n\n" + test.Error,
                     "Connection Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+            */
+                MessageDialogBox.ShowDialog(
+                    "Connection Error",
+                    "SQL connection failed:\n\n" + test.Error,
+                    MessageBoxButtons.OK,
+                    MessageType.Error);
+
                 lbStatus.Visible = false;
                 pbSpinner.Visible= false;
+
+
 
                 return;
             }
@@ -151,13 +168,15 @@ namespace WindowsFormsApp1
 
             if (result.Success)
             {
-                MessageBox.Show("Settings saved.");
+                //MessageBox.Show("Settings saved.");
+                MessageDialogBox.ShowDialog("", "Settings saved.", MessageBoxButtons.OK, MessageType.Info);
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             else
             {
-                MessageBox.Show(result.ErrorMessage);
+               // MessageBox.Show(result.ErrorMessage);
+                MessageDialogBox.ShowDialog("", result.ErrorMessage, MessageBoxButtons.OK, MessageType.Error);
             }
         }
 
@@ -200,7 +219,8 @@ namespace WindowsFormsApp1
             {
                 if (login.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show("User Added.");
+                    //MessageBox.Show("User Added.");
+                    MessageDialogBox.ShowDialog("", "User Added.", MessageBoxButtons.OK, MessageType.Info);
 
                     using (var frm = new SettingsDialogAdmin())
                     {

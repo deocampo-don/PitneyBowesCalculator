@@ -91,11 +91,18 @@ namespace WindowsFormsApp1
                     Program.AppINI._rqClientDelayMs > 0 && Program.AppINI._appRefresh > 0)
                     break;
 
-                var result = MessageBox.Show(
+            /*    var result = MessageBox.Show(
                     "Rqlite is not configured.\n\nOpen settings now?",
                     "Configuration Missing",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning);
+            */
+                var result = MessageDialogBox.ShowDialog(
+                    "Configuration Missing",
+                    "Rqlite is not configured.\n\nOpen settings now?",
+                    MessageBoxButtons.YesNo,
+                    MessageType.Warning
+                );
 
                 if (result == DialogResult.No)
                     throw new InvalidOperationException("Rqlite configuration missing.");
@@ -140,7 +147,8 @@ namespace WindowsFormsApp1
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot load cps config from database");
+                //MessageBox.Show("Cannot load cps config from database");
+                MessageDialogBox.ShowDialog("", "Cannot load cps config from database", MessageBoxButtons.OK, MessageType.Error);
             }
         }
         // -------------------------
@@ -310,11 +318,18 @@ namespace WindowsFormsApp1
 
         private void ShowDatabaseError(Exception ex)
         {
-            MessageBox.Show(
+        /*    MessageBox.Show(
                 $"Database error:\n\n{ex.Message}",
                 "Database Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error
+            );
+        */
+            MessageDialogBox.ShowDialog(
+                "Database Error",
+                $"Database error:\n\n{ex.Message}",
+                MessageBoxButtons.OK,
+                MessageType.Error
             );
         }
 
@@ -354,7 +369,8 @@ namespace WindowsFormsApp1
                     {
                         if (!int.TryParse(dialog.JobNumber, out int jobNumber))
                         {
-                            MessageBox.Show("Invalid job number.");
+                            //MessageBox.Show("Invalid job number.");
+                            MessageDialogBox.ShowDialog("", "Invalid job number.", MessageBoxButtons.OK, MessageType.Error);
                             return;
                         }
 
@@ -367,11 +383,18 @@ namespace WindowsFormsApp1
 
                         if (rows == 0)
                         {
-                            MessageBox.Show(
+                        /*    MessageBox.Show(
                                 "This job was modified by another workstation.\nPlease reopen and try again.",
                                 "Update Conflict",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Warning);
+                        */
+                            MessageDialogBox.ShowDialog(
+                                "Update Conflict",
+                                "This job was modified by another workstation.\nPlease reopen and try again.",
+                                MessageBoxButtons.OK,
+                                MessageType.Warning
+                            );
 
                             await RefreshSingleJobAsync(job.JobId);
                             return;
@@ -626,7 +649,8 @@ namespace WindowsFormsApp1
 
             if (!selectedJobs.Any())
             {
-                MessageBox.Show("No jobs selected.");
+                //MessageBox.Show("No jobs selected.");
+                MessageDialogBox.ShowDialog("", "No jobs selected.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
@@ -683,11 +707,18 @@ namespace WindowsFormsApp1
                     // 🔴 PREVENT DUPLICATES
                     if (await RqliteClient.JobNumberExistsAsync(jobNumber))
                     {
-                        MessageBox.Show(
+                    /*    MessageBox.Show(
                             $"Job number {jobNumber} already exists.",
                             "Duplicate Job",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Warning);
+                    */
+                        MessageDialogBox.ShowDialog(
+                            "Duplicate Job",
+                            $"Job number {jobNumber} already exists.",
+                            MessageBoxButtons.OK,
+                            MessageType.Warning
+                        );
 
                         return;
                     }

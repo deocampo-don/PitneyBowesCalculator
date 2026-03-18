@@ -359,11 +359,18 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             if (!selectedPallets.All(p => p.State == PalletState.Ready))
             {
 
-                MessageBox.Show(
+             /*   MessageBox.Show(
                     "Only packed pallets (Ready) can be removed.",
                     "Invalid Selection",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
+             */
+                MessageDialogBox.ShowDialog(
+                    "Invalid Selection",
+                    "Only packed pallets (Ready) can be removed.",
+                    MessageBoxButtons.OK,
+                    MessageType.Warning
+);
                 return;
             }
 
@@ -377,7 +384,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             if (!palletIds.Any())
             {
 
-                MessageBox.Show("Invalid pallet selection.");
+                //MessageBox.Show("Invalid pallet selection.");
+                MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
                 return;
             }
 
@@ -401,7 +409,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                             if (activePalletId == null)
                             {
 
-                                MessageBox.Show("Active pallet no longer exists. Please refresh.");
+                                //MessageBox.Show("Active pallet no longer exists. Please refresh.");
+                                MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
                                 return;
                             }
                             await RqliteClient.MergePalletsIntoAsync(
@@ -418,7 +427,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                             // If there is no active pallet, only one pallet can be unpacked
                             if (!hasActivePallet && palletIds.Count > 1)
                             { 
-                                MessageDialogBox.ShowDialog("Error", "When there is no active pallet, only one pallet can be unpacked. Select only one pallet and try again.", MessageBoxButtons.OK, MessageType.Info);
+                                MessageDialogBox.ShowDialog("", "When there is no active pallet, only one pallet can be unpacked. Select only one pallet and try again.", MessageBoxButtons.OK, MessageType.Info);
                                 return;
                             }
 
@@ -442,7 +451,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             catch (Exception ex)
             {
 
-                MessageBox.Show("Error processing pallets:\n\n" + ex.Message);
+                //MessageBox.Show("Error processing pallets:\n\n" + ex.Message);
+                MessageDialogBox.ShowDialog("", "Error processing pallets:\n\n" + ex.Message, MessageBoxButtons.OK, MessageType.Error);
             }
         }
 
@@ -523,7 +533,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
             if (selectedIndices == null || selectedIndices.Count == 0)
             {
-                MessageBox.Show("Select pallet(s) to print.");
+                //MessageBox.Show("Select pallet(s) to print.");
+                MessageDialogBox.ShowDialog("", "Select pallet(s) to print.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
@@ -547,7 +558,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to generate PDF:\n\n" + ex.Message);
+                //MessageBox.Show("Failed to generate PDF:\n\n" + ex.Message);
+                MessageDialogBox.ShowDialog("", "Select pallet(s) to print.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
@@ -564,7 +576,8 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
             if (!File.Exists(pdfPath))
             {
-                MessageBox.Show("PDF was not generated.");
+                //MessageBox.Show("PDF was not generated.");
+                MessageDialogBox.ShowDialog("", "PDF was not generated.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
@@ -594,11 +607,18 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                 Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Printer not available!");
 
 
-                MessageBox.Show(
+            /*    MessageBox.Show(
                     "Unable to print.\n\n" + ex.Message,
                     "Printing Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
+            */
+                MessageDialogBox.ShowDialog(
+                    "Printing Error",
+                    "Unable to print.\n\n" + ex.Message,
+                    MessageBoxButtons.OK,
+                    MessageType.Warning
+                );
             }
         }
     }

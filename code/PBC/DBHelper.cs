@@ -350,9 +350,10 @@ public static class RqliteClient
         string sqlUser,
         string sqlPwd)
     {
-        MessageBox.Show("Encrypted password: " + sqlPwd);
-        
-    
+        //MessageBox.Show("Encrypted password: " + sqlPwd);
+        MessageDialogBox.ShowDialog("", "Encrypted password: " + sqlPwd, MessageBoxButtons.OK, MessageType.Info);
+
+
         string sql = $@"
 INSERT INTO settings
 (

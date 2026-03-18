@@ -590,11 +590,11 @@ namespace WindowsFormsApp1
                     break;
                 case MessageType.Warning:
                     color = Color.FromArgb(225, 173, 1);
-                    icon = Image.FromFile("Resources/warning-50.img");
+                    icon = Image.FromFile("Resources/warning-50.png");
                     break;
                 case MessageType.Error:
                     color = Color.FromArgb(228, 14, 15);
-                    icon = Image.FromFile("Resources/info-50.png");
+                    icon = Image.FromFile("Resources/error1.png");
                     break;
                 case MessageType.Success:
                     color = Color.FromArgb(67, 108, 20);

@@ -76,7 +76,13 @@ namespace WindowsFormsApp1.Dialogs
             {
                 System.Media.SystemSounds.Beep.Play();
                 tbWoBarcode.SelectAll();
-                MessageBox.Show("You've already scanned this barcode!");
+                //MessageBox.Show("You've already scanned this barcode!");
+                MessageDialogBox.ShowDialog(
+                    "",
+                    "You've already scanned this barcode!",
+                    MessageBoxButtons.OK,
+                    MessageType.Info
+                 );
                 _scanInProgress = false;
                 return;
             }
@@ -87,7 +93,8 @@ namespace WindowsFormsApp1.Dialogs
 
                 if (!checkValue.IsValid)
                 {
-                    MessageBox.Show(checkValue.Message);
+                    //MessageBox.Show(checkValue.Message);
+                    MessageDialogBox.ShowDialog("", checkValue.Message, MessageBoxButtons.OK, MessageType.Info);
                     tbWoBarcode.SelectAll();
                     return;
                 }
@@ -96,7 +103,8 @@ namespace WindowsFormsApp1.Dialogs
 
                 if (!isCPSBarcodeScanned)
                 {
-                    MessageBox.Show("Invalid CPS barcode.");
+                    //MessageBox.Show("Invalid CPS barcode.");
+                    MessageDialogBox.ShowDialog("Error", "Invalid CPS barcode.", MessageBoxButtons.OK, MessageType.Error);
                     tbWoBarcode.SelectAll();
                     return;
                 }
@@ -127,7 +135,9 @@ namespace WindowsFormsApp1.Dialogs
                             }
                             else
                             {
-                                MessageBox.Show("Scanned Work Order not found.");
+                                //MessageBox.Show("Scanned Work Order not found.");
+                                MessageDialogBox.ShowDialog("", "Scanned Work Order not found.", MessageBoxButtons.OK, MessageType.Info);
+
                                 return;
                             }
                         }
@@ -154,7 +164,8 @@ namespace WindowsFormsApp1.Dialogs
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error scanning barcode:\n" + ex.Message);
+               // MessageBox.Show("Error scanning barcode:\n" + ex.Message);
+                MessageDialogBox.ShowDialog("", "Error scanning barcode:", MessageBoxButtons.OK, MessageType.Error);
             }
             finally
             {
@@ -210,7 +221,8 @@ namespace WindowsFormsApp1.Dialogs
         {
             if (!_sessionWorkOrders.Any())
             {
-                MessageBox.Show("No scans.");
+                //MessageBox.Show("No scans.");
+                MessageDialogBox.ShowDialog("", "No scans.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 

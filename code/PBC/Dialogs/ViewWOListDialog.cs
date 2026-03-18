@@ -68,15 +68,23 @@ namespace WindowsFormsApp1
 
             if (!selectedRows.Any())
             {
-                MessageBox.Show("No work orders selected.");
+                //MessageBox.Show("No work orders selected.");
+                MessageDialogBox.ShowDialog("", "No work orders selected.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
-            var confirm = MessageBox.Show(
+        /*    var confirm = MessageBox.Show(
                 "Delete selected work orders?",
                 "Confirm Delete",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
+        */
+            var confirm = MessageDialogBox.ShowDialog(
+                "Confirm Delete",
+                "Delete selected work orders?",
+                MessageBoxButtons.YesNo,
+                MessageType.Warning
+            );
 
             if (confirm != DialogResult.Yes)
                 return;
@@ -99,7 +107,8 @@ namespace WindowsFormsApp1
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Delete failed: " + ex.Message);
+                //MessageBox.Show("Delete failed: " + ex.Message);
+                MessageDialogBox.ShowDialog("", "Delete failed: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
             }
         }
     }

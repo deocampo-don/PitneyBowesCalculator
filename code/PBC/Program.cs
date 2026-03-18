@@ -29,7 +29,9 @@ namespace WindowsFormsApp1
 
                 if (!string.IsNullOrEmpty(err))
                 {
-                    MessageBox.Show("Failed to create config.ini\n" + err);
+                    //MessageBox.Show("Failed to create config.ini\n" + err);
+                    MessageDialogBox.ShowDialog("", "Failed to create config.ini\n" + err, MessageBoxButtons.OK, MessageType.Error);
+
                     return;
                 }
             }
@@ -37,7 +39,8 @@ namespace WindowsFormsApp1
             // 🔹 Load values
             if (!AppINI.GetINIVars(out err))
             {
-                MessageBox.Show("Failed to load configuration\n" + err);
+                //MessageBox.Show("Failed to load configuration\n" + err);
+                MessageDialogBox.ShowDialog("", "Failed to load configuration\n" + err, MessageBoxButtons.OK, MessageType.Error);
                 return;
             }
 
