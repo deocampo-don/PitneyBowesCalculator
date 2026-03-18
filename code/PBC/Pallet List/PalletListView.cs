@@ -48,8 +48,18 @@ namespace WindowsFormsApp1
             var row = new PalletRowControl();
             row.Bind(job);
 
-            row.DeleteRequested += (_, j) =>
-                DeleteRequested?.Invoke(this, j);
+            row.DeleteRequested += async (_, j) =>
+            {
+                try
+                {
+                    DeleteRequested?.Invoke(this, j);
+                }
+                catch (Exception ex)
+                {
+                    Utils.WriteUnexpectedError("DeleteRequested event failed");
+                    Utils.WriteExceptionError(ex);
+                }
+            };
 
             row.PalletChanged += (_, j) =>
                 PalletChanged?.Invoke(this, j);

@@ -32,6 +32,8 @@
             btnPbc = new Krypton.Toolkit.KryptonButton();
             btnPl = new Krypton.Toolkit.KryptonButton();
             pictureBox1 = new PictureBox();
+            rbPbcDef = new RadioButton();
+            rbPlDef = new RadioButton();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -72,6 +74,38 @@
             pictureBox1.TabStop = false;
             pictureBox1.Click += pictureBox1_Click;
             // 
+            // rbPbcDef
+            // 
+            rbPbcDef.AutoSize = true;
+            rbPbcDef.BackColor = Color.Transparent;
+            rbPbcDef.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            rbPbcDef.ForeColor = SystemColors.Control;
+            rbPbcDef.Location = new Point(430, 321);
+            rbPbcDef.Name = "rbPbcDef";
+            rbPbcDef.RightToLeft = RightToLeft.Yes;
+            rbPbcDef.Size = new Size(159, 32);
+            rbPbcDef.TabIndex = 5;
+            rbPbcDef.TabStop = true;
+            rbPbcDef.Text = "Set as Default";
+            rbPbcDef.UseVisualStyleBackColor = false;
+            rbPbcDef.CheckedChanged += rbPbcDef_CheckedChanged;
+            // 
+            // rbPlDef
+            // 
+            rbPlDef.AutoSize = true;
+            rbPlDef.BackColor = Color.Transparent;
+            rbPlDef.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            rbPlDef.ForeColor = SystemColors.Control;
+            rbPlDef.Location = new Point(612, 321);
+            rbPlDef.Name = "rbPlDef";
+            rbPlDef.RightToLeft = RightToLeft.Yes;
+            rbPlDef.Size = new Size(159, 32);
+            rbPlDef.TabIndex = 6;
+            rbPlDef.TabStop = true;
+            rbPlDef.Text = "Set as Default";
+            rbPlDef.UseVisualStyleBackColor = false;
+            rbPlDef.CheckedChanged += rbPlDef_CheckedChanged;
+            // 
             // Launcher
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -79,6 +113,8 @@
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             BackgroundImageLayout = ImageLayout.Stretch;
             ClientSize = new Size(800, 450);
+            Controls.Add(rbPlDef);
+            Controls.Add(rbPbcDef);
             Controls.Add(pictureBox1);
             Controls.Add(btnPl);
             Controls.Add(btnPbc);
@@ -88,6 +124,7 @@
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -95,5 +132,7 @@
         private Krypton.Toolkit.KryptonButton btnPbc;
         private Krypton.Toolkit.KryptonButton btnPl;
         private PictureBox pictureBox1;
+        private RadioButton rbPbcDef;
+        private RadioButton rbPlDef;
     }
 }

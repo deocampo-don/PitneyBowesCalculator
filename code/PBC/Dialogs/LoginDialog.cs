@@ -54,7 +54,7 @@ namespace WindowsFormsApp1.Dialogs
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                //MessageBox.Show("Enter username and password.");
+                
                 MessageDialogBox.ShowDialog("", "Enter username and password.", MessageBoxButtons.OK, MessageType.Error);
 
                 return;
@@ -64,7 +64,7 @@ namespace WindowsFormsApp1.Dialogs
             {
                 if (password != tbVerifyPwd.Text.Trim())
                 {
-                    //MessageBox.Show("Passwords do not match.");
+                   
                     MessageDialogBox.ShowDialog("", "Passwords do not match.", MessageBoxButtons.OK, MessageType.Error);
                     return;
                 }
@@ -99,10 +99,7 @@ namespace WindowsFormsApp1.Dialogs
             }
             else
             {
-               /* MessageBox.Show(DialogMode == "Login"
-                    ? "Invalid admin credentials."
-                    : "Failed to create user.");
-               */
+        
                 MessageDialogBox.ShowDialog(
                      "",
                         DialogMode == "Login"
@@ -112,31 +109,6 @@ namespace WindowsFormsApp1.Dialogs
                     MessageType.Error);
             }
         }
-
-        //private async void btnLogin_Click(object sender, EventArgs e)
-        //{
-        //    string username = tbUserName.Text.Trim();
-        //    string password = tbPass.Text.Trim();
-
-        //    if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-        //    {
-        //        MessageBox.Show("Enter username and password.");
-        //        return;
-        //    }
-
-        //    string hashedPassword = HashPassword(password);
-
-        //    bool created = await RqliteClient.CreateUserAsync(username, hashedPassword);
-
-        //    if (created)
-        //    {
-        //        MessageBox.Show("Admin created successfully.");
-        //    }
-        //    else
-        //    {
-        //        MessageBox.Show("Failed to create admin.");
-        //    }
-        //}
 
         public static string HashPassword(string password)
     {

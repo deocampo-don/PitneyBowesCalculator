@@ -207,8 +207,31 @@ namespace WindowsFormsApp1
 
             return result;
         }
+        public void SetStartUpScreen(string value)
+        {
+            _startUpScreen = value;
+        }
+        public bool UpdateStartUpScreen(out string errMsg)
+        {
+            errMsg = "";
+            try
+            {
+                var configFile = new IniFile(new IniOptions { CommentStarter = IniCommentStarter.Hash });
+                configFile.Load(_iniFileName);
 
-       
+                var appSection = configFile.Sections["APP"];
+                appSection.Keys["startUpScreen"].Value = _startUpScreen ?? "";
+
+                configFile.Save(_iniFileName);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+                return false;
+            }
+        }
+
     }
 }
 

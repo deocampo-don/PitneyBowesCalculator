@@ -100,12 +100,24 @@ public static class RqliteClient
             }
             catch (HttpRequestException ex)
             {
+               
                 attempt++;
 
-                Console.WriteLine($"Query retry {attempt}: {ex.Message}");
+           
+                Utils.WriteUnexpectedError(
+                    $"Rqlite query retry {attempt}/{maxRetries}"
+                );
 
+                
                 if (attempt >= maxRetries)
+                {
+                    Utils.WriteUnexpectedError(
+                        $"Rqlite query failed after {attempt} attempts"
+                    );
+
+                    Utils.WriteExceptionError(ex);
                     throw;
+                }
 
                 await Task.Delay(delayMs);
             }
@@ -207,34 +219,31 @@ public static class RqliteClient
     {
         try
         {
-            // Prevent simple SQL injection
-            username = username.Replace("'", "''");
-            password = password.Replace("'", "''");
-
             var result = await SelectAsync(
-                "users",
-                $"WHERE Username = '{username}' AND PassWord = '{password}' LIMIT 1"
-            );
+     "users",
+     $"WHERE Username = '{username}' AND PassWord = '{password}' LIMIT 1"
+ );
 
             return result?.Records?.Count > 0;
         }
-        catch
+        catch (Exception ex)
         {
+            Utils.WriteUnexpectedError($"ValidateAdmin failed | Username={username}");
+            Utils.WriteExceptionError(ex);
             return false;
         }
     }
-
     public static async Task<bool> CreateUserAsync(string username, string password)
     {
         try
         {
-            // Prevent simple SQL injection
+            // ⚠️ Still not ideal, but keeping your current pattern
             username = username.Replace("'", "''");
             password = password.Replace("'", "''");
 
             string sql = $@"
-        INSERT INTO users (Username, PassWord, IsAdmin, IsActive)
-        VALUES ('{username}', '{password}', 1, 1)";
+INSERT INTO users (Username, PassWord, IsAdmin, IsActive)
+VALUES ('{username}', '{password}', 1, 1)";
 
             var json = JsonConvert.SerializeObject(new[] { sql });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -243,8 +252,12 @@ public static class RqliteClient
 
             return response.IsSuccessStatusCode;
         }
-        catch
+        catch (Exception ex)
         {
+            // ✅ Proper logging
+            Utils.WriteUnexpectedError($"CreateUser failed | Username={username}");
+            Utils.WriteExceptionError(ex);
+
             return false;
         }
     }
@@ -482,6 +495,10 @@ WHERE Id = {jobId}
         }
         catch (Exception ex)
         {
+            Utils.WriteUnexpectedError(
+            $"SQL connection test failed | Server={server}, DB={db}, Trusted={trustedConn}, Timeout={timeout}"
+        );
+            Utils.WriteExceptionError(ex);
             return (false, ex.Message);
         }
     }
@@ -1034,6 +1051,11 @@ ORDER BY j.Id, p.PalletNumber
         }
         catch (Exception ex)
         {
+
+            Utils.WriteUnexpectedError(
+                $"Rqlite connection test failed | Address={address}, TimeoutMs={timeoutMs}");
+            Utils.WriteExceptionError(ex);
+
             return (false, ex.Message);
         }
     }
@@ -1532,25 +1554,33 @@ WHERE Id = (
 
         return await ExecuteAsync(sql.ToString());
     }
-
-
     public static async Task<bool> IsDatabaseAvailableAsync()
     {
         try
         {
-            using (var cts = new CancellationTokenSource(3000)) // 3 seconds safer
+            using (var cts = new CancellationTokenSource(3000))
             {
                 var response = await httpClient.GetAsync("/status", cts.Token);
-
                 return response.IsSuccessStatusCode;
             }
         }
-        catch
+        catch (TaskCanceledException ex)
         {
+            // ✅ Timeout-specific (useful signal)
+            Utils.WriteUnexpectedError("Rqlite availability check timeout (3s)");
+            Utils.WriteExceptionError(ex);
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            // ⚠️ Only log meaningful failures
+            Utils.WriteUnexpectedError("Rqlite availability check failed");
+            Utils.WriteExceptionError(ex);
+
             return false;
         }
     }
-
 
     // ======================
     // RESPONSE DTOs

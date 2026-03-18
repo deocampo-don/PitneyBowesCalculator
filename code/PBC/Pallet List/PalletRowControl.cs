@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Input;
 using WindowsFormsApp1.Dialogs;
 using WindowsFormsApp1.DIalogs;
 using WindowsFormsApp1.Models;
@@ -143,10 +142,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void RoundedGroupBox_Paint(object sender, PaintEventArgs e)
-        {
 
-        }
         private void UpdateButtonsState()
         {
             if (_model == null)
@@ -222,9 +218,6 @@ namespace WindowsFormsApp1
             }
         }
 
-
-
-
         private async void kryptonButton3_Click(object sender, EventArgs e)
         {
             if (_model == null)
@@ -235,7 +228,6 @@ namespace WindowsFormsApp1
 
             if (activePallet == null)
             {
-                //MessageBox.Show("No active pallet.");
                 MessageDialogBox.ShowDialog("", "No active pallet.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
@@ -257,8 +249,8 @@ namespace WindowsFormsApp1
 
                     await RqliteClient.DeleteWorkOrdersAsync(ids);
 
-                    foreach (var deleted in dlg.DeletedItems)
-                        activePallet.WorkOrders.RemoveAll(x => x.Id == deleted.Id);
+               
+                    activePallet.WorkOrders = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
 
                     UpdateButtonsState();
                     PalletChanged?.Invoke(this, _model);
@@ -272,26 +264,18 @@ namespace WindowsFormsApp1
         {
             if (_model == null)
                 return;
-
-        /*    var confirm = MessageBox.Show(
-                $"Delete PB Job \"{_model.JobName}\"?",
-                "Confirm Delete",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-        */
             var confirm = MessageDialogBox.ShowDialog(
                 "Confirm Delete",
                 $"Delete PB Job \"{_model.JobName}\"?",
                 MessageBoxButtons.YesNo,
-                MessageType.Warning);
+                MessageType.Warning
+            );
 
             if (confirm != DialogResult.Yes)
                 return;
-
+            Utils.WriteUnexpectedError($"Delete job | JobId={_model.JobId}, JobName={_model.JobName}");
             DeleteRequested?.Invoke(this, _model);
         }
-
-
         public void Bind(PbJobModel model)
         {
             _model = model;
@@ -350,11 +334,11 @@ namespace WindowsFormsApp1
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK)
                     return;
+            
 
                 if (!dlg.ScannedWorkOrders.Any())
                 {
-                    //MessageBox.Show("No scanned data.");
-                    MessageDialogBox.ShowDialog("", "No scanned data.", MessageBoxButtons.OK, MessageType.Info);
+                    MessageDialogBox.ShowDialog("", "No scanned data.", MessageBoxButtons.OK, MessageType.Error);
                     return;
                 }
 
@@ -375,8 +359,8 @@ namespace WindowsFormsApp1
 
                     if (!validWorkOrders.Any())
                     {
-                        //MessageBox.Show("All scanned barcodes are duplicates.");
                         MessageDialogBox.ShowDialog("", "All scanned barcodes are duplicates.", MessageBoxButtons.OK, MessageType.Error);
+                        
                         return;
                     }
 
@@ -404,18 +388,16 @@ namespace WindowsFormsApp1
 
                     if (duplicates.Any())
                     {
-                    /*    MessageBox.Show(
-                            $"Inserted: {validWorkOrders.Count}\nDuplicates skipped: {duplicates.Count}\n\n" +
-                            string.Join("\n", duplicates),
-                            "Duplicate Barcodes",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning
-                        );
-                    */
+
+                        var message =
+     $"Inserted: {validWorkOrders.Count}\n" +
+     $"Duplicates skipped: {duplicates.Count}\n\n" +
+     $"{string.Join("\n", duplicates)}\n\n" +
+     "Duplicate Barcodes";
+
                         MessageDialogBox.ShowDialog(
-                            "Duplicate Barcodes",
-                            $"Inserted: {validWorkOrders.Count}\nDuplicates skipped: {duplicates.Count}\n\n" +
-                            string.Join("\n", duplicates),
+                            "",
+                            message,
                             MessageBoxButtons.OK,
                             MessageType.Warning
                         );
@@ -423,9 +405,8 @@ namespace WindowsFormsApp1
                 }
                 catch (Exception ex)
                 {
-                    //MessageBox.Show("Error saving pallet: " + ex.Message);
-                    MessageDialogBox.ShowDialog("", "Error saving pallet: " + ex.Message, MessageBoxButtons.OK, MessageType.Error);
-
+                    Utils.WriteExceptionError(ex);
+                    MessageDialogBox.ShowDialog("", "Error saving pallet: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
                     return;
                 }
             }
@@ -434,101 +415,7 @@ namespace WindowsFormsApp1
             PalletChanged?.Invoke(this, _model);
         }
 
-        //private async void btnAddPallet_Click(object sender, EventArgs e)
-        //{
-        //    if (_model == null)
-        //        return;
-
-        //    Pallet pallet;
-
-        //    try
-        //    {
-        //        int palletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
-
-        //        pallet = _model.Pallets.FirstOrDefault(p => p.PalletId == palletId);
-
-        //        if (pallet == null)
-        //        {
-        //            pallet = new Pallet
-        //            {
-        //                PalletId = palletId,
-        //                PBJobId = _model.JobId
-        //            };
-
-        //            _model.Pallets.Add(pallet);
-        //        }
-
-        //        // ⭐ get current totals for dialog
-        //        int envelopeQty = pallet.PalletEnvelopeQty;
-        //        int scannedWO = pallet.PalletScannedWO;
-
-        //        using (var dlg = new AddToPalletDialog(envelopeQty, scannedWO))
-        //        {
-        //            if (dlg.ShowDialog(this) != DialogResult.OK)
-        //                return;
-
-        //            if (!dlg.ScannedWorkOrders.Any())
-        //            {
-        //                MessageBox.Show("No scanned data.");
-        //                return;
-        //            }
-
-        //            try
-        //            {
-        //                var scannedBarcodes = dlg.ScannedWorkOrders
-        //                    .Select(x => x.Barcode)
-        //                    .ToList();
-
-        //                int scanned = scannedBarcodes.Count;
-
-        //                // ⭐ Attempt insert (duplicates ignored by DB)
-        //                await RqliteClient.SaveWorkOrdersAsync(
-        //                    pallet.PalletId,
-        //                    dlg.ScannedWorkOrders
-        //                );
-
-        //                // ⭐ Reload from DB (source of truth)
-        //                pallet.WorkOrders =
-        //                    await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
-
-        //                var insertedBarcodes = pallet.WorkOrders
-        //                    .Select(x => x.Barcode)
-        //                    .ToHashSet();
-
-        //                var duplicates = scannedBarcodes
-        //                    .Where(b => insertedBarcodes.Contains(b) == false)
-        //                    .ToList();
-
-        //                int inserted = scanned - duplicates.Count;
-
-        //                if (duplicates.Any())
-        //                {
-        //                    MessageBox.Show(
-        //                        $"Inserted: {inserted}\nDuplicates skipped: {duplicates.Count}\n\n" +
-        //                        string.Join("\n", duplicates),
-        //                        "Duplicate Barcodes",
-        //                        MessageBoxButtons.OK,
-        //                        MessageBoxIcon.Warning
-        //                    );
-        //                }
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                MessageBox.Show("Error saving pallet: " + ex.Message);
-        //                return;
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show("Error preparing pallet: " + ex.Message);
-        //        return;
-        //    }
-
-        //    UpdateButtonsState();
-        //    PalletChanged?.Invoke(this, _model);
-        //}
-
+     
         private async void btnPackPallet_Click(object sender, EventArgs e)
         {
             if (_model == null)
@@ -539,16 +426,16 @@ namespace WindowsFormsApp1
 
             if (activePallet == null)
             {
-                //MessageBox.Show("No active pallet to pack.");
-                MessageDialogBox.ShowDialog("", "No active pallet to pack.", MessageBoxButtons.OK, MessageType.Error);
+              
+                MessageDialogBox.ShowDialog("", "No active pallet to pack.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
             if (activePallet.PalletEnvelopeQty == 0 &&
                 activePallet.PalletScannedWO == 0)
             {
-                //MessageBox.Show("Cannot pack an empty pallet.");
-                MessageDialogBox.ShowDialog("", "Cannot pack an empty pallet.", MessageBoxButtons.OK, MessageType.Error);
+                
+                MessageDialogBox.ShowDialog("", "Cannot pack an empty pallet.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
@@ -561,8 +448,7 @@ namespace WindowsFormsApp1
 
                 if (dlg.TrayCount <= 0)
                 {
-                    //MessageBox.Show("Tray count must be greater than 0.");
-                    MessageDialogBox.ShowDialog("", "Tray count must be greater than 0.", MessageBoxButtons.OK, MessageType.Error);
+                    MessageDialogBox.ShowDialog("", "Tray count must be greater than 0.", MessageBoxButtons.OK, MessageType.Info);
                     return;
                 }
 
@@ -571,24 +457,22 @@ namespace WindowsFormsApp1
 
             try
             {
+                Utils.WriteUnexpectedError($"Pack pallet | PalletId={activePallet.PalletId}, TrayCount={trayCount}");
                 var rows = await RqliteClient.UpdatePalletPackingAsync(
      activePallet.PalletId,
      trayCount
  );
+                
 
                 if (rows == 0)
                 {
-                /*    MessageBox.Show(
-                        "This pallet was already packed by another workstation.",
-                        "Pallet Already Packed",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                */
+
                     MessageDialogBox.ShowDialog(
-                        "Pallet Already Packed",
-                        "This pallet was already packed by another workstation.",
-                        MessageBoxButtons.OK,
-                        MessageType.Warning);
+    "Pallet Already Packed",
+    "This pallet was already packed by another workstation.",
+    MessageBoxButtons.OK,
+    MessageType.Info
+);
 
                     PalletChanged?.Invoke(this, _model);
                     return;
@@ -600,19 +484,14 @@ namespace WindowsFormsApp1
             }
             catch (Exception ex)
             {
-                //MessageBox.Show("Error saving pack data: " + ex.Message);
-                MessageDialogBox.ShowDialog("", "Error saving pack data: " + ex.Message, MessageBoxButtons.OK, MessageType.Error);
+                Utils.WriteExceptionError(ex);
+                MessageDialogBox.ShowDialog("", "Error saving pack data: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
             UpdateButtonsState();
 
             PalletChanged?.Invoke(this, _model);
-        }
-
-        private void lblAxRef_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

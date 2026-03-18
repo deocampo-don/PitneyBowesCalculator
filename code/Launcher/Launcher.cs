@@ -9,7 +9,8 @@ namespace Launcher
     public partial class Launcher : Form
     {
         private INIClass launcherINI;
-
+        private bool _isInitializing = true;
+        private bool _isUpdatingCheckbox = false;
         public Launcher()
         {
             InitializeComponent();
@@ -17,18 +18,29 @@ namespace Launcher
 
         private void Launcher_Load(object sender, EventArgs e)
         {
+            _isInitializing = true; // prevent events during setup
+
             InitializeConfig();
-            BackgroundImage = Properties.Resources.launcherBg; BackgroundImage = Properties.Resources.launcherBg;
+
+            BackgroundImage = Properties.Resources.launcherBg;
             BackgroundImageLayout = ImageLayout.Stretch;
+
+            // ✅ Load default from INI → update UI
+            string defaultApp = launcherINI?.StartUpScreen ?? "";
+
+            rbPbcDef.Checked = defaultApp.Equals("PBC", StringComparison.OrdinalIgnoreCase);
+            rbPlDef.Checked = defaultApp.Equals("POSTLIST", StringComparison.OrdinalIgnoreCase);
+
+            _isInitializing = false; // allow events after UI is set
+
             // SHIFT override -> force show launcher
             if ((ModifierKeys & Keys.Shift) == Keys.Shift)
                 return;
 
-            string defaultApp = launcherINI.StartUpScreen;
-
             if (string.IsNullOrEmpty(defaultApp))
                 return;
 
+            // ✅ Auto launch
             switch (defaultApp.ToUpper())
             {
                 case "PBC":
@@ -57,7 +69,7 @@ namespace Launcher
 
                 if (!string.IsNullOrEmpty(err))
                 {
-                    //MessageBox.Show("Failed to create config.ini\n" + err);
+
                     MessageDialogBox.ShowDialog("", "Failed to create config.ini\n" + err, MessageBoxButtons.OK, MessageType.Info);
                     return;
                 }
@@ -65,7 +77,7 @@ namespace Launcher
 
             if (!launcherINI.GetINIVars(out err))
             {
-                //MessageBox.Show("Failed to load configuration\n" + err);
+
                 MessageDialogBox.ShowDialog("", "Failed to load configuration\n" + err, MessageBoxButtons.OK, MessageType.Info);
             }
         }
@@ -123,13 +135,30 @@ namespace Launcher
             this.Close();
         }
 
-        //private void rbPbcDef_CheckedChanged(object sender, EventArgs e)
-        //{
-        //    if (rbPbcDef.Checked)
-        //    {
-        //        //launcherINI.StartUpScreen = "PBC";
-        //        launcherINI.UpdateIni(out _);
-        //    }
-        //}
+
+
+        private void rbPbcDef_CheckedChanged(object sender, EventArgs e)
+        {
+            if (_isInitializing || launcherINI == null)
+                return;
+
+            if (rbPbcDef.Checked)
+            {
+                launcherINI.SetStartUpScreen("PBC");
+                launcherINI.UpdateStartUpScreen(out _);
+            }
+        }
+
+        private void rbPlDef_CheckedChanged(object sender, EventArgs e)
+        {
+            if (_isInitializing || launcherINI == null)
+                return;
+
+            if (rbPlDef.Checked)
+            {
+                launcherINI.SetStartUpScreen("POSTLIST");
+                launcherINI.UpdateStartUpScreen(out _);
+            }
+        }
     }
 }

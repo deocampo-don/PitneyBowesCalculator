@@ -180,14 +180,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
             }
             catch (Exception ex)
             {
-
-              /*MessageBox.Show(
-                    ex.Message,
-                    "Database Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-              */
-
+                Utils.WriteExceptionError(ex);
                 MessageDialogBox.ShowDialog(
                     "Database Error",
                     ex.Message,

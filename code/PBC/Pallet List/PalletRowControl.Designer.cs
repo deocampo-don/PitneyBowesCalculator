@@ -275,7 +275,7 @@
             lblAxRef.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             lblAxRef.TabIndex = 3;
             lblAxRef.Values.Text = "23412";
-            lblAxRef.Click += lblAxRef_Click;
+          
             // 
             // roundedPanel1
             // 

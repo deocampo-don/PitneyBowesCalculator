@@ -39,6 +39,8 @@ namespace WindowsFormsApp1
         private string _preparedCpsQuery;
         public event EventHandler ItemsChanged;
         private List<PbJobModel> _shipmentRows = new();
+  
+        private bool _isConnected = false;
         // -----------------------------
         // Constructor
         // -----------------------------
@@ -68,12 +70,12 @@ namespace WindowsFormsApp1
             SyncNavigatorWithCheckedTab();
             try
             {
-                await InitializeRqliteAsync();
-                await LoadCPSConfig();
-                await StartApplicationAsync();
+                await InitializeAppAsync();
             }
             catch (Exception ex)
             {
+                Utils.WriteUnexpectedError("App initialization failed (Form1_Shown)");
+                Utils.WriteExceptionError(ex);
                 ShowDatabaseError(ex);
             }
         }
@@ -81,7 +83,16 @@ namespace WindowsFormsApp1
 
         // -----------------------------
         // Loading Configs
-        // -----------------------------
+        // -----------------------------\
+        private async Task InitializeAppAsync()
+        {
+            await InitializeRqliteAsync();
+
+            if (!await StartApplicationAsync())
+                return;
+
+           
+        }
         private async Task InitializeRqliteAsync()
         {
             while (true)
@@ -90,13 +101,6 @@ namespace WindowsFormsApp1
                     Program.AppINI._rqClientMaxRetries > 0 &&
                     Program.AppINI._rqClientDelayMs > 0 && Program.AppINI._appRefresh > 0)
                     break;
-
-            /*    var result = MessageBox.Show(
-                    "Rqlite is not configured.\n\nOpen settings now?",
-                    "Configuration Missing",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
-            */
                 var result = MessageDialogBox.ShowDialog(
                     "Configuration Missing",
                     "Rqlite is not configured.\n\nOpen settings now?",
@@ -136,6 +140,33 @@ namespace WindowsFormsApp1
                 RqliteClient.DefaultEndPoint = Program.AppINI._rqClientAddress.Trim();
             }
         }
+
+        private async Task<bool> StartApplicationAsync()
+        {
+            if (!await RqliteClient.IsDatabaseAvailableAsync())
+            {
+                _ = StartReconnectWatcher();
+                return false;
+            }
+
+            await OnDatabaseConnectedAsync();
+            return true;
+        }
+
+        private async Task OnDatabaseConnectedAsync()
+        {
+            _isConnected = true;
+            _isReconnecting = false;
+
+            Utils.hideStatusAndSpinner(lbDbConnecting, pbConnectionSpinner, "Connected");
+
+            await LoadJobsAsync();
+            _lastJobsTimestamp = await RqliteClient.GetJobsLastUpdatedAsync();
+
+            await LoadCPSConfig(); // 🔥 now included here
+
+            StartBackgroundPolling();
+        }
         public static async Task LoadCPSConfig()
         {
             try
@@ -147,10 +178,15 @@ namespace WindowsFormsApp1
             }
             catch (Exception ex)
             {
-                //MessageBox.Show("Cannot load cps config from database");
-                MessageDialogBox.ShowDialog("", "Cannot load cps config from database", MessageBoxButtons.OK, MessageType.Error);
+                Utils.WriteUnexpectedError("LoadCPSConfig failed");
+                Utils.WriteExceptionError(ex);
+                MessageDialogBox.ShowDialog("",
+                    $"Cannot load CPS config.\n\n{ex.Message}",
+                    MessageBoxButtons.OK,
+                    MessageType.Error);
             }
         }
+
         // -------------------------
         // Polling
         // -------------------------
@@ -165,8 +201,8 @@ namespace WindowsFormsApp1
             _pollTimer.Tick += async (_, __) =>
             {
                 if (_isPolling) return;
-                if (PausePolling)
-                    return;
+                if (PausePolling) return;
+
                 _isPolling = true;
 
                 try
@@ -177,13 +213,21 @@ namespace WindowsFormsApp1
 
                     await PollForUpdatesAsync();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Utils.WriteUnexpectedError("Polling failed (StartBackgroundPolling)");
+
+                    Utils.WriteExceptionError(ex);
+
                     _pollTimer.Stop();
+                    _isConnected = false;
 
                     Utils.showStatusAndSpinner(lbDbConnecting, pbConnectionSpinner, "Database Offline - Reconnecting...");
 
-                    StartReconnectWatcher();
+                    if (!_isReconnecting)
+                    {
+                        _ = StartReconnectWatcher();
+                    }
                 }
                 finally
                 {
@@ -201,7 +245,11 @@ namespace WindowsFormsApp1
 
         private async Task PollForUpdatesAsync()
         {
-
+            if (!await RqliteClient.IsDatabaseAvailableAsync())
+            {
+                Utils.WriteUnexpectedError("Database unavailable during polling.");
+                throw new InvalidOperationException("Database offline");
+            }
             if (WindowState == FormWindowState.Minimized)
                 return;
             if (Application.OpenForms.OfType<ViewButtonDialog>().Any())
@@ -217,8 +265,6 @@ namespace WindowsFormsApp1
 
             _lastJobsTimestamp = dbTimestamp;
             _lastJobsCount = dbCount;
-
-            _lastJobsTimestamp = dbTimestamp;
 
             // ---------------------------------------
             // Existing logic runs only when needed
@@ -277,54 +323,55 @@ namespace WindowsFormsApp1
                 }
             }
         }
-        private async Task StartApplicationAsync()
-        {
-            if (!await RqliteClient.IsDatabaseAvailableAsync())
-            {
-                Utils.showStatusAndSpinner(lbDbConnecting, pbConnectionSpinner, "Database Offline - Reconnecting...");
-                StartReconnectWatcher();
-                return;
-            }
 
-            Utils.hideStatusAndSpinner(lbDbConnecting, pbConnectionSpinner, "Connected");
 
-            await LoadJobsAsync();
-
-            _lastJobsTimestamp = await RqliteClient.GetJobsLastUpdatedAsync();
-
-            StartBackgroundPolling();
-        }
-
-        private async void StartReconnectWatcher()
+        private async Task StartReconnectWatcher()
         {
             if (_isReconnecting) return;
 
             _isReconnecting = true;
+            _isConnected = false;
 
-            while (true)
+            Utils.showStatusAndSpinner(lbDbConnecting, pbConnectionSpinner, "Database Offline - Reconnecting...");
+
+            while (_isReconnecting)
             {
-                await Task.Delay(5000);
-
-                if (await RqliteClient.IsDatabaseAvailableAsync())
+                try
                 {
-                    _isReconnecting = false;
+                    Utils.WriteUnexpectedError("Reconnect attempt...");
+                    await Task.Delay(3000);
 
-                    await StartApplicationAsync();
+                    if (await RqliteClient.IsDatabaseAvailableAsync())
+                    {
+                        Utils.WriteUnexpectedError("Database reconnected successfully.");
+                        _isReconnecting = false;
 
-                    break;
+                        // Ensure UI thread
+                        if (InvokeRequired)
+                        {
+                            BeginInvoke(new Action(async () =>
+                            {
+                                await OnDatabaseConnectedAsync();
+                            }));
+                        }
+                        else
+                        {
+                            await OnDatabaseConnectedAsync();
+                        }
+
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Utils.WriteUnexpectedError("Reconnect attempt (StartReconnectWatcher)");
                 }
             }
         }
 
         private void ShowDatabaseError(Exception ex)
         {
-        /*    MessageBox.Show(
-                $"Database error:\n\n{ex.Message}",
-                "Database Error",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error
-            );
-        */
+
             MessageDialogBox.ShowDialog(
                 "Database Error",
                 $"Database error:\n\n{ex.Message}",
@@ -356,7 +403,8 @@ namespace WindowsFormsApp1
                 }
                 catch (Exception ex)
                 {
-                    ShowDatabaseError(ex);
+                    Utils.WriteUnexpectedError("Delete PB Job failed");
+                    Utils.WriteExceptionError(ex);
                 }
             };
 
@@ -367,28 +415,22 @@ namespace WindowsFormsApp1
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
-                        if (!int.TryParse(dialog.JobNumber, out int jobNumber))
+                        if (dialog.JobNumber.Length != 6 ||
+      !int.TryParse(dialog.JobNumber, out int jobNumber))
                         {
-                            //MessageBox.Show("Invalid job number.");
-                            MessageDialogBox.ShowDialog("", "Invalid job number.", MessageBoxButtons.OK, MessageType.Error);
+                            MessageDialogBox.ShowDialog("", "Job number must be exactly 6 digits.", MessageBoxButtons.OK, MessageType.Error);
                             return;
                         }
 
                         var rows = await RqliteClient.UpdatePbJobAsync(
-    job.JobId,
-    dialog.JobName,
-    jobNumber,
-    dialog.IsTemp,
-    job.LastUpdated);
-
+                                job.JobId,
+                                dialog.JobName,
+                                jobNumber,
+                                dialog.IsTemp,
+                                job.LastUpdated);
                         if (rows == 0)
                         {
-                        /*    MessageBox.Show(
-                                "This job was modified by another workstation.\nPlease reopen and try again.",
-                                "Update Conflict",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Warning);
-                        */
+
                             MessageDialogBox.ShowDialog(
                                 "Update Conflict",
                                 "This job was modified by another workstation.\nPlease reopen and try again.",
@@ -674,6 +716,9 @@ namespace WindowsFormsApp1
             }
             catch (Exception ex)
             {
+                Utils.WriteUnexpectedError(
+    $"Ship pallets | Count={jobIds.Length}, JobIds={string.Join(",", jobIds)}"
+);
                 ShowDatabaseError(ex);
             }
         }
@@ -702,17 +747,18 @@ namespace WindowsFormsApp1
 
                 try
                 {
-                    int jobNumber = int.TryParse(dlg.JobNumber, out var num) ? num : 0;
+                    if (dlg.JobNumber.Length != 6 || !dlg.JobNumber.All(char.IsDigit))
+                    {
+                        MessageDialogBox.ShowDialog("", "Job number must be exactly 6 digits.", MessageBoxButtons.OK, MessageType.Error);
+                        return;
+                    }
+
+                    int jobNumber = int.Parse(dlg.JobNumber);
 
                     // 🔴 PREVENT DUPLICATES
                     if (await RqliteClient.JobNumberExistsAsync(jobNumber))
                     {
-                    /*    MessageBox.Show(
-                            $"Job number {jobNumber} already exists.",
-                            "Duplicate Job",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning);
-                    */
+                       
                         MessageDialogBox.ShowDialog(
                             "Duplicate Job",
                             $"Job number {jobNumber} already exists.",
@@ -730,12 +776,18 @@ namespace WindowsFormsApp1
                         IsTemp = dlg.IsTemp
                     };
 
+                    Utils.WriteUnexpectedError(
+              $"Create PB Job | JobNumber={jobNumber}, JobName={job.JobName}, IsTemp={job.IsTemp}"
+          );
+
                     await RqliteClient.InsertPbJobAsync(job);
 
                     await LoadJobsAsync();
                 }
                 catch (Exception ex)
                 {
+                    Utils.WriteUnexpectedError("Create PB Job failed");
+                    Utils.WriteExceptionError(ex);
                     ShowDatabaseError(ex);
                 }
             }
@@ -794,6 +846,8 @@ namespace WindowsFormsApp1
             }
             catch (Exception ex)
             {
+                Utils.WriteUnexpectedError("Print Summary failed");
+                Utils.WriteExceptionError(ex);
                 MessageDialogBox.ShowDialog(
                     "Printing Error",
                     ex.Message,
@@ -817,7 +871,7 @@ namespace WindowsFormsApp1
                 );
                 return;
             }
-            Utils.GenerateReport(jobs,dtPickUpFrom,dtPickUpTo);
+            Utils.GenerateReport(jobs, dtPickUpFrom, dtPickUpTo);
         }
     }
 }

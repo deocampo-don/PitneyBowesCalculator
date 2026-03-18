@@ -359,12 +359,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             if (!selectedPallets.All(p => p.State == PalletState.Ready))
             {
 
-             /*   MessageBox.Show(
-                    "Only packed pallets (Ready) can be removed.",
-                    "Invalid Selection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-             */
+      
                 MessageDialogBox.ShowDialog(
                     "Invalid Selection",
                     "Only packed pallets (Ready) can be removed.",
@@ -384,7 +379,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             if (!palletIds.Any())
             {
 
-                //MessageBox.Show("Invalid pallet selection.");
+                
                 MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
                 return;
             }
@@ -409,7 +404,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                             if (activePalletId == null)
                             {
 
-                                //MessageBox.Show("Active pallet no longer exists. Please refresh.");
+                                
                                 MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
                                 return;
                             }
@@ -451,7 +446,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             catch (Exception ex)
             {
 
-                //MessageBox.Show("Error processing pallets:\n\n" + ex.Message);
+                Utils.WriteExceptionError(ex);
                 MessageDialogBox.ShowDialog("", "Error processing pallets:\n\n" + ex.Message, MessageBoxButtons.OK, MessageType.Error);
             }
         }
@@ -493,6 +488,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             }
             catch (Exception ex)
             {
+                Utils.WriteExceptionError(ex);
                 Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Printer not available!");
 
                 MessageDialogBox.ShowDialog(
@@ -505,120 +501,6 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             finally
             {
                 btnPrintPallet.Enabled = true;
-            }
-        }
-
-
-        private void SaveReportAsPdf(string filePath)
-        {
-            palletPrintIndex = 0;
-            workOrderIndex = 0;
-
-            PrintDocument doc = new PrintDocument();
-
-            doc.PrinterSettings.PrinterName = "Microsoft Print to PDF";
-            doc.PrinterSettings.PrintToFile = true;
-            doc.PrinterSettings.PrintFileName = filePath;
-
-            doc.PrintPage += PrintDocument_PrintPage;
-
-            doc.Print();
-        }
-
-
-
-        private async Task PrintSelectedPalletsAsync()
-        {
-            var selectedIndices = lvPallet.GetSelectedIndices();
-
-            if (selectedIndices == null || selectedIndices.Count == 0)
-            {
-                //MessageBox.Show("Select pallet(s) to print.");
-                MessageDialogBox.ShowDialog("", "Select pallet(s) to print.", MessageBoxButtons.OK, MessageType.Info);
-                return;
-            }
-
-            palletsToPrint = selectedIndices
-                .Select(i => _job.Pallets[i])
-                .ToList();
-
-            string pdfPath = Path.Combine(
-                Path.GetTempPath(),
-                $"PBJob_{_job.JobNumber}_{DateTime.Now:yyyyMMddHHmmss}.pdf"
-            );
-
-            lbStatus.Text = "Generating PDF...";
-
-            try
-            {
-                await Task.Run(() =>
-                {
-                    SaveReportAsPdf(pdfPath);
-                });
-            }
-            catch (Exception ex)
-            {
-                //MessageBox.Show("Failed to generate PDF:\n\n" + ex.Message);
-                MessageDialogBox.ShowDialog("", "Select pallet(s) to print.", MessageBoxButtons.OK, MessageType.Info);
-                return;
-            }
-
-            /* -------------------------------------------------------------
-               WAIT FOR PDF DRIVER TO FINISH WRITING
-            ------------------------------------------------------------- */
-
-            int wait = 0;
-            while (!File.Exists(pdfPath) && wait < 5000)
-            {
-                await Task.Delay(100);
-                wait += 100;
-            }
-
-            if (!File.Exists(pdfPath))
-            {
-                //MessageBox.Show("PDF was not generated.");
-                MessageDialogBox.ShowDialog("", "PDF was not generated.", MessageBoxButtons.OK, MessageType.Info);
-                return;
-            }
-
-            /* -------------------------------------------------------------
-               OPEN PDF FOR USER VIEWING
-            ------------------------------------------------------------- */
-
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = pdfPath,
-                UseShellExecute = true
-            });
-
-            lbStatus.Text = "Sending to printer...";
-
-            try
-            {
-                await Task.Run(() =>
-                {
-                    Utils.PrintPdf(pdfPath);
-                });
-
-                //lbStatus.Text = "Printed successfully";
-            }
-            catch (Exception ex)
-            {
-                Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Printer not available!");
-
-
-            /*    MessageBox.Show(
-                    "Unable to print.\n\n" + ex.Message,
-                    "Printing Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            */
-                MessageDialogBox.ShowDialog(
-                    "Printing Error",
-                    "Unable to print.\n\n" + ex.Message,
-                    MessageBoxButtons.OK,
-                    MessageType.Warning
-                );
             }
         }
     }

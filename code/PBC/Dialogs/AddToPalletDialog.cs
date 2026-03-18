@@ -76,7 +76,7 @@ namespace WindowsFormsApp1.Dialogs
             {
                 System.Media.SystemSounds.Beep.Play();
                 tbWoBarcode.SelectAll();
-                //MessageBox.Show("You've already scanned this barcode!");
+              
                 MessageDialogBox.ShowDialog(
                     "",
                     "You've already scanned this barcode!",
@@ -93,9 +93,10 @@ namespace WindowsFormsApp1.Dialogs
 
                 if (!checkValue.IsValid)
                 {
-                    //MessageBox.Show(checkValue.Message);
+                    
                     MessageDialogBox.ShowDialog("", checkValue.Message, MessageBoxButtons.OK, MessageType.Info);
                     tbWoBarcode.SelectAll();
+                    _scanInProgress = false;
                     return;
                 }
 
@@ -103,9 +104,10 @@ namespace WindowsFormsApp1.Dialogs
 
                 if (!isCPSBarcodeScanned)
                 {
-                    //MessageBox.Show("Invalid CPS barcode.");
+                    
                     MessageDialogBox.ShowDialog("Error", "Invalid CPS barcode.", MessageBoxButtons.OK, MessageType.Error);
                     tbWoBarcode.SelectAll();
+                    _scanInProgress = false;
                     return;
                 }
 
@@ -135,7 +137,7 @@ namespace WindowsFormsApp1.Dialogs
                             }
                             else
                             {
-                                //MessageBox.Show("Scanned Work Order not found.");
+                                
                                 MessageDialogBox.ShowDialog("", "Scanned Work Order not found.", MessageBoxButtons.OK, MessageType.Info);
 
                                 return;
@@ -162,10 +164,64 @@ namespace WindowsFormsApp1.Dialogs
                 txtEnvelopeQty.Text = (_baseEnvelopeQty + sessionEnv).ToString("N0");
                 txtScannedWO.Text = (_baseScannedWO + sessionWO).ToString();
             }
+            catch (SqlException ex)
+            {
+                Utils.WriteUnexpectedError($"SQL error during scan | Barcode={barcodeValue}");
+                Utils.WriteExceptionError(ex);
+
+                if (ex.Number == 18456) // Login failed
+                {
+                    MessageDialogBox.ShowDialog(
+                        "Database Authentication Error",
+                        "Invalid database credentials.\nPlease check CPS configuration.",
+                        MessageBoxButtons.OK,
+                        MessageType.Error
+                    );
+                }
+                else if (ex.Number == -2) // Timeout
+                {
+                    MessageDialogBox.ShowDialog(
+                        "Database Timeout",
+                        "The database took too long to respond.\nPlease try again.",
+                        MessageBoxButtons.OK,
+                        MessageType.Warning
+                    );
+                }
+                else
+                {
+                    MessageDialogBox.ShowDialog(
+                        "Database Error",
+                        $"Cannot query CPS database.\n\n{ex.Message}",
+                        MessageBoxButtons.OK,
+                        MessageType.Error
+                    );
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Covers connection state issues
+                Utils.WriteUnexpectedError($"DB operation error | Barcode={barcodeValue}");
+                Utils.WriteExceptionError(ex);
+
+                MessageDialogBox.ShowDialog(
+                    "Database Error",
+                    ex.Message,
+                    MessageBoxButtons.OK,
+                    MessageType.Error
+                );
+            }
             catch (Exception ex)
             {
-               // MessageBox.Show("Error scanning barcode:\n" + ex.Message);
-                MessageDialogBox.ShowDialog("", "Error scanning barcode:", MessageBoxButtons.OK, MessageType.Error);
+                // Real scanning / unexpected errors
+                Utils.WriteUnexpectedError($"Scan failed | Barcode={barcodeValue}");
+                Utils.WriteExceptionError(ex);
+
+                MessageDialogBox.ShowDialog(
+                    "Scan Error",
+                    $"Error scanning barcode.\n\n{ex.Message}",
+                    MessageBoxButtons.OK,
+                    MessageType.Error
+                );
             }
             finally
             {
@@ -221,7 +277,7 @@ namespace WindowsFormsApp1.Dialogs
         {
             if (!_sessionWorkOrders.Any())
             {
-                //MessageBox.Show("No scans.");
+               
                 MessageDialogBox.ShowDialog("", "No scans.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
