@@ -84,9 +84,9 @@
             lblHeader.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
             lblHeader.Location = new System.Drawing.Point(19, 58);
             lblHeader.Name = "lblHeader";
-            lblHeader.Size = new System.Drawing.Size(258, 32);
+            lblHeader.Size = new System.Drawing.Size(271, 32);
             lblHeader.TabIndex = 3;
-            lblHeader.Text = "Before You Remove...";
+            lblHeader.Text = "Before You Continue...";
             // 
             // label1
             // 
@@ -95,9 +95,9 @@
             label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             label1.Location = new System.Drawing.Point(20, 98);
             label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(350, 21);
+            label1.Size = new System.Drawing.Size(297, 21);
             label1.TabIndex = 4;
-            label1.Text = "Removing this packed pallet will undo it's packed";
+            label1.Text = "Removing this pallet will undo it's packed";
             // 
             // label2
             // 

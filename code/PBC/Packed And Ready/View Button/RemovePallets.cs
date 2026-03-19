@@ -18,6 +18,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             Delete,
             Merge
         }
+        
 
         /* -------------------------------------------------------------
          * PUBLIC RESULT
@@ -29,6 +30,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
          * ------------------------------------------------------------- */
         private readonly bool _hasActivePallet;
         private bool firstYesClicked = false;
+       
 
         /* -------------------------------------------------------------
          * WIN32 (DRAG FORM)
@@ -42,6 +44,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         /* -------------------------------------------------------------
          * CONSTRUCTOR
          * ------------------------------------------------------------- */
+        
         public RemovePallets(bool hasActivePallet)
         {
             InitializeComponent();
@@ -49,15 +52,24 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             ShadowHelper.ApplyShadow(this);
             _hasActivePallet = hasActivePallet;
 
+
+            
+
             pnlHeader.MouseDown += pnlHeader_MouseDown;
 
             // Default UI state
             btnCancel1.Visible = false;
+            btnNo1.Visible = true;
+
+
+            btnYes1.Text = "Unpack";
+            btnNo1.Text = "Delete";
 
             if (!_hasActivePallet)
             {
                 // No merge scenario
-                btnNo1.Visible = false;
+                btnNo1.Visible = true;
+                
             }
         }
 
@@ -94,7 +106,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
 
                 await RunExpandAnimationAsync();
                 SwitchToMergeUI();
-
+                
                 return;
             }
 
@@ -112,9 +124,10 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             // If user presses NO before merge options appear → cancel
             if (!_hasActivePallet || !firstYesClicked)
             {
-                DialogResult = DialogResult.Cancel;
+                Action = RemoveAction.Delete;
+                DialogResult = DialogResult.OK;
                 Close();
-                return;
+                
             }
 
             // After animation → NO means delete
@@ -159,7 +172,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         //}
         private async Task RunExpandAnimationAsync()
         {
-            int targetHeight = 330;
+            int targetHeight = 370;
             int step = 10;
             int delay = 3;
 
@@ -187,11 +200,13 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             label1.Text = "You already have a pallet in progress.";
             label2.Text = "What would you like to do?";
 
-            label3.Text = "Yes - Merge to the ongoing pallet.";
-            label4.Text = "No - Delete the pallet.";
+            label3.Text = "Merge to the ongoing pallet.";
+            label4.Text = "Delete this pallet.";
             label5.Text = "Cancel - Finish packing the current pallet.";
 
             btnCancel1.Visible = true;
+            btnNo1.Text = "Delete";
+            btnYes1.Text = "Merge";
         }
     }
 }

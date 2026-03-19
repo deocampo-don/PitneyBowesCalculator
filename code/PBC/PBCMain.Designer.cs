@@ -821,7 +821,7 @@ namespace WindowsFormsApp1
             kcbPickedUp.StateNormal.Back.Color2 = System.Drawing.SystemColors.Control;
             kcbPickedUp.TabIndex = 4;
             kcbPickedUp.Values.DropDownArrowColor = System.Drawing.Color.Empty;
-            kcbPickedUp.Values.Text = "PICKED UP";
+            kcbPickedUp.Values.Text = "REPORTS";
             // 
             // kcbPackedReady
             // 

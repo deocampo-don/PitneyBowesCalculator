@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace WindowsFormsApp1.DIalogs
@@ -38,6 +39,24 @@ namespace WindowsFormsApp1.DIalogs
 
         private void btnOk_Click(object sender, EventArgs e)
         {
+
+            string input = tbTrays.Text.Trim();
+
+            // Step 1: Must contain digits only
+            if (!input.All(char.IsDigit))
+            {
+                MessageDialogBox.ShowDialog(
+                    "Invalid Input",
+                    "Tray count must contain digits only.",
+                    MessageBoxButtons.OK,
+                    MessageType.Warning);
+
+                tbTrays.Focus();
+                tbTrays.SelectAll();
+                return;
+            }
+
+
             if (!int.TryParse(tbTrays.Text.Trim(), out int trays) || trays <= 0)
             {
             /*    MessageBox.Show(
@@ -52,10 +71,12 @@ namespace WindowsFormsApp1.DIalogs
                     MessageBoxButtons.OK,
                     MessageType.Warning);
 
+
                 tbTrays.Focus();
                 tbTrays.SelectAll();
                 return;
             }
+            
 
             // ✅ Set result and close
             TrayCount = trays;

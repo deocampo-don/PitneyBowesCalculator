@@ -273,6 +273,21 @@ namespace WindowsFormsApp1
 
             if (confirm != DialogResult.Yes)
                 return;
+
+            //  Check if job has pallets
+            bool hasPallets = _model.Pallets != null && _model.Pallets.Any();
+
+            if (hasPallets)
+            {
+                var confirmWithPallets = MessageDialogBox.ShowDialog(
+                    "Warning",
+                    "Cannot Delete Job.\n" +
+                    "This job has ongoing or packed pallets.\n",
+                    //"This action cannot be undone.\n\nAre you sure you want to delete it?",
+                    MessageBoxButtons.OK,
+                    MessageType.Warning);
+                    return;
+            }
             Utils.WriteUnexpectedError($"Delete job | JobId={_model.JobId}, JobName={_model.JobName}");
             DeleteRequested?.Invoke(this, _model);
         }

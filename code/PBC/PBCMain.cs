@@ -415,10 +415,10 @@ namespace WindowsFormsApp1
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
-                        if (dialog.JobNumber.Length != 6 ||
-      !int.TryParse(dialog.JobNumber, out int jobNumber))
+                        if (!int.TryParse(dialog.JobNumber, out int jobNumber) || jobNumber <= 0)
+
                         {
-                            MessageDialogBox.ShowDialog("", "Job number must be exactly 6 digits.", MessageBoxButtons.OK, MessageType.Error);
+                            MessageDialogBox.ShowDialog("", "Job number must contain digits", MessageBoxButtons.OK, MessageType.Info);
                             return;
                         }
 
@@ -747,9 +747,10 @@ namespace WindowsFormsApp1
 
                 try
                 {
-                    if (dlg.JobNumber.Length != 6 || !dlg.JobNumber.All(char.IsDigit))
+                    //if (dlg.JobNumber.Length != 6 || !dlg.JobNumber.All(char.IsDigit))
+                    if ( !dlg.JobNumber.All(char.IsDigit))
                     {
-                        MessageDialogBox.ShowDialog("", "Job number must be exactly 6 digits.", MessageBoxButtons.OK, MessageType.Error);
+                        MessageDialogBox.ShowDialog("", "Job number must contain digits only.", MessageBoxButtons.OK, MessageType.Info);
                         return;
                     }
 
