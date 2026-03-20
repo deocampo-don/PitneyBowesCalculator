@@ -22,8 +22,34 @@ namespace WindowsFormsApp1
             scrollHost.Resize += (_, __) => ResizeRowsToHost();
            
         }
-            
 
+        public void UpdateItem(PbJobModel job)
+        {
+            var existingControl = FindControl(job.JobId);
+
+            if (existingControl != null)
+            {
+                // ✅ Update data WITHOUT removing
+                existingControl.Bind(job);
+            }
+            else
+            {
+                // fallback (should rarely happen)
+                AddItem(job);
+            }
+        }
+
+        private PalletRowControl FindControl(int jobId)
+        {
+            foreach (Control ctrl in rowsContainer.Controls)
+            {
+                if (ctrl is PalletRowControl row && row.BoundJob?.JobId == jobId)
+                {
+                    return row;
+                }
+            }
+            return null;
+        }
         public void RefreshItem(PbJobModel job)
         {
             var row = rowsContainer.Controls

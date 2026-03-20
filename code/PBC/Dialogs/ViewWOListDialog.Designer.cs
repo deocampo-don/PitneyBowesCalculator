@@ -61,7 +61,7 @@
             kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 184F));
             kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 11F));
             kryptonTableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 19F));
-            kryptonTableLayoutPanel1.Size = new System.Drawing.Size(334, 296);
+            kryptonTableLayoutPanel1.Size = new System.Drawing.Size(407, 296);
             kryptonTableLayoutPanel1.StateCommon.Color1 = System.Drawing.Color.Transparent;
             kryptonTableLayoutPanel1.StateCommon.Color2 = System.Drawing.Color.Transparent;
             kryptonTableLayoutPanel1.TabIndex = 0;
@@ -95,7 +95,7 @@
             woScrollHost.Location = new System.Drawing.Point(3, 74);
             woScrollHost.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             woScrollHost.Name = "woScrollHost";
-            woScrollHost.Size = new System.Drawing.Size(328, 180);
+            woScrollHost.Size = new System.Drawing.Size(401, 180);
             woScrollHost.StateCommon.Color1 = System.Drawing.Color.Transparent;
             woScrollHost.TabIndex = 2;
             // 
@@ -108,7 +108,7 @@
             woFlowRows.Location = new System.Drawing.Point(0, 0);
             woFlowRows.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             woFlowRows.Name = "woFlowRows";
-            woFlowRows.Size = new System.Drawing.Size(328, 0);
+            woFlowRows.Size = new System.Drawing.Size(401, 0);
             woFlowRows.TabIndex = 0;
             woFlowRows.WrapContents = false;
             // 
@@ -120,7 +120,7 @@
             tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             tableLayoutPanel1.Controls.Add(btnClearWo, 1, 0);
             tableLayoutPanel1.Controls.Add(btnCancelWo, 0, 0);
-            tableLayoutPanel1.Location = new System.Drawing.Point(78, 258);
+            tableLayoutPanel1.Location = new System.Drawing.Point(151, 258);
             tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
@@ -176,7 +176,7 @@
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.White;
-            ClientSize = new System.Drawing.Size(370, 334);
+            ClientSize = new System.Drawing.Size(443, 334);
             Controls.Add(kryptonTableLayoutPanel1);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);

@@ -48,27 +48,68 @@ namespace WindowsFormsApp1
         }
 
 
-        private void btnOk_Click(object sender, EventArgs e)
-        {
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-        }
-
         private void btnCancelWo_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
+        //private async void btnClearWo_Click(object sender, EventArgs e)
+        //{
+        //    var selectedRows = woFlowRows.Controls
+        //.OfType<WorkOrderRowControl>()
+        //.Where(r => r.IsSelected)
+        //.ToList();
+
+        //    if (!selectedRows.Any())
+        //    {
+
+        //        MessageDialogBox.ShowDialog("", "No work orders selected.", MessageBoxButtons.OK, MessageType.Info);
+        //        return;
+        //    }
+
+        //    var confirm = MessageDialogBox.ShowDialog(
+        //        "Confirm Delete",
+        //        "Delete selected work orders?",
+        //        MessageBoxButtons.YesNo,
+        //        MessageType.Warning
+        //    );
+
+        //    if (confirm != DialogResult.Yes)
+        //        return;
+
+        //    DeletedItems = selectedRows
+        //        .Select(r => r.BoundItem)
+        //        .ToList();
+
+        //    try
+        //    {
+        //        await RqliteClient.DeleteWorkOrdersAsync(
+        //            DeletedItems.Select(w => w.Id)
+        //        );
+
+        //        // Remove from dialog list
+        //        foreach (var wo in DeletedItems)
+        //            _items.Remove(wo);
+        //        if (DeletedItems.Count == 0){
+        //            MessageDialogBox.ShowDialog("", "Pallet is now empty. Deleting pallet..", MessageBoxButtons.OK, MessageType.Info);
+        //        }
+        //        SetItems(jobname,jobn,_items);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Utils.WriteExceptionError(ex);             
+        //        MessageDialogBox.ShowDialog("", "Delete failed: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
+        //    }
+        //}
         private async void btnClearWo_Click(object sender, EventArgs e)
         {
             var selectedRows = woFlowRows.Controls
-        .OfType<WorkOrderRowControl>()
-        .Where(r => r.IsSelected)
-        .ToList();
+                .OfType<WorkOrderRowControl>()
+                .Where(r => r.IsSelected)
+                .ToList();
 
             if (!selectedRows.Any())
             {
-              
                 MessageDialogBox.ShowDialog("", "No work orders selected.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
@@ -89,19 +130,33 @@ namespace WindowsFormsApp1
 
             try
             {
-                await RqliteClient.DeleteWorkOrdersAsync(
-                    DeletedItems.Select(w => w.Id)
-                );
+                var ids = DeletedItems.Select(w => w.Id).ToList();
+                var palletId = DeletedItems.First().PalletId;
 
-                // Remove from dialog list
+                // STEP 1: Delete in DB
+                await RqliteClient.DeleteWorkOrdersAsync(ids);
+
+                // STEP 2: Update UI list
                 foreach (var wo in DeletedItems)
                     _items.Remove(wo);
 
-                SetItems(jobname,jobn,_items);
+                // ⭐ STEP 3: If empty → delete pallet
+                if (!_items.Any())
+                {
+                    await RqliteClient.DeletePalletsAsync(new[] { palletId });
+
+                    MessageDialogBox.ShowDialog("",
+                        "No work orders left. Pallet will be removed.",
+                        MessageBoxButtons.OK,
+                        MessageType.Info);
+                    this.Close();
+                }
+
+                SetItems(jobname, jobn, _items);
             }
             catch (Exception ex)
             {
-                Utils.WriteExceptionError(ex);             
+                Utils.WriteExceptionError(ex);
                 MessageDialogBox.ShowDialog("", "Delete failed: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
             }
         }

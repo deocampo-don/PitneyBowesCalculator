@@ -39,7 +39,11 @@ namespace WindowsFormsApp1
         private string _preparedCpsQuery;
         public event EventHandler ItemsChanged;
         private List<PbJobModel> _shipmentRows = new();
-  
+        private readonly HashSet<int> _skipNextRefreshJobIds = new HashSet<int>();
+        private readonly object _skipLock = new object();
+        public static PBCMain Instance { get; private set; }
+
+
         private bool _isConnected = false;
         // -----------------------------
         // Constructor
@@ -47,7 +51,7 @@ namespace WindowsFormsApp1
         public PBCMain()
         {
             InitializeComponent();
-
+            Instance = this;
             // UI Setup ONLY
             ApplyTabStyles();
             WireCheckSetToNavigator();
@@ -245,6 +249,7 @@ namespace WindowsFormsApp1
 
         private async Task PollForUpdatesAsync()
         {
+            Debug.WriteLine("Refreshing..");
             if (!await RqliteClient.IsDatabaseAvailableAsync())
             {
                 Utils.WriteUnexpectedError("Database unavailable during polling.");
@@ -252,7 +257,8 @@ namespace WindowsFormsApp1
             }
             if (WindowState == FormWindowState.Minimized)
                 return;
-            if (Application.OpenForms.OfType<ViewButtonDialog>().Any())
+            if (Application.OpenForms.OfType<Form>()
+     .Any(f => f is ViewWOListDialog))
                 return;
 
             // ⭐ GLOBAL CHANGE DETECTION (very cheap)
@@ -261,7 +267,11 @@ namespace WindowsFormsApp1
 
             // nothing changed
             if (_lastJobsTimestamp == dbTimestamp && dbCount == _lastJobsCount)
+            {
+                Debug.WriteLine("No updates..");
                 return;
+            }
+               
 
             _lastJobsTimestamp = dbTimestamp;
             _lastJobsCount = dbCount;
@@ -305,6 +315,13 @@ namespace WindowsFormsApp1
 
                 if (local.LastUpdated != lastUpdated)
                 {
+                    //await RefreshSingleJobAsync(jobId);
+                    if (ShouldSkipRefresh(jobId))
+                    {
+                        Debug.WriteLine($"[SKIP] Job {jobId}");
+                        continue; // if inside loop
+                    }
+
                     await RefreshSingleJobAsync(jobId);
                 }
             }
@@ -491,7 +508,26 @@ namespace WindowsFormsApp1
             CSSDesign.MakeTitleBarButton(btnClose);
             CSSDesign.MakeTitleBarButton(btnSettings);
         }
+        public void MarkSkipRefresh(int jobId)
+        {
+            lock (_skipLock)
+            {
+                _skipNextRefreshJobIds.Add(jobId);
+            }
+        }
 
+        private bool ShouldSkipRefresh(int jobId)
+        {
+            lock (_skipLock)
+            {
+                if (_skipNextRefreshJobIds.Contains(jobId))
+                {
+                    _skipNextRefreshJobIds.Remove(jobId);
+                    return true;
+                }
+            }
+            return false;
+        }
         // -----------------------------
         // Data Loading (DB → UI)
         // -----------------------------
@@ -526,6 +562,7 @@ namespace WindowsFormsApp1
                 pickedUpListView?.AddItem(job);
             }
         }
+      
         private void RemoveJobFromUI(int jobId)
         {
             lvBuild?.RemoveItem(jobId);

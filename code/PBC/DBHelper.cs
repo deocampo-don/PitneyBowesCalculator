@@ -433,6 +433,33 @@ WHERE Id = {jobId}
         var result = await ExecuteAsync(sql);
         return result.RowsAffected;
     }
+    //public static async Task DeleteWorkOrdersAsync(IEnumerable<int> workOrderIds)
+    //{
+    //    if (workOrderIds == null || !workOrderIds.Any())
+    //        return;
+
+    //    var idList = string.Join(",", workOrderIds);
+
+    //    string sql = $@"
+    //DELETE FROM {TablePalletWorkOrders}
+    //WHERE Id IN ({idList});
+
+    //UPDATE {TableJobs}
+    //SET LastUpdated = datetime('now','localtime')
+    //WHERE Id IN (
+    //    SELECT PBJobId
+    //    FROM {TablePallets}
+    //    WHERE Id IN (
+    //        SELECT PalletId
+    //        FROM {TablePalletWorkOrders}
+    //        WHERE Id IN ({idList})
+    //    )
+    //);
+    //";
+
+    //    await ExecuteAsync(sql);
+    //}
+
     public static async Task DeleteWorkOrdersAsync(IEnumerable<int> workOrderIds)
     {
         if (workOrderIds == null || !workOrderIds.Any())
@@ -440,26 +467,39 @@ WHERE Id = {jobId}
 
         var idList = string.Join(",", workOrderIds);
 
-        string sql = $@"
-    DELETE FROM {TablePalletWorkOrders}
-    WHERE Id IN ({idList});
+        // ⭐ STEP 1: Get affected job IDs FIRST
+        var result = await QueryAsync($@"
+SELECT DISTINCT P.PBJobId
+FROM {TablePalletWorkOrders} WO
+INNER JOIN {TablePallets} P ON WO.PalletId = P.Id
+WHERE WO.Id IN ({idList});
+");
 
-    UPDATE {TableJobs}
-    SET LastUpdated = datetime('now','localtime')
-    WHERE Id IN (
-        SELECT PBJobId
-        FROM {TablePallets}
-        WHERE Id IN (
-            SELECT PalletId
-            FROM {TablePalletWorkOrders}
-            WHERE Id IN ({idList})
-        )
-    );
-    ";
+        var jobIds = result.Records
+            .Select(r => Convert.ToInt32(r["PBJobId"]))
+            .Distinct()
+            .ToList();
 
-        await ExecuteAsync(sql);
+        var jobIdList = jobIds.Any()
+            ? string.Join(",", jobIds)
+            : null;
+
+        // ⭐ STEP 2: Delete work orders
+        await ExecuteAsync($@"
+DELETE FROM {TablePalletWorkOrders}
+WHERE Id IN ({idList});
+");
+
+        // ⭐ STEP 3: Update jobs
+        if (!string.IsNullOrEmpty(jobIdList))
+        {
+            await ExecuteAsync($@"
+UPDATE {TableJobs}
+SET LastUpdated = datetime('now','localtime')
+WHERE Id IN ({jobIdList});
+");
+        }
     }
-
     public static async Task<(bool Success, string Error)> TestSqlConnectionAsync(
   string server,
   string db,
@@ -662,6 +702,33 @@ WHERE Id = (
     // ======================
     // BATCH DELETE PALLETS (New)
     // ======================
+    //    public static async Task DeletePalletsAsync(IEnumerable<int> palletIds)
+    //    {
+    //        if (palletIds == null || !palletIds.Any())
+    //            return;
+
+    //        var idList = string.Join(",", palletIds);
+
+    //        await ExecuteAsync($@"
+    //DELETE FROM {TablePalletWorkOrders}
+    //WHERE PalletId IN ({idList});
+    //");
+
+    //        await ExecuteAsync($@"
+    //DELETE FROM {TablePallets}
+    //WHERE Id IN ({idList});
+    //");
+
+    //        await ExecuteAsync($@"
+    //UPDATE {TableJobs}
+    //SET LastUpdated = datetime('now','localtime')
+    //WHERE Id IN (
+    //    SELECT PBJobId
+    //    FROM {TablePallets}
+    //    WHERE Id IN ({idList})
+    //);
+    //");
+    //    }
     public static async Task DeletePalletsAsync(IEnumerable<int> palletIds)
     {
         if (palletIds == null || !palletIds.Any())
@@ -669,25 +736,43 @@ WHERE Id = (
 
         var idList = string.Join(",", palletIds);
 
+        // ⭐ STEP 1: Get affected Job IDs FIRST (important)
+        var result = await QueryAsync($@"
+SELECT DISTINCT PBJobId
+FROM {TablePallets}
+WHERE Id IN ({idList});
+");
+
+        var jobIds = result.Records
+            .Select(r => Convert.ToInt32(r["PBJobId"]))
+            .Distinct()
+            .ToList();
+
+        var jobIdList = jobIds.Any()
+            ? string.Join(",", jobIds)
+            : null;
+
+        // ⭐ STEP 2: Delete work orders
         await ExecuteAsync($@"
 DELETE FROM {TablePalletWorkOrders}
 WHERE PalletId IN ({idList});
 ");
 
+        // ⭐ STEP 3: Delete pallets
         await ExecuteAsync($@"
 DELETE FROM {TablePallets}
 WHERE Id IN ({idList});
 ");
 
-        await ExecuteAsync($@"
+        // ⭐ STEP 4: Update jobs (only if needed)
+        if (!string.IsNullOrEmpty(jobIdList))
+        {
+            await ExecuteAsync($@"
 UPDATE {TableJobs}
 SET LastUpdated = datetime('now','localtime')
-WHERE Id IN (
-    SELECT PBJobId
-    FROM {TablePallets}
-    WHERE Id IN ({idList})
-);
+WHERE Id IN ({jobIdList});
 ");
+        }
     }
 
     public class CpsSettings
