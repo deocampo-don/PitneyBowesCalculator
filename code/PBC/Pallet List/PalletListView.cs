@@ -15,6 +15,7 @@ namespace WindowsFormsApp1
         public event EventHandler<PbJobModel> DeleteRequested;
         public event EventHandler<PbJobModel> PalletChanged;
         public event EventHandler<PbJobModel> EditRequested;
+        public event EventHandler<PbJobModel> SoftDeleteRequested;
 
         public PalletListView()
         {
@@ -86,7 +87,10 @@ namespace WindowsFormsApp1
                     Utils.WriteExceptionError(ex);
                 }
             };
-
+            row.DeleteRequested += async (_, j) =>
+            {
+                DeleteRequested?.Invoke(this, j);
+            };
             row.PalletChanged += (_, j) =>
                 PalletChanged?.Invoke(this, j);
             row.EditRequested += (_, j) =>

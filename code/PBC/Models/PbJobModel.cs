@@ -13,6 +13,7 @@ public class PbJobModel
     public string JobName { get; set; }
     public int JobNumber { get; set; }
     public bool IsTemp { get; set; } = false;
+    public bool IsActive { get; set; }
 
     // ===== Dates =====
     public DateTime? PackDate { get; set; }   // nullable

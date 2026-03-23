@@ -21,6 +21,7 @@ namespace WindowsFormsApp1
 
         private PbJobModel _model;
         public event EventHandler<PbJobModel> EditRequested;
+        public event EventHandler<PbJobModel> SoftDeleteRequested;
         private PalletScanSession _session = new PalletScanSession();
         public PbJobModel BoundJob { get; private set; }
 
@@ -309,6 +310,7 @@ namespace WindowsFormsApp1
         {
             if (_model == null)
                 return;
+
             var confirm = MessageDialogBox.ShowDialog(
                 "Confirm Delete",
                 $"Delete PB Job \"{_model.JobName}\"?",
@@ -319,22 +321,55 @@ namespace WindowsFormsApp1
             if (confirm != DialogResult.Yes)
                 return;
 
-            //  Check if job has pallets
-            bool hasPallets = _model.Pallets != null && _model.Pallets.Any();
+            var pallets = _model.Pallets ?? new List<Pallet>();
 
-            if (hasPallets)
+            bool hasAnyPallets = pallets.Any();
+
+            bool hasNonShipped = pallets.Any(p =>
+                p.State == PalletState.Ready ||
+                p.State == PalletState.Packed_NotReady ||
+                p.State == PalletState.NotReady);
+
+            bool allShipped = hasAnyPallets && pallets.All(p => p.State == PalletState.Shipped);
+
+            if (hasNonShipped)
             {
-                var confirmWithPallets = MessageDialogBox.ShowDialog(
-                    "Warning",
-                    "Cannot Delete Job.\n" +
-                    "This job has ongoing or packed pallets.\n",
-                    //"This action cannot be undone.\n\nAre you sure you want to delete it?",
+                MessageDialogBox.ShowDialog(
+                    "Cannot Delete",
+                    "This job has ongoing or packed pallets.",
                     MessageBoxButtons.OK,
-                    MessageType.Warning);
-                    return;
+                    MessageType.Warning
+                );
+                return;
             }
+
             Utils.WriteUnexpectedError($"Delete job | JobId={_model.JobId}, JobName={_model.JobName}");
-            DeleteRequested?.Invoke(this, _model);
+
+            // HARD DELETE
+            if (!hasAnyPallets)
+            {
+                DeleteRequested?.Invoke(this, _model);
+                return;
+            }
+
+            // SOFT DELETE
+            if (allShipped)
+            {
+                var confirmArchive = MessageDialogBox.ShowDialog(
+                    "Archive Job",
+                    $"This job already has shipped pallets.\n\n" +
+                    $"It cannot be deleted but will be archived instead.\n\n" +
+                    $"Proceed?",
+                    MessageBoxButtons.YesNo,
+                    MessageType.Warning
+                );
+
+                if (confirmArchive != DialogResult.Yes)
+                    return;
+
+                SoftDeleteRequested?.Invoke(this, _model);
+                return;
+            }
         }
         public void Bind(PbJobModel model)
         {

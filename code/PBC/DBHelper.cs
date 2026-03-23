@@ -821,6 +821,7 @@ INSERT OR IGNORE INTO PBJob
     JobName,
     JobNumber,
     IsTemp,
+    IsActive,
     LastUpdated
 )
 VALUES
@@ -828,6 +829,7 @@ VALUES
     {FormatValue(job.JobName)},
     {job.JobNumber},
     {(job.IsTemp ? 1 : 0)},
+    1,
     datetime('now','localtime')
 );
 ";
@@ -853,6 +855,43 @@ VALUES
         return result.Records.Count > 0;
     }
 
+    public static async Task<PbJobModel?> GetJobByNumberAsync(int jobNumber)
+    {
+        var sql = $@"
+        SELECT Id, JobName, JobNumber, IsTemp, IsActive, LastUpdated
+        FROM PBJOB
+        WHERE JobNumber = {jobNumber}
+        LIMIT 1;
+    ";
+
+        var result = await QueryAsync(sql);
+
+        var row = result.Records.FirstOrDefault();
+        if (row == null)
+            return null;
+
+        return new PbJobModel
+        {
+            JobId = Convert.ToInt32(row["Id"]),
+            JobName = row["JobName"]?.ToString(),
+            JobNumber = Convert.ToInt32(row["JobNumber"]),
+            IsTemp = Convert.ToInt32(row["IsTemp"]) == 1,
+            IsActive = Convert.ToInt32(row["IsActive"]) == 1,
+            LastUpdated = DateTime.Parse(row["LastUpdated"].ToString())
+        };
+    }
+
+    public static async Task ReactivatePbJobAsync(int jobId)
+    {
+        var sql = $@"
+        UPDATE PBJOB
+        SET IsActive = 1,
+            LastUpdated = datetime('now','localtime')
+        WHERE Id = {jobId};
+    ";
+
+        await ExecuteAsync(sql);
+    }
     public static async Task ShipPalletsAsync(IEnumerable<int> jobIds)
     {
         if (jobIds == null || !jobIds.Any())
@@ -1004,6 +1043,7 @@ SELECT
     j.JobName,
     j.JobNumber,
     j.IsTemp,
+    j.IsActive,
     j.LastUpdated,
 
     p.Id AS PalletId,
@@ -1042,6 +1082,7 @@ ORDER BY j.Id, p.PalletNumber
                     JobName = row["JobName"]?.ToString(),
                     JobNumber = Convert.ToInt32(row["JobNumber"]),
                     IsTemp = Convert.ToInt32(row["IsTemp"]) == 1,
+                    IsActive = Convert.ToInt32(row["IsActive"]) == 1,
                     LastUpdated = row["LastUpdated"] == null
                         ? (DateTime?)null
                         : Convert.ToDateTime(row["LastUpdated"]),
@@ -1333,6 +1374,7 @@ WHERE Id = {jobId};
         j.JobName,
         j.JobNumber,
         j.IsTemp,
+        j.IsActive,
         j.LastUpdated,
 
         p.Id AS PalletId,
@@ -1367,6 +1409,7 @@ WHERE Id = {jobId};
                     JobName = row["JobName"]?.ToString(),
                     JobNumber = Convert.ToInt32(row["JobNumber"]),
                     IsTemp = Convert.ToInt32(row["IsTemp"]) == 1,
+                    IsActive = Convert.ToInt32(row["IsActive"]) == 1,
                     LastUpdated = row["LastUpdated"] == null
                         ? (DateTime?)null
                         : Convert.ToDateTime(row["LastUpdated"]),
@@ -1464,73 +1507,17 @@ WHERE Id = {jobId};
 
         return list;
     }
-
-    public static async Task<List<PbJobModel>> LoadFullJobGraphAsync()
+    public static async Task SoftDeletePbJobAsync(int jobId)
     {
-        var jobs = await LoadJobsAsync();
+        var sql = $@"
+        UPDATE PBJOB
+        SET IsActive = 0,
+            LastUpdated = datetime('now','localtime')
+        WHERE Id = {jobId};
+    ";
 
-        if (!jobs.Any())
-            return jobs;
-
-        var jobIds = string.Join(",", jobs.Select(j => j.JobId));
-
-        var palletResult = await SelectAsync(
-            TablePallets,
-            $"WHERE JobId IN ({jobIds})");
-
-        var allPallets = palletResult.Records.Select(row => new Pallet
-        {
-            PalletId = Convert.ToInt32(row["PalletId"]),
-            PBJobId = Convert.ToInt32(row["JobId"]),
-            PalletNumber = Convert.ToInt32(row["PalletNumber"]),
-            TrayCount = Convert.ToInt32(row["TrayCount"]),
-            PackedAt = row["PackedTime"] == null ? (DateTime?)null : DateTime.Parse(row["PackedTime"].ToString()),
-            WorkOrders = new List<WorkOrder>()
-        }).ToList();
-
-        if (allPallets.Any())
-        {
-            var palletIds = string.Join(",", allPallets.Select(p => p.PalletId));
-
-            var woResult = await SelectAsync(
-                TablePalletWorkOrders,
-                $"WHERE PalletId IN ({palletIds})");
-
-            var allWorkOrders = woResult.Records.Select(row => new WorkOrder(
-                row["WoCode"].ToString(),
-                Convert.ToInt32(row["Quantity"]))
-            {
-                PalletId = Convert.ToInt32(row["PalletId"]),
-                Id = Convert.ToInt32(row["PalletWorkOrderId"])
-            }).ToList();
-
-            var woLookup = allWorkOrders
-                .GroupBy(w => w.PalletId)
-                .ToDictionary(g => g.Key, g => g.ToList());
-
-            foreach (var pallet in allPallets)
-            {
-                if (woLookup.ContainsKey(pallet.PalletId))
-                    pallet.WorkOrders = woLookup[pallet.PalletId];
-            }
-        }
-
-        var palletLookup = allPallets
-            .GroupBy(p => p.PBJobId)
-            .ToDictionary(g => g.Key, g => g.ToList());
-
-        foreach (var job in jobs)
-        {
-            if (palletLookup.ContainsKey(job.JobId))
-                job.Pallets = palletLookup[job.JobId];
-            else
-                job.Pallets = new List<Pallet>();
-        }
-
-        return jobs;
+        await ExecuteAsync(sql);
     }
-
-
     public static async Task<int> SavePalletAsync(Pallet pallet)
     {
         var sql = $@"

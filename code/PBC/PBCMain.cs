@@ -24,7 +24,8 @@ namespace WindowsFormsApp1
         // Fields
         // -----------------------------
         private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
-
+        private readonly List<PbJobModel> _pbJobsWShipped = new List<PbJobModel>();
+        public event EventHandler<PbJobModel> SoftDeleteRequested;
         private Dictionary<int, PbJobModel> _jobsById = new Dictionary<int, PbJobModel>();
         private System.Windows.Forms.Timer _pollTimer;
         private bool _isPolling;
@@ -407,6 +408,23 @@ namespace WindowsFormsApp1
             packedListView2.PackedDataChanged += PackedListView2_PackedDataChanged;
             lvBuild.PalletChanged += PalletListView_PalletChanged;
 
+            //lvBuild.DeleteRequested += async (_, job) =>
+            //{
+            //    if (job == null) return;
+
+            //    try
+            //    {
+            //        await RqliteClient.DeletePbJobAsync(job.JobId);
+            //        _pbJobs.Remove(job);
+            //        _jobsById.Remove(job.JobId);
+            //        RemoveJobFromUI(job.JobId);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Utils.WriteUnexpectedError("Delete PB Job failed");
+            //        Utils.WriteExceptionError(ex);
+            //    }
+            //};
             lvBuild.DeleteRequested += async (_, job) =>
             {
                 if (job == null) return;
@@ -414,6 +432,7 @@ namespace WindowsFormsApp1
                 try
                 {
                     await RqliteClient.DeletePbJobAsync(job.JobId);
+
                     _pbJobs.Remove(job);
                     _jobsById.Remove(job.JobId);
                     RemoveJobFromUI(job.JobId);
@@ -421,6 +440,25 @@ namespace WindowsFormsApp1
                 catch (Exception ex)
                 {
                     Utils.WriteUnexpectedError("Delete PB Job failed");
+                    Utils.WriteExceptionError(ex);
+                }
+            };
+
+            lvBuild.SoftDeleteRequested += async (_, job) =>
+            {
+                if (job == null) return;
+
+                try
+                {
+                    await RqliteClient.SoftDeletePbJobAsync(job.JobId);
+
+                    job.IsActive = false;
+
+                    RefreshSingleJobUI(job);
+                }
+                catch (Exception ex)
+                {
+                    Utils.WriteUnexpectedError("Soft delete PB Job failed");
                     Utils.WriteExceptionError(ex);
                 }
             };
@@ -534,7 +572,7 @@ namespace WindowsFormsApp1
         private async Task LoadJobsAsync()
         {
             var jobs = await RqliteClient.LoadJobsAsync();
-
+          
             _pbJobs.Clear();
             _pbJobs.AddRange(jobs);
 
@@ -543,8 +581,6 @@ namespace WindowsFormsApp1
             RefreshAllViews();
         }
 
-
-
         // -----------------------------
         // View Refresh
         // -----------------------------
@@ -552,80 +588,166 @@ namespace WindowsFormsApp1
         {
             RemoveJobFromUI(job.JobId);
 
-            // Build and Packed always contain the job
-            lvBuild?.AddItem(job);
-            packedListView2?.AddItem(job);
+            // ✅ Build view (IsActive only)
+            if (job.IsActive)
+            {
+                lvBuild?.AddItem(job);
 
-            // PickedUp only if shipped pallets exist  
+                // ✅ Packed view MUST match RefreshAllViews logic
+                if (job.Pallets.Any(p =>
+                    p.State == PalletState.Ready ||
+                    p.State == PalletState.Packed_NotReady))
+                {
+                    packedListView2?.AddItem(job);
+                }
+            }
+
+            // ✅ Shipment view (history, includes everything)
             if (job.Pallets.Any(p => p.ShippedAt.HasValue))
             {
                 pickedUpListView?.AddItem(job);
             }
         }
-      
+
         private void RemoveJobFromUI(int jobId)
         {
             lvBuild?.RemoveItem(jobId);
             packedListView2?.RemoveItem(jobId);
             pickedUpListView?.RemoveItem(jobId);
         }
+        //   private void RefreshAllViews()
+        //   {
+        //       var activeJobs = _pbJobs.Where(j => j.IsActive).ToList();
+        //       var allJobs = _pbJobs; 
+
+        //       lvBuild?.SetItems(activeJobs);
+
+        //       var packedJobs = activeJobs
+        //.Select(job =>
+        //{
+        //    var activePallets = job.Pallets
+        //        .Where(p => p.State == PalletState.Ready ||
+        //                    p.State == PalletState.Packed_NotReady)
+        //        .Select(p => new Pallet
+        //        {
+        //            PalletId = p.PalletId,
+        //            PBJobId = p.PBJobId,
+        //            PalletNumber = p.PalletNumber,
+        //            PackedAt = p.PackedAt,
+        //            ShippedAt = p.ShippedAt,
+        //            TrayCount = p.TrayCount,
+        //            State = p.State,
+        //            WorkOrders = p.WorkOrders
+        //                .Select(w => new WorkOrder(w.WorkOrderCode, w.Quantity)
+        //                {
+        //                    Id = w.Id,
+        //                    PalletId = w.PalletId
+        //                })
+        //                .ToList()
+        //        })
+        //        .ToList();
+
+        //    if (!activePallets.Any())
+        //        return null;
+
+        //    return new PbJobModel
+        //    {
+        //        JobId = job.JobId,
+        //        JobName = job.JobName,
+        //        JobNumber = job.JobNumber,
+        //        IsTemp = job.IsTemp,
+        //        LastUpdated = job.LastUpdated,
+        //        Pallets = activePallets
+        //    };
+        //})
+        //.Where(j => j != null)
+        //.ToList();
+
+        //       packedListView2?.SetItems(packedJobs);
+
+        //       _shipmentRows = new List<PbJobModel>();
+        //       foreach (var job in _pbJobs)
+        //       {
+        //           var shippedGroups = job.Pallets
+        //               .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
+        //               .GroupBy(p => p.ShippedAt.Value);
+
+        //           foreach (var group in shippedGroups)
+        //           {
+        //               var shipmentClone = new PbJobModel
+        //               {
+        //                   JobId = job.JobId,
+        //                   JobName = job.JobName,
+        //                   JobNumber = job.JobNumber,
+        //                   IsTemp = job.IsTemp,
+        //                   LastUpdated = job.LastUpdated,
+        //                   ShippedDate = group.Key,
+        //                   Pallets = group
+        //                       .Select(p => new Pallet
+        //                       {
+        //                           PalletId = p.PalletId,
+        //                           PBJobId = p.PBJobId,
+        //                           PalletNumber = p.PalletNumber,
+        //                           PackedAt = p.PackedAt,
+        //                           ShippedAt = p.ShippedAt,
+        //                           TrayCount = p.TrayCount,
+        //                           State = p.State,
+        //                           WorkOrders = p.WorkOrders
+        //                               .Select(w => new WorkOrder(w.WorkOrderCode, w.Quantity)
+        //                               {
+        //                                   Id = w.Id,
+        //                                   PalletId = w.PalletId
+        //                               })
+        //                               .ToList()
+        //                       })
+        //                       .ToList()
+        //               };
+
+        //               _shipmentRows.Add(shipmentClone);
+        //           }
+        //       }
+
+        //       _shipmentRows = _shipmentRows
+        //           .OrderByDescending(s => s.ShippedDate)
+        //           .ToList();
+
+        //       pickedUpListView?.SetItems(_shipmentRows);
+        //   }
         private void RefreshAllViews()
         {
+            // 1️⃣ Active jobs
+            var activeJobs = _pbJobs.Where(j => j.IsActive).ToList();
 
-            lvBuild?.SetItems(_pbJobs);
-            var activeJobs = _pbJobs
-     .Select(job =>
-     {
-         var activePallets = job.Pallets
-             .Where(p => p.State == PalletState.Ready ||
-                         p.State == PalletState.Packed_NotReady)
-             .Select(p => new Pallet
-             {
-                 PalletId = p.PalletId,
-                 PBJobId = p.PBJobId,
-                 PalletNumber = p.PalletNumber,
-                 PackedAt = p.PackedAt,
-                 ShippedAt = p.ShippedAt,
-                 TrayCount = p.TrayCount,
-                 State = p.State,
-                 WorkOrders = p.WorkOrders
-                     .Select(w => new WorkOrder(w.WorkOrderCode, w.Quantity)
-                     {
-                         Id = w.Id,
-                         PalletId = w.PalletId
-                     })
-                     .ToList()
-             })
-             .ToList();
+            // 2️⃣ Build view
+            lvBuild?.SetItems(activeJobs);
 
-         if (!activePallets.Any())
-             return null;
-
-         return new PbJobModel
-         {
-             JobId = job.JobId,
-             JobName = job.JobName,
-             JobNumber = job.JobNumber,
-             IsTemp = job.IsTemp,
-             LastUpdated = job.LastUpdated,
-             Pallets = activePallets
-         };
-     })
-     .Where(j => j != null)
-     .ToList();
-
-            packedListView2?.SetItems(activeJobs);
-
-            _shipmentRows = new List<PbJobModel>();
-            foreach (var job in _pbJobs)
-            {
-                var shippedGroups = job.Pallets
-                    .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
-                    .GroupBy(p => p.ShippedAt.Value);
-
-                foreach (var group in shippedGroups)
+            // 3️⃣ Packed view
+            var packedJobs = activeJobs
+                .Where(job => job.Pallets.Any(p =>
+                    p.State == PalletState.Ready ||
+                    p.State == PalletState.Packed_NotReady))
+                .Select(job => new PbJobModel
                 {
-                    var shipmentClone = new PbJobModel
+                    JobId = job.JobId,
+                    JobName = job.JobName,
+                    JobNumber = job.JobNumber,
+                    IsTemp = job.IsTemp,
+                    LastUpdated = job.LastUpdated,
+                    Pallets = job.Pallets
+                        .Where(p => p.State == PalletState.Ready ||
+                                    p.State == PalletState.Packed_NotReady)
+                        .ToList()
+                })
+                .ToList();
+
+            packedListView2?.SetItems(packedJobs);
+
+            // 4️⃣ Shipment view (ALL jobs, including inactive)
+            _shipmentRows = _pbJobs
+                .SelectMany(job => job.Pallets
+                    .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
+                    .GroupBy(p => p.ShippedAt.Value)
+                    .Select(group => new PbJobModel
                     {
                         JobId = job.JobId,
                         JobName = job.JobName,
@@ -633,32 +755,9 @@ namespace WindowsFormsApp1
                         IsTemp = job.IsTemp,
                         LastUpdated = job.LastUpdated,
                         ShippedDate = group.Key,
-                        Pallets = group
-                            .Select(p => new Pallet
-                            {
-                                PalletId = p.PalletId,
-                                PBJobId = p.PBJobId,
-                                PalletNumber = p.PalletNumber,
-                                PackedAt = p.PackedAt,
-                                ShippedAt = p.ShippedAt,
-                                TrayCount = p.TrayCount,
-                                State = p.State,
-                                WorkOrders = p.WorkOrders
-                                    .Select(w => new WorkOrder(w.WorkOrderCode, w.Quantity)
-                                    {
-                                        Id = w.Id,
-                                        PalletId = w.PalletId
-                                    })
-                                    .ToList()
-                            })
-                            .ToList()
-                    };
-
-                    _shipmentRows.Add(shipmentClone);
-                }
-            }
-
-            _shipmentRows = _shipmentRows
+                        Pallets = group.ToList()
+                    })
+                )
                 .OrderByDescending(s => s.ShippedDate)
                 .ToList();
 
@@ -763,13 +862,18 @@ namespace WindowsFormsApp1
         private void ApplySearchFilter()
         {
             if (_shipmentRows.Count == 0)
+            {
+                pickedUpListView.SetItems(new List<PbJobModel>());
                 return;
+            }
 
             var fromDate = dtPickUpFrom.Value.Date;
-            var toDate = dtPickUpTo.Value.Date.AddDays(1).AddTicks(-1);
+            var toDate = dtPickUpTo.Value.Date.AddDays(1);
 
             var filtered = _shipmentRows
-                .Where(x => x.ShippedDate >= fromDate && x.ShippedDate <= toDate)
+                .Where(x => x.ShippedDate.HasValue &&
+                            x.ShippedDate.Value >= fromDate &&
+                            x.ShippedDate.Value < toDate)
                 .ToList();
 
             pickedUpListView.SetItems(filtered);
@@ -784,25 +888,56 @@ namespace WindowsFormsApp1
 
                 try
                 {
-                    //if (dlg.JobNumber.Length != 6 || !dlg.JobNumber.All(char.IsDigit))
-                    if ( !dlg.JobNumber.All(char.IsDigit))
+                    var jobNumberText = dlg.JobNumber?.Trim();
+
+                    if (string.IsNullOrWhiteSpace(jobNumberText) || !jobNumberText.All(char.IsDigit))
                     {
                         MessageDialogBox.ShowDialog("", "Job number must contain digits only.", MessageBoxButtons.OK, MessageType.Info);
                         return;
                     }
 
-                    int jobNumber = int.Parse(dlg.JobNumber);
+                    int jobNumber = int.Parse(jobNumberText);
 
-                    // 🔴 PREVENT DUPLICATES
-                    if (await RqliteClient.JobNumberExistsAsync(jobNumber))
+                    var existingJob = await RqliteClient.GetJobByNumberAsync(jobNumber);
+
+                    if (existingJob != null)
                     {
-                       
-                        MessageDialogBox.ShowDialog(
-                            "Duplicate Job",
-                            $"Job number {jobNumber} already exists.",
-                            MessageBoxButtons.OK,
-                            MessageType.Warning
+                        // ❌ Active duplicate
+                        if (existingJob.IsActive)
+                        {
+                            MessageDialogBox.ShowDialog(
+                                "Duplicate Job",
+                                $"Job number {jobNumber} already exists.",
+                                MessageBoxButtons.OK,
+                                MessageType.Warning
+                            );
+                            return;
+                        }
+
+                        // 🔄 Inactive → Reactivate
+                        var confirm = MessageDialogBox.ShowDialog(
+                            "Duplicate Found",
+                            $"Job number {jobNumber} already exists and contains previous shipments.\n\n" +
+                            $"Do you want to reactivate it?",
+                            MessageBoxButtons.YesNo,
+                            MessageType.Info
                         );
+
+                        if (confirm == DialogResult.Yes)
+                        {
+                            await RqliteClient.ReactivatePbJobAsync(existingJob.JobId);
+
+                            await LoadJobsAsync(); // 🔥 safer than RefreshSingleJobAsync
+
+                            MessageDialogBox.ShowDialog(
+                                "Reactivated",
+                                "Job has been restored.",
+                                MessageBoxButtons.OK,
+                                MessageType.Info
+                            );
+
+                            return;
+                        }
 
                         return;
                     }
@@ -815,8 +950,8 @@ namespace WindowsFormsApp1
                     };
 
                     Utils.WriteUnexpectedError(
-              $"Create PB Job | JobNumber={jobNumber}, JobName={job.JobName}, IsTemp={job.IsTemp}"
-          );
+                        $"Create PB Job | JobNumber={jobNumber}, JobName={job.JobName}, IsTemp={job.IsTemp}"
+                    );
 
                     await RqliteClient.InsertPbJobAsync(job);
 
