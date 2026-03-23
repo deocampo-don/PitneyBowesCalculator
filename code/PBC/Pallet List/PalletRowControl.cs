@@ -298,8 +298,9 @@ namespace WindowsFormsApp1
 
                     UpdateButtonsState();
 
-                    // ⭐ ADD THIS
-                    PBCMain.Instance.MarkSkipRefresh(_model.JobId);
+                   
+                    var ts = await RqliteClient.GetJobsLastUpdatedAsync();
+                    PBCMain.Instance.MarkPendingUpdate(_model.JobId, ts);
 
                     PalletChanged?.Invoke(this, _model);
                 }
@@ -483,27 +484,18 @@ namespace WindowsFormsApp1
                         _model.Pallets.Add(pallet);
                     }
 
-                    PBCMain.PausePolling = true;
-                    // 5️⃣ Insert work orders
-                    //await RqliteClient.SaveWorkOrdersAsync(pallet.PalletId, validWorkOrders);
-
-                    //// 6️⃣ Reload pallet
-                    //pallet.WorkOrders = await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
-                    //UpdateButtonsState();
-
-                    //// ⭐ ADD THIS
-                    //PBCMain.Instance.MarkSkipRefresh(_model.JobId);
-                    //PalletChanged?.Invoke(this, _model);
-                    // ⭐ optimistic UI update FIRST
+                    // 1️⃣ optimistic UI update (instant)
                     pallet.WorkOrders.AddRange(validWorkOrders);
-
-                    PBCMain.Instance.MarkSkipRefresh(_model.JobId);
                     PalletChanged?.Invoke(this, _model);
 
-                    // THEN save to DB
+                    // 2️⃣ save to DB
                     await RqliteClient.SaveWorkOrdersAsync(pallet.PalletId, validWorkOrders);
 
-                    // OPTIONAL: background sync (no UI block)
+                    // 3️⃣ mark your update (prevents double refresh)
+                    var ts = await RqliteClient.GetJobsLastUpdatedAsync();
+                    PBCMain.Instance.MarkPendingUpdate(_model.JobId, ts);
+
+
                     _ = Task.Run(async () =>
                     {
                         var fresh = await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
@@ -535,7 +527,7 @@ namespace WindowsFormsApp1
                 }
                 finally
                 {
-                    PBCMain.PausePolling = false;
+                 
                 }
             }
         }
@@ -616,8 +608,9 @@ namespace WindowsFormsApp1
 
             UpdateButtonsState();
 
-            // ⭐ FIX: use main form, not control
-            PBCMain.Instance.MarkSkipRefresh(_model.JobId);
+            
+            var ts = await RqliteClient.GetJobsLastUpdatedAsync();
+            PBCMain.Instance.MarkPendingUpdate(_model.JobId, ts);
 
             PalletChanged?.Invoke(this, _model);
         }

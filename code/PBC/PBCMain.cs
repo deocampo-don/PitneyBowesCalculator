@@ -1,51 +1,52 @@
 ﻿using Krypton.Toolkit;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.IO;
+
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.Dialogs;
-using WindowsFormsApp1.Packed_And_Ready;
+
 using WindowsFormsApp1.Packed_And_Ready.View_Button;
-using WindowsFormsApp1.Properties;
+
 
 namespace WindowsFormsApp1
 {
     public partial class PBCMain : Form
-    {
+    {// -----------------------------
+     // Data
+     // -----------------------------
+        private readonly List<PbJobModel> _pbJobs = new();
+        private Dictionary<int, PbJobModel> _jobsById = new();
+        private List<PbJobModel> _shipmentRows = new();
+
         // -----------------------------
-        // Fields
+        // Polling
         // -----------------------------
-        private readonly List<PbJobModel> _pbJobs = new List<PbJobModel>();
-        private readonly List<PbJobModel> _pbJobsWShipped = new List<PbJobModel>();
-        public event EventHandler<PbJobModel> SoftDeleteRequested;
-        private Dictionary<int, PbJobModel> _jobsById = new Dictionary<int, PbJobModel>();
         private System.Windows.Forms.Timer _pollTimer;
         private bool _isPolling;
-        public string iniFileName;
-        public static bool PausePolling { get; set; }
-        internal INIClass? appINI;
         private DateTime? _lastJobsTimestamp;
         private int _lastJobsCount = 0;
-        public static CpsConfig DbCpsConfig;
-        private bool _isReconnecting = false;
-        public static string CPSConnectionString;
-        private string _preparedCpsQuery;
-        public event EventHandler ItemsChanged;
-        private List<PbJobModel> _shipmentRows = new();
-        private readonly HashSet<int> _skipNextRefreshJobIds = new HashSet<int>();
-        private readonly object _skipLock = new object();
+
+        // -----------------------------
+        // Concurrency (NEW SYSTEM)
+        // -----------------------------
+        private readonly Dictionary<int, DateTime?> _pendingUpdates = new();
+        private readonly object _pendingLock = new object();
         public static PBCMain Instance { get; private set; }
+        public static CpsConfig? DbCpsConfig { get; private set; }
+        public static string? CPSConnectionString { get; private set; }
+        private readonly Dictionary<int, DateTime?> _lastProcessedUpdates = new();
 
-
+        // -----------------------------
+        // Connection
+        // -----------------------------
         private bool _isConnected = false;
+        private bool _isReconnecting = false;
         // -----------------------------
         // Constructor
         // -----------------------------
@@ -206,7 +207,7 @@ namespace WindowsFormsApp1
             _pollTimer.Tick += async (_, __) =>
             {
                 if (_isPolling) return;
-                if (PausePolling) return;
+               
 
                 _isPolling = true;
 
@@ -314,16 +315,23 @@ namespace WindowsFormsApp1
                 if (!_jobsById.TryGetValue(jobId, out var local))
                     continue;
 
-                if (local.LastUpdated != lastUpdated)
+                if (!Nullable.Equals(local.LastUpdated, lastUpdated))
                 {
-                    //await RefreshSingleJobAsync(jobId);
-                    if (ShouldSkipRefresh(jobId))
+                    if (_lastProcessedUpdates.TryGetValue(jobId, out var lastProcessed) &&
+                        Nullable.Equals(lastProcessed, lastUpdated))
                     {
-                        Debug.WriteLine($"[SKIP] Job {jobId}");
-                        continue; // if inside loop
+                        continue; // already handled this update
+                    }
+
+                    if (ShouldIgnoreOwnUpdate(jobId, lastUpdated))
+                    {
+                        _lastProcessedUpdates[jobId] = lastUpdated;
+                        continue;
                     }
 
                     await RefreshSingleJobAsync(jobId);
+
+                    _lastProcessedUpdates[jobId] = lastUpdated;
                 }
             }
 
@@ -408,23 +416,6 @@ namespace WindowsFormsApp1
             packedListView2.PackedDataChanged += PackedListView2_PackedDataChanged;
             lvBuild.PalletChanged += PalletListView_PalletChanged;
 
-            //lvBuild.DeleteRequested += async (_, job) =>
-            //{
-            //    if (job == null) return;
-
-            //    try
-            //    {
-            //        await RqliteClient.DeletePbJobAsync(job.JobId);
-            //        _pbJobs.Remove(job);
-            //        _jobsById.Remove(job.JobId);
-            //        RemoveJobFromUI(job.JobId);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Utils.WriteUnexpectedError("Delete PB Job failed");
-            //        Utils.WriteExceptionError(ex);
-            //    }
-            //};
             lvBuild.DeleteRequested += async (_, job) =>
             {
                 if (job == null) return;
@@ -546,26 +537,6 @@ namespace WindowsFormsApp1
             CSSDesign.MakeTitleBarButton(btnClose);
             CSSDesign.MakeTitleBarButton(btnSettings);
         }
-        public void MarkSkipRefresh(int jobId)
-        {
-            lock (_skipLock)
-            {
-                _skipNextRefreshJobIds.Add(jobId);
-            }
-        }
-
-        private bool ShouldSkipRefresh(int jobId)
-        {
-            lock (_skipLock)
-            {
-                if (_skipNextRefreshJobIds.Contains(jobId))
-                {
-                    _skipNextRefreshJobIds.Remove(jobId);
-                    return true;
-                }
-            }
-            return false;
-        }
         // -----------------------------
         // Data Loading (DB → UI)
         // -----------------------------
@@ -579,6 +550,7 @@ namespace WindowsFormsApp1
             _jobsById = jobs.ToDictionary(j => j.JobId);
 
             RefreshAllViews();
+            _lastProcessedUpdates.Clear();
         }
 
         // -----------------------------
@@ -615,104 +587,7 @@ namespace WindowsFormsApp1
             packedListView2?.RemoveItem(jobId);
             pickedUpListView?.RemoveItem(jobId);
         }
-        //   private void RefreshAllViews()
-        //   {
-        //       var activeJobs = _pbJobs.Where(j => j.IsActive).ToList();
-        //       var allJobs = _pbJobs; 
-
-        //       lvBuild?.SetItems(activeJobs);
-
-        //       var packedJobs = activeJobs
-        //.Select(job =>
-        //{
-        //    var activePallets = job.Pallets
-        //        .Where(p => p.State == PalletState.Ready ||
-        //                    p.State == PalletState.Packed_NotReady)
-        //        .Select(p => new Pallet
-        //        {
-        //            PalletId = p.PalletId,
-        //            PBJobId = p.PBJobId,
-        //            PalletNumber = p.PalletNumber,
-        //            PackedAt = p.PackedAt,
-        //            ShippedAt = p.ShippedAt,
-        //            TrayCount = p.TrayCount,
-        //            State = p.State,
-        //            WorkOrders = p.WorkOrders
-        //                .Select(w => new WorkOrder(w.WorkOrderCode, w.Quantity)
-        //                {
-        //                    Id = w.Id,
-        //                    PalletId = w.PalletId
-        //                })
-        //                .ToList()
-        //        })
-        //        .ToList();
-
-        //    if (!activePallets.Any())
-        //        return null;
-
-        //    return new PbJobModel
-        //    {
-        //        JobId = job.JobId,
-        //        JobName = job.JobName,
-        //        JobNumber = job.JobNumber,
-        //        IsTemp = job.IsTemp,
-        //        LastUpdated = job.LastUpdated,
-        //        Pallets = activePallets
-        //    };
-        //})
-        //.Where(j => j != null)
-        //.ToList();
-
-        //       packedListView2?.SetItems(packedJobs);
-
-        //       _shipmentRows = new List<PbJobModel>();
-        //       foreach (var job in _pbJobs)
-        //       {
-        //           var shippedGroups = job.Pallets
-        //               .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
-        //               .GroupBy(p => p.ShippedAt.Value);
-
-        //           foreach (var group in shippedGroups)
-        //           {
-        //               var shipmentClone = new PbJobModel
-        //               {
-        //                   JobId = job.JobId,
-        //                   JobName = job.JobName,
-        //                   JobNumber = job.JobNumber,
-        //                   IsTemp = job.IsTemp,
-        //                   LastUpdated = job.LastUpdated,
-        //                   ShippedDate = group.Key,
-        //                   Pallets = group
-        //                       .Select(p => new Pallet
-        //                       {
-        //                           PalletId = p.PalletId,
-        //                           PBJobId = p.PBJobId,
-        //                           PalletNumber = p.PalletNumber,
-        //                           PackedAt = p.PackedAt,
-        //                           ShippedAt = p.ShippedAt,
-        //                           TrayCount = p.TrayCount,
-        //                           State = p.State,
-        //                           WorkOrders = p.WorkOrders
-        //                               .Select(w => new WorkOrder(w.WorkOrderCode, w.Quantity)
-        //                               {
-        //                                   Id = w.Id,
-        //                                   PalletId = w.PalletId
-        //                               })
-        //                               .ToList()
-        //                       })
-        //                       .ToList()
-        //               };
-
-        //               _shipmentRows.Add(shipmentClone);
-        //           }
-        //       }
-
-        //       _shipmentRows = _shipmentRows
-        //           .OrderByDescending(s => s.ShippedDate)
-        //           .ToList();
-
-        //       pickedUpListView?.SetItems(_shipmentRows);
-        //   }
+    
         private void RefreshAllViews()
         {
             // 1️⃣ Active jobs
@@ -802,8 +677,35 @@ namespace WindowsFormsApp1
             }
             RefreshAllViews();
         }
+        public void MarkPendingUpdate(int jobId, DateTime? timestamp)
+        {
+            if (timestamp == null)
+                return;
 
+            lock (_pendingLock)
+            {
+                _pendingUpdates[jobId] = timestamp;
+            }
+        }
+        private bool ShouldIgnoreOwnUpdate(int jobId, DateTime? dbTimestamp)
+        {
+            if (dbTimestamp == null)
+                return false;
 
+            lock (_pendingLock)
+            {
+                if (_pendingUpdates.TryGetValue(jobId, out var pending))
+                {
+                    if (pending == dbTimestamp)
+                    {
+                        _pendingUpdates.Remove(jobId); // consume once
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
         // -----------------------------
         // Window Buttons
         // -----------------------------

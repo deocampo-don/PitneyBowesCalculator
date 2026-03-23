@@ -275,7 +275,7 @@ namespace WindowsFormsApp1
             nvNavigator.Owner = null;
             nvNavigator.PageBackStyle = Krypton.Toolkit.PaletteBackStyle.PanelClient;
             nvNavigator.Pages.AddRange(new Krypton.Navigator.KryptonPage[] { pgBuild, pgPacked, pgPicked });
-            nvNavigator.SelectedIndex = 2;
+            nvNavigator.SelectedIndex = 1;
             nvNavigator.Size = new System.Drawing.Size(1226, 462);
             nvNavigator.StateCommon.Page.Color1 = System.Drawing.Color.FromArgb(241, 241, 241);
             nvNavigator.StateCommon.Page.Color2 = System.Drawing.Color.FromArgb(241, 241, 241);
@@ -363,7 +363,7 @@ namespace WindowsFormsApp1
             pgPacked.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             pgPacked.MinimumSize = new System.Drawing.Size(130, 46);
             pgPacked.Name = "pgPacked";
-            pgPacked.Size = new System.Drawing.Size(1228, 464);
+            pgPacked.Size = new System.Drawing.Size(1226, 462);
             pgPacked.Text = "kryptonPage2";
             pgPacked.ToolTipTitle = "Page ToolTip";
             pgPacked.UniqueName = "78120dba424747da8ffc132c067ceb97";
@@ -372,10 +372,10 @@ namespace WindowsFormsApp1
             // 
             pnlShipPallets.Controls.Add(panel1);
             pnlShipPallets.Dock = System.Windows.Forms.DockStyle.Bottom;
-            pnlShipPallets.Location = new System.Drawing.Point(0, 394);
+            pnlShipPallets.Location = new System.Drawing.Point(0, 392);
             pnlShipPallets.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             pnlShipPallets.Name = "pnlShipPallets";
-            pnlShipPallets.Size = new System.Drawing.Size(1228, 70);
+            pnlShipPallets.Size = new System.Drawing.Size(1226, 70);
             pnlShipPallets.StateCommon.Color1 = System.Drawing.Color.White;
             pnlShipPallets.TabIndex = 7;
             // 
@@ -385,7 +385,7 @@ namespace WindowsFormsApp1
             panel1.Controls.Add(chkbxSelectAll);
             panel1.Controls.Add(btnShipPallets);
             panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            panel1.Location = new System.Drawing.Point(888, 0);
+            panel1.Location = new System.Drawing.Point(886, 0);
             panel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             panel1.Name = "panel1";
             panel1.Size = new System.Drawing.Size(340, 70);
@@ -433,7 +433,7 @@ namespace WindowsFormsApp1
             packedListView2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             packedListView2.Name = "packedListView2";
             packedListView2.Padding = new System.Windows.Forms.Padding(0, 0, 0, 75);
-            packedListView2.Size = new System.Drawing.Size(1228, 464);
+            packedListView2.Size = new System.Drawing.Size(1226, 462);
             packedListView2.TabIndex = 1;
             // 
             // pgPicked

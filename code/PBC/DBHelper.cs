@@ -433,33 +433,45 @@ WHERE Id = {jobId}
         var result = await ExecuteAsync(sql);
         return result.RowsAffected;
     }
-    //public static async Task DeleteWorkOrdersAsync(IEnumerable<int> workOrderIds)
-    //{
-    //    if (workOrderIds == null || !workOrderIds.Any())
-    //        return;
 
-    //    var idList = string.Join(",", workOrderIds);
+    public static async Task DeleteWorkOrdersAndMaybePalletAsync(
+    List<int> workOrderIds,
+    int palletId)
+    {
+        var idList = string.Join(",", workOrderIds);
 
-    //    string sql = $@"
-    //DELETE FROM {TablePalletWorkOrders}
-    //WHERE Id IN ({idList});
+        // ✅ get jobId FIRST (safe)
+        var result = await QueryAsync($@"
+SELECT PBJobId
+FROM {TablePallets}
+WHERE Id = {palletId}
+LIMIT 1;
+");
 
-    //UPDATE {TableJobs}
-    //SET LastUpdated = datetime('now','localtime')
-    //WHERE Id IN (
-    //    SELECT PBJobId
-    //    FROM {TablePallets}
-    //    WHERE Id IN (
-    //        SELECT PalletId
-    //        FROM {TablePalletWorkOrders}
-    //        WHERE Id IN ({idList})
-    //    )
-    //);
-    //";
+        if (result.Records.Count == 0)
+            return;
 
-    //    await ExecuteAsync(sql);
-    //}
+        int jobId = Convert.ToInt32(result.Records[0]["PBJobId"]);
 
+        // ✅ single atomic execution (no CTE)
+        string sql = $@"
+
+DELETE FROM {TablePalletWorkOrders}
+WHERE Id IN ({idList});
+
+DELETE FROM {TablePallets}
+WHERE Id = {palletId}
+AND NOT EXISTS (
+    SELECT 1 FROM {TablePalletWorkOrders} WHERE PalletId = {palletId}
+);
+
+UPDATE {TableJobs}
+SET LastUpdated = datetime('now','localtime')
+WHERE Id = {jobId};
+";
+
+        await ExecuteAsync(sql);
+    }
     public static async Task DeleteWorkOrdersAsync(IEnumerable<int> workOrderIds)
     {
         if (workOrderIds == null || !workOrderIds.Any())
@@ -667,10 +679,10 @@ WHERE Id = {jobId};
         return result.RowsAffected;
     }
     public static async Task<int> UpdatePalletPackingAsync(
-     int palletId,
-     int trayCount)
+    int palletId,
+    int trayCount)
     {
-        string sql1 = $@"
+        string sql = $@"
 UPDATE {TablePallets}
 SET
     TrayCount = {trayCount},
@@ -679,22 +691,17 @@ SET
 WHERE Id = {palletId}
   AND PackedAt IS NULL
   AND State = {(int)PalletState.NotReady};
-";
 
-        var result = await ExecuteAsync(sql1);
-
-        if (result.RowsAffected > 0)
-        {
-            string sql2 = $@"
 UPDATE {TableJobs}
 SET LastUpdated = datetime('now','localtime')
 WHERE Id = (
     SELECT PBJobId
     FROM {TablePallets}
     WHERE Id = {palletId}
-)";
-            await ExecuteAsync(sql2);
-        }
+);
+";
+
+        var result = await ExecuteAsync(sql);
 
         return result.RowsAffected;
     }

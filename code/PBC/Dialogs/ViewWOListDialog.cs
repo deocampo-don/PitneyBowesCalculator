@@ -133,25 +133,26 @@ namespace WindowsFormsApp1
                 var ids = DeletedItems.Select(w => w.Id).ToList();
                 var palletId = DeletedItems.First().PalletId;
 
-                // STEP 1: Delete in DB
-                await RqliteClient.DeleteWorkOrdersAsync(ids);
+                // ✅ SINGLE atomic call (prevents double refresh)
+                await RqliteClient.DeleteWorkOrdersAndMaybePalletAsync(ids, palletId);
 
-                // STEP 2: Update UI list
+                // ✅ Update UI locally (optimistic)
                 foreach (var wo in DeletedItems)
                     _items.Remove(wo);
 
-                // ⭐ STEP 3: If empty → delete pallet
+                // ✅ If empty, just close (DB already handled pallet deletion)
                 if (!_items.Any())
                 {
-                    await RqliteClient.DeletePalletsAsync(new[] { palletId });
-
                     MessageDialogBox.ShowDialog("",
                         "No work orders left. Pallet will be removed.",
                         MessageBoxButtons.OK,
                         MessageType.Info);
+
                     this.Close();
+                    return;
                 }
 
+                // ✅ Rebind UI
                 SetItems(jobname, jobn, _items);
             }
             catch (Exception ex)

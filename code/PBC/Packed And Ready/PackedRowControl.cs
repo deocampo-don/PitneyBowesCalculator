@@ -112,7 +112,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
 
             Form parentForm = this.FindForm();
 
-            PBCMain.PausePolling = true;   // ⭐ pause polling
+            
 
             using (var dlg = new ViewButtonDialog(_modelpbjob))
             {
@@ -124,7 +124,7 @@ namespace WindowsFormsApp1.Packed_And_Ready
                 }
             }
 
-            PBCMain.PausePolling = false;  // ⭐ resume polling
+           
         }
 
         private async void chkbxStatus_CheckedChanged(object sender, EventArgs e)
