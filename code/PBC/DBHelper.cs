@@ -472,46 +472,7 @@ WHERE Id = {jobId};
 
         await ExecuteAsync(sql);
     }
-    public static async Task DeleteWorkOrdersAsync(IEnumerable<int> workOrderIds)
-    {
-        if (workOrderIds == null || !workOrderIds.Any())
-            return;
-
-        var idList = string.Join(",", workOrderIds);
-
-        // ⭐ STEP 1: Get affected job IDs FIRST
-        var result = await QueryAsync($@"
-SELECT DISTINCT P.PBJobId
-FROM {TablePalletWorkOrders} WO
-INNER JOIN {TablePallets} P ON WO.PalletId = P.Id
-WHERE WO.Id IN ({idList});
-");
-
-        var jobIds = result.Records
-            .Select(r => Convert.ToInt32(r["PBJobId"]))
-            .Distinct()
-            .ToList();
-
-        var jobIdList = jobIds.Any()
-            ? string.Join(",", jobIds)
-            : null;
-
-        // ⭐ STEP 2: Delete work orders
-        await ExecuteAsync($@"
-DELETE FROM {TablePalletWorkOrders}
-WHERE Id IN ({idList});
-");
-
-        // ⭐ STEP 3: Update jobs
-        if (!string.IsNullOrEmpty(jobIdList))
-        {
-            await ExecuteAsync($@"
-UPDATE {TableJobs}
-SET LastUpdated = datetime('now','localtime')
-WHERE Id IN ({jobIdList});
-");
-        }
-    }
+    
     public static async Task<(bool Success, string Error)> TestSqlConnectionAsync(
   string server,
   string db,
@@ -573,25 +534,18 @@ WHERE Id IN ({jobIdList});
 
     public static async Task DeletePbJobAsync(int jobId)
     {
-        // Delete workorders first
         await ExecuteAsync($@"
-        DELETE FROM WORKORDERS
-        WHERE PalletId IN (
-            SELECT PalletId FROM PALLET WHERE PBJobId = {jobId}
-        );
-    ");
+DELETE FROM {TablePalletWorkOrders}
+WHERE PalletId IN (
+    SELECT Id FROM {TablePallets} WHERE PBJobId = {jobId}
+);
 
-        // Delete pallets
-        await ExecuteAsync($@"
-        DELETE FROM PALLET
-        WHERE PBJobId = {jobId};
-    ");
+DELETE FROM {TablePallets}
+WHERE PBJobId = {jobId};
 
-        // Delete job
-        await ExecuteAsync($@"
-        DELETE FROM {TableJobs}
-        WHERE Id = {jobId};
-    ");
+DELETE FROM {TableJobs}
+WHERE Id = {jobId};
+");
     }
     public static async Task SetJobReadyAsync(int jobId)
     {
@@ -657,25 +611,18 @@ WHERE Id = {jobId};
     PalletState fromState,
     PalletState toState)
     {
-        string sql1 = $@"
+        string sql = $@"
 UPDATE {TablePallets}
 SET State = {(int)toState}
 WHERE PBJobId = {jobId}
 AND State = {(int)fromState};
-";
 
-        var result = await ExecuteAsync(sql1);
-
-        if (result.RowsAffected > 0)
-        {
-            string sql2 = $@"
 UPDATE {TableJobs}
 SET LastUpdated = datetime('now','localtime')
 WHERE Id = {jobId};
 ";
-            await ExecuteAsync(sql2);
-        }
 
+        var result = await ExecuteAsync(sql);
         return result.RowsAffected;
     }
     public static async Task<int> UpdatePalletPackingAsync(
@@ -743,7 +690,7 @@ WHERE Id = (
 
         var idList = string.Join(",", palletIds);
 
-        // ⭐ STEP 1: Get affected Job IDs FIRST (important)
+        // get jobIds first
         var result = await QueryAsync($@"
 SELECT DISTINCT PBJobId
 FROM {TablePallets}
@@ -755,31 +702,22 @@ WHERE Id IN ({idList});
             .Distinct()
             .ToList();
 
-        var jobIdList = jobIds.Any()
-            ? string.Join(",", jobIds)
-            : null;
+        if (!jobIds.Any())
+            return;
 
-        // ⭐ STEP 2: Delete work orders
+        var jobIdList = string.Join(",", jobIds);
+
         await ExecuteAsync($@"
 DELETE FROM {TablePalletWorkOrders}
 WHERE PalletId IN ({idList});
-");
 
-        // ⭐ STEP 3: Delete pallets
-        await ExecuteAsync($@"
 DELETE FROM {TablePallets}
 WHERE Id IN ({idList});
-");
 
-        // ⭐ STEP 4: Update jobs (only if needed)
-        if (!string.IsNullOrEmpty(jobIdList))
-        {
-            await ExecuteAsync($@"
 UPDATE {TableJobs}
 SET LastUpdated = datetime('now','localtime')
 WHERE Id IN ({jobIdList});
 ");
-        }
     }
 
     public class CpsSettings
@@ -1237,9 +1175,6 @@ ORDER BY j.Id, p.PalletNumber
 
     public static async Task<int> GetOrCreateWorkingPalletAsync(int jobId)
     {
-        Debug.WriteLine($"[PALLET] Request pallet for Job {jobId}");
-
-        // 1️⃣ Check existing pallet
         var existing = await QueryAsync($@"
 SELECT Id
 FROM {TablePallets}
@@ -1250,28 +1185,22 @@ LIMIT 1
 ");
 
         if (existing.Records.Count > 0)
-        {
-            int palletId = Convert.ToInt32(existing.Records[0]["Id"]);
-            Debug.WriteLine($"[PALLET] Using existing pallet {palletId}");
-            return palletId;
-        }
+            return Convert.ToInt32(existing.Records[0]["Id"]);
 
-        Debug.WriteLine("[PALLET] No active pallet found. Creating new pallet...");
-
-        // 2️⃣ Insert pallet
         await ExecuteAsync($@"
 INSERT INTO {TablePallets}
 (PBJobId, PalletNumber, State, TrayCount)
-VALUES
-(
-    {jobId},
-    0,
-    {(int)PalletState.NotReady},
-    0
-);
+VALUES ({jobId}, 0, {(int)PalletState.NotReady}, 0);
+
+UPDATE {TablePallets}
+SET PalletNumber = last_insert_rowid()
+WHERE Id = last_insert_rowid();
+
+UPDATE {TableJobs}
+SET LastUpdated = datetime('now','localtime')
+WHERE Id = {jobId};
 ");
 
-        // 3️⃣ Get the pallet we just inserted
         var inserted = await QueryAsync($@"
 SELECT Id
 FROM {TablePallets}
@@ -1284,25 +1213,7 @@ LIMIT 1
         if (inserted.Records.Count == 0)
             throw new Exception("Failed to retrieve inserted pallet.");
 
-        int palletIdNew = Convert.ToInt32(inserted.Records[0]["Id"]);
-
-        Debug.WriteLine($"[PALLET] Inserted pallet {palletIdNew}");
-
-        // 4️⃣ Set PalletNumber = Id
-        await ExecuteAsync($@"
-UPDATE {TablePallets}
-SET PalletNumber = {palletIdNew}
-WHERE Id = {palletIdNew};
-");
-
-        // 5️⃣ Update PBJob timestamp
-        await ExecuteAsync($@"
-UPDATE {TableJobs}
-SET LastUpdated = datetime('now','localtime')
-WHERE Id = {jobId};
-");
-
-        return palletIdNew;
+        return Convert.ToInt32(inserted.Records[0]["Id"]);
     }
     //    public static async Task<int> GetOrCreateWorkingPalletAsync(int jobId)
     //    {
@@ -1555,40 +1466,6 @@ WHERE Id = {jobId};
         return 0;
     }
 
-
-    //    public static async Task<RqliteWriteResult> SaveWorkOrdersAsync(
-    //    int palletId,
-    //    List<WorkOrder> workOrders)
-    //    {
-    //        if (workOrders == null || !workOrders.Any())
-    //            return new RqliteWriteResult { Success = true, RowsAffected = 0 };
-
-    //        var sqlBuilder = new StringBuilder();
-
-    //        foreach (var wo in workOrders)
-    //        {
-    //            sqlBuilder.AppendLine($@"
-    //INSERT OR IGNORE INTO {TablePalletWorkOrders}
-    //(PalletId, Barcode, WorkOrder, Quantity)
-    //VALUES (
-    //    {palletId},
-    //    {FormatValue(wo.Barcode)},
-    //    {FormatValue(wo.WorkOrderCode)},
-    //    {wo.Quantity}
-    //);");
-    //        }
-    //        sqlBuilder.AppendLine($@"
-    //UPDATE {TableJobs}
-    //SET LastUpdated = datetime('now','localtime')
-    //WHERE Id = (
-    //    SELECT PBJobId
-    //    FROM {TablePallets}
-    //    WHERE Id = {palletId}
-    //);
-    //");
-    //        return await ExecuteAsync(sqlBuilder.ToString());
-    //    }
-
     public static async Task<RqliteWriteResult> SaveWorkOrdersAsync(
     int palletId,
     List<WorkOrder> workOrders)
@@ -1671,7 +1548,7 @@ WHERE Id = (
 
     private class WriteResult
     {
-        public int rows_affected { get; set; }
+        public int rows_affected { get; set;     }
     }
 
     private class QueryResponse
