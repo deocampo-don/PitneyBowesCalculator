@@ -104,25 +104,19 @@ namespace WindowsFormsApp1.Packed_And_Ready
 
         public void SetAllSelected(bool isSelected)
         {
+
             foreach (Control c in packedFlowRow.Controls)
             {
                 if (c is PackedRowControl row)
                 {
                     row.SetChecked(isSelected);
+                 
+                       
                 }
             }
+
         }
 
-
-        public void RefreshItem(PbJobModel job)
-        {
-            var row = packedFlowRow.Controls
-                .OfType<PackedRowControl>()
-                .FirstOrDefault(r => r.BoundJob?.JobId == job.JobId);
-
-            if (row != null)
-                row.Bind(job);
-        }
         public void RemoveItem(int jobId)
         {
             var row = packedFlowRow.Controls

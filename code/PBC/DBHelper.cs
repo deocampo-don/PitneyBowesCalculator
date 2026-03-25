@@ -606,10 +606,10 @@ WHERE Id = {jobId};
 
         var result = await ExecuteAsync(sql);
    }
-    public static async Task<int> TogglePalletReadyAsync(
-    int jobId,
-    PalletState fromState,
-    PalletState toState)
+    public static async Task<DateTime?> TogglePalletReadyAsync(
+     int jobId,
+     PalletState fromState,
+     PalletState toState)
     {
         string sql = $@"
 UPDATE {TablePallets}
@@ -622,8 +622,20 @@ SET LastUpdated = datetime('now','localtime')
 WHERE Id = {jobId};
 ";
 
-        var result = await ExecuteAsync(sql);
-        return result.RowsAffected;
+        await ExecuteAsync(sql);
+
+        // 🔥 immediately fetch exact timestamp for THIS job
+        var result = await QueryAsync($@"
+SELECT LastUpdated
+FROM {TableJobs}
+WHERE Id = {jobId}
+LIMIT 1;
+");
+
+        if (result.Records.Count == 0)
+            return null;
+
+        return DateTime.Parse(result.Records[0]["LastUpdated"].ToString());
     }
     public static async Task<int> UpdatePalletPackingAsync(
     int palletId,

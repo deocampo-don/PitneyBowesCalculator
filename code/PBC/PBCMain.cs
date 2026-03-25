@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.Dialogs;
-
+using System.Drawing;
 using WindowsFormsApp1.Packed_And_Ready.View_Button;
 
 
@@ -23,6 +23,7 @@ namespace WindowsFormsApp1
         private readonly List<PbJobModel> _pbJobs = new();
         private Dictionary<int, PbJobModel> _jobsById = new();
         private List<PbJobModel> _shipmentRows = new();
+        private int _buildScrollY = 0;
 
         // -----------------------------
         // Polling
@@ -47,6 +48,7 @@ namespace WindowsFormsApp1
         // -----------------------------
         private bool _isConnected = false;
         private bool _isReconnecting = false;
+        private HashSet<int> _updatingJobs = new();
         // -----------------------------
         // Constructor
         // -----------------------------
@@ -97,7 +99,7 @@ namespace WindowsFormsApp1
             if (!await StartApplicationAsync())
                 return;
 
-           
+
         }
         private async Task InitializeRqliteAsync()
         {
@@ -207,7 +209,7 @@ namespace WindowsFormsApp1
             _pollTimer.Tick += async (_, __) =>
             {
                 if (_isPolling) return;
-               
+
 
                 _isPolling = true;
 
@@ -216,7 +218,7 @@ namespace WindowsFormsApp1
                     lvBuild.BeginUpdate();
                     packedListView2.BeginUpdate();
                     pickedUpListView.BeginUpdate();
-
+               
                     await PollForUpdatesAsync();
                 }
                 catch (Exception ex)
@@ -240,8 +242,9 @@ namespace WindowsFormsApp1
                     lvBuild.EndUpdate();
                     packedListView2.EndUpdate();
                     pickedUpListView.EndUpdate();
-
+              
                     _isPolling = false;
+                    
                 }
             };
 
@@ -273,7 +276,7 @@ namespace WindowsFormsApp1
                 Debug.WriteLine("No updates..");
                 return;
             }
-               
+
 
             _lastJobsTimestamp = dbTimestamp;
             _lastJobsCount = dbCount;
@@ -543,7 +546,7 @@ namespace WindowsFormsApp1
         private async Task LoadJobsAsync()
         {
             var jobs = await RqliteClient.LoadJobsAsync();
-          
+
             _pbJobs.Clear();
             _pbJobs.AddRange(jobs);
 
@@ -587,7 +590,7 @@ namespace WindowsFormsApp1
             packedListView2?.RemoveItem(jobId);
             pickedUpListView?.RemoveItem(jobId);
         }
-    
+
         private void RefreshAllViews()
         {
             // 1️⃣ Active jobs
@@ -642,6 +645,7 @@ namespace WindowsFormsApp1
 
         private async Task RefreshSingleJobAsync(int jobId)
         {
+           
             var updated = await RqliteClient.LoadSingleJobGraphAsync(jobId);
             if (updated == null)
                 return;
@@ -677,6 +681,7 @@ namespace WindowsFormsApp1
             }
             RefreshAllViews();
         }
+
         public void MarkPendingUpdate(int jobId, DateTime? timestamp)
         {
             if (timestamp == null)
@@ -686,6 +691,11 @@ namespace WindowsFormsApp1
             {
                 _pendingUpdates[jobId] = timestamp;
             }
+        }
+
+        public void UnmarkJobUpdating(int jobId)
+        {
+            _updatingJobs.Remove(jobId);
         }
         private bool ShouldIgnoreOwnUpdate(int jobId, DateTime? dbTimestamp)
         {
@@ -723,46 +733,11 @@ namespace WindowsFormsApp1
         // -----------------------------
         // Actions
         // -----------------------------
-        private async void btnShipPallets_Click(object sender, EventArgs e)
-        {
-            var selectedJobs = packedListView2.GetReadyJobs().ToList();
 
-            if (!selectedJobs.Any())
-            {
-                //MessageBox.Show("No jobs selected.");
-                MessageDialogBox.ShowDialog("", "No jobs selected.", MessageBoxButtons.OK, MessageType.Info);
-                return;
-            }
-
-            var jobIds = selectedJobs
-                .Select(j => j.JobId)
-                .ToArray();
-
-            // Show custom confirmation dialog
-            using (var dlg = new ShipPalletsConfirmationDialog())
-            {
-                if (dlg.ShowDialog(this) != DialogResult.OK)
-                {
-                    return; // ❗ STOP if user cancels
-                }
-            }
-
-            try
-            {
-                await RqliteClient.ShipPalletsAsync(jobIds);
-                await LoadJobsAsync();
-            }
-            catch (Exception ex)
-            {
-                Utils.WriteUnexpectedError(
-    $"Ship pallets | Count={jobIds.Length}, JobIds={string.Join(",", jobIds)}"
-);
-                ShowDatabaseError(ex);
-            }
-        }
 
         private void ApplySearchFilter()
         {
+            Debug.WriteLine($"ShipmentRows count: {_shipmentRows.Count}");
             if (_shipmentRows.Count == 0)
             {
                 pickedUpListView.SetItems(new List<PbJobModel>());
@@ -777,7 +752,13 @@ namespace WindowsFormsApp1
                             x.ShippedDate.Value >= fromDate &&
                             x.ShippedDate.Value < toDate)
                 .ToList();
+            foreach (var x in _shipmentRows.Take(5))
+            {
+                Debug.WriteLine($"DATA: {x.ShippedDate}");
+            }
 
+            Debug.WriteLine($"FROM: {fromDate}");
+            Debug.WriteLine($"TO: {toDate}");
             pickedUpListView.SetItems(filtered);
         }
 
@@ -874,11 +855,12 @@ namespace WindowsFormsApp1
         }
 
 
-        private void chkbxSelectAll_CheckedChanged_1(object sender, EventArgs e)
+        private void SaveScrollPositions()
         {
-            packedListView2.SetAllSelected(chkbxSelectAll.Checked);
+            _buildScrollY = lvBuild.VerticalScroll.Value;
         }
 
+        
         private async void btnSettings_Click(object sender, EventArgs e)
         {
             using (var dlg = new SettingsDialog())
@@ -947,6 +929,156 @@ namespace WindowsFormsApp1
                 return;
             }
             Utils.GenerateReport(jobs, dtPickUpFrom, dtPickUpTo);
+        }
+
+        //private async void btnShipPallets_Click_1(object sender, EventArgs e)
+        //{
+        //    var selectedJobs = packedListView2.GetReadyJobs().ToList();
+
+        //    if (!selectedJobs.Any())
+        //    {
+        //        MessageDialogBox.ShowDialog("", "No jobs selected.", MessageBoxButtons.OK, MessageType.Info);
+        //        return;
+        //    }
+
+        //    var jobIds = selectedJobs.Select(j => j.JobId).ToArray();
+
+        //    // Confirmation
+        //    using (var dlg = new ShipPalletsConfirmationDialog())
+        //    {
+        //        if (dlg.ShowDialog(this) != DialogResult.OK)
+        //            return;
+        //    }
+
+        //    try
+        //    {
+        //        // 🔥 SHOW LOADING
+        //        Utils.showStatusAndSpinner(lbPrintShip, pbPrintShip, "Shipping pallets...");
+        //        Cursor.Current = Cursors.WaitCursor;
+        //        this.Enabled = false;
+
+        //        await RqliteClient.ShipPalletsAsync(jobIds);
+
+        //        // 🔥 Update local model (for printing)
+        //        var now = DateTime.Now;
+        //        foreach (var job in selectedJobs)
+        //        {
+        //            job.ShippedDate = now;
+        //        }
+
+        //        // 🔥 Print (can take time)
+        //        await Task.Run(() =>
+        //        {
+        //            PrintEngine.Print(e => PrintLayouts.SummaryShip(e, selectedJobs));
+        //        });
+
+        //        // 🔥 Refresh UI
+        //        await LoadJobsAsync();
+
+        //        // ✅ SUCCESS (auto hides after 2s)
+        //        Utils.hideStatusAndSpinner(lbPrintShip, pbPrintShip, "Pallets shipped successfully");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Utils.WriteUnexpectedError(
+        //            $"Ship pallets | Count={jobIds.Length}, JobIds={string.Join(",", jobIds)}"
+        //        );
+
+        //        Utils.errorStatusAndSpinner(lbPrintShip, pbPrintShip, "Shipping failed");
+
+        //        ShowDatabaseError(ex);
+        //    }
+        //    finally
+        //    {
+        //        // 🔥 ALWAYS RESTORE UI
+        //        Cursor.Current = Cursors.Default;
+        //        this.Enabled = true;
+
+        //        // fallback safety (in case timer/UI glitches)
+        //        Utils.hideNow(lbPrintShip, pbPrintShip);
+        //    }
+        //}
+        private async void btnShipPallets_Click_1(object sender, EventArgs e)
+        {
+            var selectedJobs = packedListView2.GetReadyJobs().ToList();
+
+            if (!selectedJobs.Any())
+            {
+                MessageDialogBox.ShowDialog("", "No jobs selected.", MessageBoxButtons.OK, MessageType.Info);
+                return;
+            }
+
+            var jobIds = selectedJobs.Select(j => j.JobId).ToArray();
+
+            using (var dlg = new ShipPalletsConfirmationDialog())
+            {
+                if (dlg.ShowDialog(this) != DialogResult.OK)
+                    return;
+            }
+
+            try
+            {
+                //Utils.showStatusAndSpinner(lbPrintShip, pbPrintShip, $"Shipping {jobIds.Length} pallets...");
+                lbPrintShip.Visible = true;
+                lbPrintShip.Text = $"Preparing...";
+                progressBarShip.Visible = true;
+                progressBarShip.Style = ProgressBarStyle.Marquee; // 🔥 unknown duration
+
+                Cursor.Current = Cursors.WaitCursor;
+                this.Enabled = false;
+
+                // 🔥 DB update
+                await RqliteClient.ShipPalletsAsync(jobIds);
+
+                var now = DateTime.Now;
+                foreach (var job in selectedJobs)
+                {
+                    job.ShippedDate = now;
+                }
+
+                // 🔥 switch to printing state
+                this.Invoke(new Action(() =>
+                {
+                    lbPrintShip.Text = "Generating PDF...";
+                }));
+
+                // 🔥 SINGLE PDF (background thread)
+                await Task.Run(() =>
+                {
+                    PrintEngine.Print(e => PrintLayouts.SummaryShip(e, selectedJobs));
+                });
+
+                // 🔥 Refresh once
+                await LoadJobsAsync();
+
+                //Utils.hideStatusAndSpinner(lbPrintShip, pbPrintShip, "Pallets shipped successfully");
+            }
+            catch (Exception ex)
+            {
+                Utils.WriteUnexpectedError(
+                    $"Ship pallets | Count={jobIds.Length}, JobIds={string.Join(",", jobIds)}"
+                );
+
+                //Utils.errorStatusAndSpinner(lbPrintShip, pbPrintShip, "Shipping failed");
+
+                ShowDatabaseError(ex);
+            }
+            finally
+            {
+                lbPrintShip.Visible = false;
+                progressBarShip.Visible=false;
+                Cursor.Current = Cursors.Default;
+                this.Enabled = true;
+                //Utils.hideNow(lbPrintShip, pbPrintShip);
+
+                progressBarShip.Style = ProgressBarStyle.Blocks;
+                progressBarShip.Value = 0;
+            }
+        }
+
+        private void chkbxSelectAll_CheckedChanged(object sender, EventArgs e)
+        {
+            packedListView2.SetAllSelected(chkbxSelectAll.Checked);
         }
     }
 }

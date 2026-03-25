@@ -219,44 +219,6 @@ namespace WindowsFormsApp1
                     Grey, Grey, Color.White);
             }
         }
-
-        //private async void kryptonButton3_Click(object sender, EventArgs e)
-        //{
-        //    if (_model == null)
-        //        return;
-
-        //    var activePallet = _model.Pallets
-        //        .FirstOrDefault(p => p.PackedAt == null);
-
-        //    if (activePallet == null)
-        //    {
-        //        MessageDialogBox.ShowDialog("", "No active pallet.", MessageBoxButtons.OK, MessageType.Info);
-        //        return;
-        //    }
-
-        //    // ⭐ ALWAYS reload from DB (concurrency safe)
-        //    var dbItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
-
-        //    activePallet.WorkOrders = dbItems;
-
-        //    using (var dlg = new ViewWOListDialog())
-        //    {
-        //        dlg.SetItems(_model.JobName, _model.JobNumber.ToString(), dbItems);
-
-        //        dlg.ShowDialog(this);
-
-        //        if (dlg.DeletedItems != null && dlg.DeletedItems.Any())
-        //        {
-        //            var ids = dlg.DeletedItems.Select(x => x.Id).ToList();
-
-        //            await RqliteClient.DeleteWorkOrdersAsync(ids);      
-        //            activePallet.WorkOrders = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
-
-        //            UpdateButtonsState();
-        //            PalletChanged?.Invoke(this, _model);
-        //        }
-        //    }
-        //}
         private async void kryptonButton3_Click(object sender, EventArgs e)
 {
     if (_model == null)
@@ -574,7 +536,7 @@ namespace WindowsFormsApp1
 
             try
             {
-                Utils.WriteUnexpectedError($"Pack pallet | PalletId={activePallet.PalletId}, TrayCount={trayCount}");
+               
                 var rows = await RqliteClient.UpdatePalletPackingAsync(
      activePallet.PalletId,
      trayCount
@@ -597,7 +559,7 @@ namespace WindowsFormsApp1
 
                 activePallet.TrayCount = trayCount;
                 activePallet.PackedAt = DateTime.Now;
-                activePallet.State = PalletState.Packed;
+                activePallet.State = PalletState.Ready;
             }
             catch (Exception ex)
             {

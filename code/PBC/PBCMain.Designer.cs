@@ -49,7 +49,9 @@ namespace WindowsFormsApp1
             btnAddPBJob = new Krypton.Toolkit.KryptonButton();
             lvBuild = new PalletListView();
             pgPacked = new Krypton.Navigator.KryptonPage();
-            pnlShipPallets = new Krypton.Toolkit.KryptonPanel();
+            panel2 = new System.Windows.Forms.Panel();
+            progressBarShip = new System.Windows.Forms.ProgressBar();
+            lbPrintShip = new Krypton.Toolkit.KryptonLabel();
             panel1 = new System.Windows.Forms.Panel();
             chkbxSelectAll = new System.Windows.Forms.CheckBox();
             btnShipPallets = new System.Windows.Forms.Button();
@@ -104,8 +106,7 @@ namespace WindowsFormsApp1
             tlpAddPbJob.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pgPacked).BeginInit();
             pgPacked.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pnlShipPallets).BeginInit();
-            pnlShipPallets.SuspendLayout();
+            panel2.SuspendLayout();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pgPicked).BeginInit();
             pgPicked.SuspendLayout();
@@ -356,7 +357,7 @@ namespace WindowsFormsApp1
             // pgPacked
             // 
             pgPacked.AutoHiddenSlideSize = new System.Drawing.Size(200, 200);
-            pgPacked.Controls.Add(pnlShipPallets);
+            pgPacked.Controls.Add(panel2);
             pgPacked.Controls.Add(packedListView2);
             pgPacked.Flags = 65534;
             pgPacked.LastVisibleSet = true;
@@ -368,16 +369,37 @@ namespace WindowsFormsApp1
             pgPacked.ToolTipTitle = "Page ToolTip";
             pgPacked.UniqueName = "78120dba424747da8ffc132c067ceb97";
             // 
-            // pnlShipPallets
+            // panel2
             // 
-            pnlShipPallets.Controls.Add(panel1);
-            pnlShipPallets.Dock = System.Windows.Forms.DockStyle.Bottom;
-            pnlShipPallets.Location = new System.Drawing.Point(0, 392);
-            pnlShipPallets.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            pnlShipPallets.Name = "pnlShipPallets";
-            pnlShipPallets.Size = new System.Drawing.Size(1226, 70);
-            pnlShipPallets.StateCommon.Color1 = System.Drawing.Color.White;
-            pnlShipPallets.TabIndex = 7;
+            panel2.Controls.Add(progressBarShip);
+            panel2.Controls.Add(lbPrintShip);
+            panel2.Controls.Add(panel1);
+            panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            panel2.Location = new System.Drawing.Point(0, 392);
+            panel2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            panel2.Name = "panel2";
+            panel2.Size = new System.Drawing.Size(1226, 70);
+            panel2.TabIndex = 9;
+            // 
+            // progressBarShip
+            // 
+            progressBarShip.Location = new System.Drawing.Point(698, 13);
+            progressBarShip.Name = "progressBarShip";
+            progressBarShip.Size = new System.Drawing.Size(181, 23);
+            progressBarShip.TabIndex = 9;
+            progressBarShip.Visible = false;
+            // 
+            // lbPrintShip
+            // 
+            lbPrintShip.Location = new System.Drawing.Point(698, 37);
+            lbPrintShip.Margin = new System.Windows.Forms.Padding(4);
+            lbPrintShip.Name = "lbPrintShip";
+            lbPrintShip.Size = new System.Drawing.Size(181, 24);
+            lbPrintShip.StateCommon.Padding = new System.Windows.Forms.Padding(0);
+            lbPrintShip.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            lbPrintShip.TabIndex = 52;
+            lbPrintShip.Values.Text = "Shipping and Printing...";
+            lbPrintShip.Visible = false;
             // 
             // panel1
             // 
@@ -389,7 +411,7 @@ namespace WindowsFormsApp1
             panel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             panel1.Name = "panel1";
             panel1.Size = new System.Drawing.Size(340, 70);
-            panel1.TabIndex = 50;
+            panel1.TabIndex = 51;
             // 
             // chkbxSelectAll
             // 
@@ -403,7 +425,7 @@ namespace WindowsFormsApp1
             chkbxSelectAll.TabIndex = 45;
             chkbxSelectAll.Text = "Select All";
             chkbxSelectAll.UseVisualStyleBackColor = true;
-            chkbxSelectAll.CheckedChanged += chkbxSelectAll_CheckedChanged_1;
+            chkbxSelectAll.CheckedChanged += chkbxSelectAll_CheckedChanged;
             // 
             // btnShipPallets
             // 
@@ -417,14 +439,14 @@ namespace WindowsFormsApp1
             btnShipPallets.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnShipPallets.Font = new System.Drawing.Font("Segoe UI Semibold", 14F, System.Drawing.FontStyle.Bold);
             btnShipPallets.ForeColor = System.Drawing.Color.FromArgb(0, 0, 64);
-            btnShipPallets.Location = new System.Drawing.Point(167, 15);
+            btnShipPallets.Location = new System.Drawing.Point(164, 15);
             btnShipPallets.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             btnShipPallets.Name = "btnShipPallets";
             btnShipPallets.Size = new System.Drawing.Size(160, 46);
             btnShipPallets.TabIndex = 44;
             btnShipPallets.Text = "Ship Pallets";
             btnShipPallets.UseVisualStyleBackColor = false;
-            btnShipPallets.Click += btnShipPallets_Click;
+            btnShipPallets.Click += btnShipPallets_Click_1;
             // 
             // packedListView2
             // 
@@ -929,8 +951,8 @@ namespace WindowsFormsApp1
             tlpAddPbJob.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pgPacked).EndInit();
             pgPacked.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pnlShipPallets).EndInit();
-            pnlShipPallets.ResumeLayout(false);
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pgPicked).EndInit();
@@ -1013,14 +1035,16 @@ namespace WindowsFormsApp1
         private Krypton.Toolkit.KryptonPanel pnlBottom;
         private System.Windows.Forms.TableLayoutPanel tlpAddPbJob;
         private Krypton.Toolkit.KryptonButton btnAddPBJob;
-        private Krypton.Toolkit.KryptonPanel pnlShipPallets;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.CheckBox chkbxSelectAll;
-        private System.Windows.Forms.Button btnShipPallets;
         private Krypton.Toolkit.KryptonLabel lbDbConnecting;
         private Krypton.Toolkit.KryptonPictureBox pbConnectionSpinner;
         private RoundedPanel roundedPanel1;
         private System.Windows.Forms.CheckBox cbPackedSelectAll;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.CheckBox chkbxSelectAll;
+        private System.Windows.Forms.Button btnShipPallets;
+        private Krypton.Toolkit.KryptonLabel lbPrintShip;
+        private System.Windows.Forms.ProgressBar progressBarShip;
     }
 }
 

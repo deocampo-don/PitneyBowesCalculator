@@ -51,14 +51,6 @@ public class PbJobModel
         }
     }
 
-    public int TotalScannedWOOfJob
-    {
-        get
-        {
-            return Pallets.Sum(p => p.PalletScannedWO);
-        }
-    }
-
     public DateTime? LastPackedTime
     {
         get
@@ -78,25 +70,6 @@ public class PbJobModel
                 ?? PackDate
                 ?? DateTime.Today;
         }
-    }
-
-    public Pallet GetOrCreateWorkingPallet()
-    {
-        // If there is an unpacked pallet, use it
-        var existing = Pallets
-            .FirstOrDefault(p => p.PackedAt == null);
-
-        if (existing != null)
-            return existing;
-
-        // Otherwise create new pallet
-        var newPallet = new Pallet
-        {
-            PalletId = this.JobId,
-            PalletNumber = Pallets.Count + 1
-        };
-
-        return newPallet;
     }
 
     public Pallet GetActivePallet()
@@ -154,14 +127,6 @@ public class Pallet
         get { return WorkOrders?.Sum(w => w.Quantity) ?? 0; }
     }
 
-
-    // ===== Helper Flags (Very Useful) =====
-    public bool IsPacked => State == PalletState.Packed;
-
-    public bool IsReady =>
-        State == PalletState.Ready || State == PalletState.Packed;
-
-    public bool IsShipped => State == PalletState.Shipped;
 }
 
 #endregion

@@ -79,7 +79,7 @@ namespace WindowsFormsApp1
             {
                 try
                 {
-                    DeleteRequested?.Invoke(this, j);
+                    DeleteRequested?.Invoke(this, j); 
                 }
                 catch (Exception ex)
                 {
@@ -95,6 +95,8 @@ namespace WindowsFormsApp1
                 PalletChanged?.Invoke(this, j);
             row.EditRequested += (_, j) =>
         EditRequested?.Invoke(this, j);
+            row.SoftDeleteRequested += (_, j) =>
+    SoftDeleteRequested?.Invoke(this, j);
             row.Dock = DockStyle.Top;
 
             rowsContainer.Controls.Add(row);
@@ -112,6 +114,7 @@ namespace WindowsFormsApp1
         }
         public void SetItems(IEnumerable<PbJobModel> items)
         {
+         
             rowsContainer.SuspendLayout();
             rowsContainer.Controls.Clear();
 
@@ -121,6 +124,7 @@ namespace WindowsFormsApp1
             }
 
             rowsContainer.ResumeLayout();
+        
         }
 
 

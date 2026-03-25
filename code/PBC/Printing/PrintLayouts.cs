@@ -61,6 +61,62 @@ public static class PrintLayouts
         }
     }
 
+    public static void SummaryShip(PrintPageEventArgs e, List<PbJobModel> jobs)
+    {
+        int left = 60;
+        int y = 50;
+
+        Font titleFont = new Font("Segoe UI", 18, FontStyle.Bold);
+        Font headerFont = new Font("Segoe UI", 10, FontStyle.Bold);
+        Font textFont = new Font("Segoe UI", 10);
+
+        int rowHeight = 25;
+
+        int colJob = left;
+        int colQty = 400;
+        int colTrays = 480;
+        int colPallets = 560;
+        int colShip = 650;
+
+        // Title
+        e.Graphics.DrawString("Pitney Bose Summary Sheet", titleFont, Brushes.Black, left, y);
+        y += 40;
+
+        e.Graphics.DrawString("Timestamp: " + DateTime.Now.ToString("M/d/yy h:mmtt"),
+            textFont, Brushes.Black, left, y);
+
+        y += 40;
+
+        // Header
+        e.Graphics.FillRectangle(Brushes.LightGray, left, y, 750, rowHeight);
+
+        e.Graphics.DrawString("Job ID", headerFont, Brushes.Black, colJob, y + 5);
+        e.Graphics.DrawString("QTY", headerFont, Brushes.Black, colQty, y + 5);
+        e.Graphics.DrawString("TRAYS", headerFont, Brushes.Black, colTrays, y + 5);
+        e.Graphics.DrawString("PALLETS", headerFont, Brushes.Black, colPallets, y + 5);
+        e.Graphics.DrawString("PACK DATE", headerFont, Brushes.Black, colShip, y + 5);
+
+        y += rowHeight;
+
+        bool alt = false;
+
+        foreach (var job in jobs)
+        {
+            if (alt)
+                e.Graphics.FillRectangle(Brushes.Gainsboro, left, y, 750, rowHeight);
+
+            e.Graphics.DrawString($"{job.JobNumber} {job.JobName}", textFont, Brushes.Black, colJob, y + 5);
+            e.Graphics.DrawString(job.TotalEnvelopeOfJob.ToString(), textFont, Brushes.Black, colQty, y + 5);
+            e.Graphics.DrawString(job.TotalTraysOfJob.ToString(), textFont, Brushes.Black, colTrays, y + 5);
+            e.Graphics.DrawString(job.Pallets.Count.ToString(), textFont, Brushes.Black, colPallets, y + 5);
+            e.Graphics.DrawString(job.ShippedDate?.ToString("MM/dd/yyyy hh:mm tt") ?? "--",
+                textFont, Brushes.Black, colShip, y + 5);
+
+            y += rowHeight;
+            alt = !alt;
+        }
+    }
+
     public static void DrawPallets(PrintPageEventArgs e, PbJobModel job, List<Pallet> pallets)
     {
         int left = 60;

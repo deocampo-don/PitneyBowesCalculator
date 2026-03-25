@@ -139,7 +139,7 @@ namespace WindowsFormsApp1.Dialogs
                             {
                                 
                                 MessageDialogBox.ShowDialog("", "Scanned Work Order not found.", MessageBoxButtons.OK, MessageType.Info);
-
+                                Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Not found!");
                                 return;
                             }
                         }

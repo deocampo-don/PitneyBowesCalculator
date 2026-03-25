@@ -498,6 +498,20 @@ namespace WindowsFormsApp1
             pb.Image = Resources.spinner_32px;
         }
 
+        public static void hideNow(KryptonLabel lb, PictureBox pb)
+        {
+            if (lb.InvokeRequired)
+            {
+                lb.Invoke(new Action(() => hideNow(lb, pb)));
+                return;
+            }
+
+            lb.Visible = false;
+            pb.Visible = false;
+
+            _connectionStatusTimer?.Stop();
+        }
+
         public static string ShowDialog(string text, string caption)
         {
             Form prompt = new Form()
@@ -753,6 +767,12 @@ namespace WindowsFormsApp1
             mainLayout.Controls.Add(contentLayout, 0, 0);
             mainLayout.Controls.Add(buttonPanel, 0, 1);
             this.Controls.Add(mainLayout);
+            this.Controls.Add(mainLayout);
+
+            // 🔥 ADD THIS BLOCK HERE
+            var owner = Form.ActiveForm;
+
+        
         }
 
         public static DialogResult ShowDialog(string title, string message, MessageBoxButtons messageButton, MessageType messageType)
