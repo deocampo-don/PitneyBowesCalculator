@@ -425,7 +425,7 @@ SET
     JobName = {FormatValue(jobName)},
     JobNumber = {jobNumber},
     IsTemp = {(isTemp ? 1 : 0)},
-    LastUpdated = datetime('now','localtime')
+    LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id = {jobId}
   AND LastUpdated = {lastUpdatedValue};
 ";
@@ -466,7 +466,7 @@ AND NOT EXISTS (
 );
 
 UPDATE {TableJobs}
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id = {jobId};
 ";
 
@@ -557,7 +557,7 @@ AND State = {(int)PalletState.Packed_NotReady}
 AND PackedAt IS NOT NULL;
 
 UPDATE PBJOB
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id = {jobId};
 ";
 
@@ -573,7 +573,7 @@ AND State = {(int)PalletState.Ready}
 AND PackedAt IS NOT NULL;
 
 UPDATE PBJOB
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id = {jobId};
 ";
 
@@ -600,7 +600,7 @@ WHERE PalletNumber IN ({ids})
 AND State = {(int)PalletState.Ready};
 
 UPDATE {TableJobs}
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id = {jobId};
 ";
 
@@ -618,7 +618,7 @@ WHERE PBJobId = {jobId}
 AND State = {(int)fromState};
 
 UPDATE {TableJobs}
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id = {jobId};
 ";
 
@@ -652,7 +652,7 @@ WHERE Id = {palletId}
   AND State = {(int)PalletState.NotReady};
 
 UPDATE {TableJobs}
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id = (
     SELECT PBJobId
     FROM {TablePallets}
@@ -664,37 +664,6 @@ WHERE Id = (
 
         return result.RowsAffected;
     }
-
-    // ======================
-    // BATCH DELETE PALLETS (New)
-    // ======================
-    //    public static async Task DeletePalletsAsync(IEnumerable<int> palletIds)
-    //    {
-    //        if (palletIds == null || !palletIds.Any())
-    //            return;
-
-    //        var idList = string.Join(",", palletIds);
-
-    //        await ExecuteAsync($@"
-    //DELETE FROM {TablePalletWorkOrders}
-    //WHERE PalletId IN ({idList});
-    //");
-
-    //        await ExecuteAsync($@"
-    //DELETE FROM {TablePallets}
-    //WHERE Id IN ({idList});
-    //");
-
-    //        await ExecuteAsync($@"
-    //UPDATE {TableJobs}
-    //SET LastUpdated = datetime('now','localtime')
-    //WHERE Id IN (
-    //    SELECT PBJobId
-    //    FROM {TablePallets}
-    //    WHERE Id IN ({idList})
-    //);
-    //");
-    //    }
     public static async Task DeletePalletsAsync(IEnumerable<int> palletIds)
     {
         if (palletIds == null || !palletIds.Any())
@@ -727,7 +696,7 @@ DELETE FROM {TablePallets}
 WHERE Id IN ({idList});
 
 UPDATE {TableJobs}
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id IN ({jobIdList});
 ");
     }
@@ -843,7 +812,7 @@ VALUES
         var sql = $@"
         UPDATE PBJOB
         SET IsActive = 1,
-            LastUpdated = datetime('now','localtime')
+            LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
         WHERE Id = {jobId};
     ";
 
@@ -855,7 +824,7 @@ VALUES
         var sql = $@"
     UPDATE PBJOB
     SET IsActive = 1,
-        LastUpdated = datetime('now','localtime'),
+        LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime'),
         JobName = '{newName}'
     WHERE Id = {jobId};
     ";
@@ -869,19 +838,6 @@ VALUES
 
         var idList = string.Join(",", jobIds);
         var shippedAt = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
-
-//        string sql = $@"
-//UPDATE PALLET
-//SET ShippedAt = '{shippedAt}',
-//    State = {(int)PalletState.Shipped}
-//WHERE PBJobId IN ({idList})
-//AND State = {(int)PalletState.Ready}
-//AND ShippedAt IS NULL;
-
-//UPDATE PBJOB
-//SET LastUpdated = datetime('now','localtime')
-//WHERE Id IN ({idList});
-//";
 
         string sql = $@"
 UPDATE PALLET
@@ -898,7 +854,7 @@ AND State = {(int)PalletState.Ready}
 AND ShippedAt IS NULL;
 
 UPDATE PBJOB
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id IN ({idList});
 ";
 
@@ -909,52 +865,6 @@ WHERE Id IN ({idList});
     // MERGE PALLETS (MOVE WO ONLY, DELETE SOURCE PALLETS)
     // =====================================================
 
-    //    public static async Task MergePalletsIntoAsync(
-    //    IEnumerable<int> sourcePalletIds,
-    //    int targetPalletId)
-    //    {
-    //        if (sourcePalletIds == null || !sourcePalletIds.Any())
-    //            return;
-
-    //        var sources = sourcePalletIds
-    //            .Where(x => x != targetPalletId)
-    //            .Distinct()
-    //            .ToList();
-
-    //        if (!sources.Any())
-    //            return;
-
-    //        var idList = string.Join(",", sources);
-
-    //        string sql = $@"
-
-    //-- 1️⃣ Move workorders
-    //UPDATE {TablePalletWorkOrders}
-    //SET PalletId = {targetPalletId}
-    //WHERE PalletId IN ({idList});
-
-    //-- 2️⃣ Delete source pallets (but not shipped)
-    //DELETE FROM {TablePallets}
-    //WHERE Id IN ({idList})
-    //AND State != {(int)PalletState.Shipped};
-
-    //-- 3️⃣ Reset target pallet state (contents changed)
-    //UPDATE {TablePallets}
-    //SET State = {(int)PalletState.NotReady}
-    //WHERE Id = {targetPalletId};
-
-    //-- 4️⃣ Update parent job timestamp
-    //UPDATE {TableJobs}
-    //SET LastUpdated = datetime('now','localtime')
-    //WHERE Id = (
-    //    SELECT PBJobId
-    //    FROM {TablePallets}
-    //    WHERE Id = {targetPalletId}
-    //);
-    //";
-
-    //        await ExecuteAsync(sql);
-    //    }
     public static async Task MergePalletsIntoAsync(
         IEnumerable<int> sourcePalletIds,
         int targetPalletId)
@@ -986,7 +896,7 @@ SET State = {(int)PalletState.NotReady}
 WHERE Id = {targetPalletId};
 
 UPDATE {TableJobs}
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id = (
     SELECT PBJobId
     FROM {TablePallets}
@@ -1247,7 +1157,7 @@ SET PalletNumber = last_insert_rowid()
 WHERE Id = last_insert_rowid();
 
 UPDATE {TableJobs}
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id = {jobId};
 ");
 
@@ -1485,7 +1395,7 @@ LIMIT 1
         var sql = $@"
         UPDATE PBJOB
         SET IsActive = 0,
-            LastUpdated = datetime('now','localtime')
+            LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
         WHERE Id = {jobId};
     ";
 
@@ -1505,7 +1415,7 @@ LIMIT 1
     );
 
     UPDATE {TableJobs}
-    SET LastUpdated = datetime('now','localtime')
+    SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
     WHERE Id = {pallet.PBJobId};
     ";
 
@@ -1556,7 +1466,7 @@ VALUES");
 
         sql.AppendLine($@"
 UPDATE {TableJobs}
-SET LastUpdated = datetime('now','localtime')
+SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
 WHERE Id = (
     SELECT PBJobId
     FROM {TablePallets}

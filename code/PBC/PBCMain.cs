@@ -271,11 +271,11 @@ namespace WindowsFormsApp1
             var dbCount = await RqliteClient.GetJobsCountAsync();
 
             // nothing changed
-            if (_lastJobsTimestamp == dbTimestamp && dbCount == _lastJobsCount)
-            {
-                Debug.WriteLine("No updates..");
-                return;
-            }
+            //if (_lastJobsTimestamp == dbTimestamp && dbCount == _lastJobsCount)
+            //{
+            //    Debug.WriteLine("No updates..");
+            //    return;
+            //}
 
 
             _lastJobsTimestamp = dbTimestamp;
