@@ -567,28 +567,49 @@ namespace WindowsFormsApp1
             if (job.IsActive)
             {
                 lvBuild?.AddItem(job);
-
-                // ✅ Packed view MUST match RefreshAllViews logic
                 if (job.Pallets.Any(p =>
-                    p.State == PalletState.Ready ||
-                    p.State == PalletState.Packed_NotReady))
+      p.State == PalletState.Ready ||
+      p.State == PalletState.Packed_NotReady))
                 {
                     packedListView2?.AddItem(job);
                 }
             }
-
-            // ✅ Shipment view (history, includes everything)
             if (job.Pallets.Any(p => p.ShippedAt.HasValue))
             {
-                pickedUpListView?.AddItem(job);
+                // 1️⃣ Remove old rows for this job
+                pickedUpListView?.RemoveItemsByJobId(job.JobId);
+
+                // 2️⃣ Recreate correct grouped rows
+                var shipmentRows = job.Pallets
+                    .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
+                    .GroupBy(p => new { p.ShippedAt.Value, p.JobNameSnapshot })
+                    .Select(group => new PbJobModel
+                    {
+                        JobId = job.JobId,
+                        JobName = group.Key.JobNameSnapshot ?? job.JobName,
+                        JobNumber = job.JobNumber,
+                        IsTemp = job.IsTemp,
+                        LastUpdated = job.LastUpdated,
+                        ShippedDate = group.Key.Value,
+                        Pallets = group.ToList()
+                    })
+                    .ToList();
+
+                // 3️⃣ Add them properly
+                foreach (var row in shipmentRows)
+                {
+                    pickedUpListView?.AddItem(row);
+                }
             }
         }
+
+     
 
         private void RemoveJobFromUI(int jobId)
         {
             lvBuild?.RemoveItem(jobId);
             packedListView2?.RemoveItem(jobId);
-            pickedUpListView?.RemoveItem(jobId);
+            pickedUpListView?.RemoveItemsByJobId(jobId);
         }
 
         private void RefreshAllViews()
@@ -624,15 +645,15 @@ namespace WindowsFormsApp1
             _shipmentRows = _pbJobs
                 .SelectMany(job => job.Pallets
                     .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
-                    .GroupBy(p => p.ShippedAt.Value)
+                    .GroupBy(p => new { p.ShippedAt.Value, p.JobNameSnapshot })
                     .Select(group => new PbJobModel
                     {
                         JobId = job.JobId,
-                        JobName = job.JobName,
+                        JobName = group.Key.JobNameSnapshot ?? job.JobName,
                         JobNumber = job.JobNumber,
                         IsTemp = job.IsTemp,
                         LastUpdated = job.LastUpdated,
-                        ShippedDate = group.Key,
+                        ShippedDate = group.Key.Value,
                         Pallets = group.ToList()
                     })
                 )
@@ -734,7 +755,6 @@ namespace WindowsFormsApp1
         // Actions
         // -----------------------------
 
-
         private void ApplySearchFilter()
         {
             Debug.WriteLine($"ShipmentRows count: {_shipmentRows.Count}");
@@ -783,9 +803,11 @@ namespace WindowsFormsApp1
 
                     var existingJob = await RqliteClient.GetJobByNumberAsync(jobNumber);
 
+                    // =========================
+                    // HANDLE EXISTING JOB
+                    // =========================
                     if (existingJob != null)
                     {
-                        // ❌ Active duplicate
                         if (existingJob.IsActive)
                         {
                             MessageDialogBox.ShowDialog(
@@ -797,7 +819,6 @@ namespace WindowsFormsApp1
                             return;
                         }
 
-                        // 🔄 Inactive → Reactivate
                         var confirm = MessageDialogBox.ShowDialog(
                             "Duplicate Found",
                             $"Job number {jobNumber} already exists and contains previous shipments.\n\n" +
@@ -806,25 +827,60 @@ namespace WindowsFormsApp1
                             MessageType.Info
                         );
 
-                        if (confirm == DialogResult.Yes)
+                        if (confirm != DialogResult.Yes)
+                            return;
+
+                        var rename = MessageDialogBox.ShowDialog(
+                            "Rename Job",
+                            "Would you like to rename the reused PB Job?",
+                            MessageBoxButtons.YesNo,
+                            MessageType.Info);
+
+                        if (rename == DialogResult.Yes)
+                        {
+                            using (var renameDlg = new CreatePBJobDialog(existingJob))
+                            {
+                                if (renameDlg.ShowDialog(this) != DialogResult.OK)
+                                    return;
+
+                                var newName = renameDlg.JobName;
+
+                                if (string.IsNullOrWhiteSpace(newName))
+                                {
+                                    MessageDialogBox.ShowDialog(
+                                        "",
+                                        "Job name cannot be empty.",
+                                        MessageBoxButtons.OK,
+                                        MessageType.Warning);
+                                    return;
+                                }
+
+                                await RqliteClient.ReactivatePbJobAndRenameAsync(
+                                    existingJob.JobId,
+                                    newName
+                                );
+                            }
+                        }
+                        else
                         {
                             await RqliteClient.ReactivatePbJobAsync(existingJob.JobId);
-
-                            await LoadJobsAsync(); // 🔥 safer than RefreshSingleJobAsync
-
-                            MessageDialogBox.ShowDialog(
-                                "Reactivated",
-                                "Job has been restored.",
-                                MessageBoxButtons.OK,
-                                MessageType.Info
-                            );
-
-                            return;
                         }
 
-                        return;
+                        await LoadJobsAsync();
+
+                        MessageDialogBox.ShowDialog(
+                            "Reactivated",
+                            "Job has been restored.",
+                            MessageBoxButtons.OK,
+                            MessageType.Info
+                        );
+
+                        return; // 🔥 IMPORTANT: STOP HERE
                     }
 
+                    // =========================
+                    // CREATE NEW JOB
+                    // =========================
                     var job = new PbJobModel
                     {
                         JobName = dlg.JobName ?? string.Empty,

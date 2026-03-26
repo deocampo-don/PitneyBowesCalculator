@@ -111,6 +111,7 @@ public class Pallet
     public int TrayCount { get; set; }
 
     public PalletState State { get; set; }
+    public string JobNameSnapshot { get; set; }
 
     // ===== Aggregates =====
     public List<WorkOrder> WorkOrders { get; set; } = new List<WorkOrder>();

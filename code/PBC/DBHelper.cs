@@ -849,6 +849,19 @@ VALUES
 
         await ExecuteAsync(sql);
     }
+
+    public static async Task ReactivatePbJobAndRenameAsync(int jobId, string newName)
+    {
+        var sql = $@"
+    UPDATE PBJOB
+    SET IsActive = 1,
+        LastUpdated = datetime('now','localtime'),
+        JobName = '{newName}'
+    WHERE Id = {jobId};
+    ";
+        Utils.WriteUnexpectedError($"Renaming JobId={jobId} to '{newName}'");
+        await ExecuteAsync(sql);
+    }
     public static async Task ShipPalletsAsync(IEnumerable<int> jobIds)
     {
         if (jobIds == null || !jobIds.Any())
@@ -857,10 +870,29 @@ VALUES
         var idList = string.Join(",", jobIds);
         var shippedAt = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
+//        string sql = $@"
+//UPDATE PALLET
+//SET ShippedAt = '{shippedAt}',
+//    State = {(int)PalletState.Shipped}
+//WHERE PBJobId IN ({idList})
+//AND State = {(int)PalletState.Ready}
+//AND ShippedAt IS NULL;
+
+//UPDATE PBJOB
+//SET LastUpdated = datetime('now','localtime')
+//WHERE Id IN ({idList});
+//";
+
         string sql = $@"
 UPDATE PALLET
-SET ShippedAt = '{shippedAt}',
-    State = {(int)PalletState.Shipped}
+SET 
+    ShippedAt = '{shippedAt}',
+    State = {(int)PalletState.Shipped},
+    JobNameSnapshot = (
+        SELECT JobName 
+        FROM PBJOB 
+        WHERE PBJOB.Id = PALLET.PBJobId
+    )
 WHERE PBJobId IN ({idList})
 AND State = {(int)PalletState.Ready}
 AND ShippedAt IS NULL;
@@ -1008,6 +1040,7 @@ SELECT
     p.PackedAt,
     p.ShippedAt,
     p.State,
+    p.JobNameSnapshot,
     p.TrayCount,
 
     w.Id AS WorkOrderId,
@@ -1033,6 +1066,8 @@ ORDER BY j.Id, p.PalletNumber
 
             if (!jobs.TryGetValue(jobId, out var job))
             {
+             
+
                 job = new PbJobModel
                 {
                     JobId = jobId,
@@ -1065,7 +1100,10 @@ ORDER BY j.Id, p.PalletNumber
                     PackedAt = row["PackedAt"] == null ? (DateTime?)null : Convert.ToDateTime(row["PackedAt"]),
                     ShippedAt = row["ShippedAt"] == null ? (DateTime?)null : Convert.ToDateTime(row["ShippedAt"]),
                     State = (PalletState)Convert.ToInt32(row["State"]),
-                    WorkOrders = new List<WorkOrder>()
+                    WorkOrders = new List<WorkOrder>(),
+
+                    JobNameSnapshot = row["JobNameSnapshot"]?.ToString()
+
                 };
 
                 pallets[palletId] = pallet;
@@ -1312,6 +1350,7 @@ LIMIT 1
         p.PackedAt,
         p.ShippedAt,
         p.State,
+        p.JobNameSnapshot,
         p.TrayCount,
 
         w.Id AS WorkOrderId,
@@ -1333,10 +1372,14 @@ LIMIT 1
         {
             if (job == null)
             {
+                var snapshotName = row["JobNameSnapshot"]?.ToString();
+
                 job = new PbJobModel
                 {
                     JobId = jobId,
-                    JobName = row["JobName"]?.ToString(),
+                    JobName = !string.IsNullOrEmpty(snapshotName)
+                        ? snapshotName
+                        : row["JobName"]?.ToString(),
                     JobNumber = Convert.ToInt32(row["JobNumber"]),
                     IsTemp = Convert.ToInt32(row["IsTemp"]) == 1,
                     IsActive = Convert.ToInt32(row["IsActive"]) == 1,

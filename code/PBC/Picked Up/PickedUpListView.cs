@@ -13,6 +13,8 @@ namespace WindowsFormsApp1.Picked_Up
 {
     public partial class PickedUpListView : UserControl
     {
+
+        private readonly Dictionary<int, List<PickedUpRowControl>> _rowsByJobId = new();
         public PickedUpListView()
         {
             InitializeComponent();
@@ -22,12 +24,13 @@ namespace WindowsFormsApp1.Picked_Up
 
         public void RefreshItem(PbJobModel job)
         {
-            var row = pickflowRows.Controls
-                .OfType<PickedUpRowControl>()
-                .FirstOrDefault(r => r.BoundJob.JobId == job.JobId);
-
-            if (row != null)
-                row.Bind(job);
+            if (_rowsByJobId.TryGetValue(job.JobId, out var rows))
+            {
+                foreach (var row in rows)
+                {
+                    row.Bind(job);
+                }
+            }
         }
         public void BeginUpdate()
         {
@@ -40,20 +43,29 @@ namespace WindowsFormsApp1.Picked_Up
         }
         public void RemoveItem(int jobId)
         {
-            var row = pickflowRows.Controls
-                .OfType<PickedUpRowControl>()
-                .FirstOrDefault(r => r.BoundJob.JobId == jobId);
-
-            if (row != null)
-                pickflowRows.Controls.Remove(row);
+            RemoveItemsByJobId(jobId); // reuse logic
         }
 
         public void AddItem(PbJobModel job)
         {
+            // 🔥 prevent duplicates
+            if (_rowsByJobId.ContainsKey(job.JobId))
+            {
+                RemoveItemsByJobId(job.JobId);
+            }
+
             var row = new PickedUpRowControl();
             row.Bind(job);
 
             pickflowRows.Controls.Add(row);
+
+            if (!_rowsByJobId.TryGetValue(job.JobId, out var list))
+            {
+                list = new List<PickedUpRowControl>();
+                _rowsByJobId[job.JobId] = list;
+            }
+            list.Add(row);
+
             BeginInvoke(new Action(ResizeRowsToHost));
         }
 
@@ -76,14 +88,21 @@ namespace WindowsFormsApp1.Picked_Up
             pickflowRows.SuspendLayout();
 
             pickflowRows.Controls.Clear();
+            _rowsByJobId.Clear(); // 🔥 reset index
 
-            // Give the scrollbar its own space so rows can fill visually
-          
             foreach (var item in items)
             {
                 var row = new PickedUpRowControl();
                 row.Bind(item);
+
                 pickflowRows.Controls.Add(row);
+
+                if (!_rowsByJobId.TryGetValue(item.JobId, out var list))
+                {
+                    list = new List<PickedUpRowControl>();
+                    _rowsByJobId[item.JobId] = list;
+                }
+                list.Add(row);
             }
 
             pickflowRows.ResumeLayout();
@@ -105,6 +124,20 @@ namespace WindowsFormsApp1.Picked_Up
             {
                 c.Width = width;
             }
+        }
+
+        public void RemoveItemsByJobId(int jobId)
+        {
+            if (!_rowsByJobId.TryGetValue(jobId, out var rows))
+                return;
+
+            foreach (var row in rows)
+            {
+                pickflowRows.Controls.Remove(row);
+                row.Dispose();
+            }
+
+            _rowsByJobId.Remove(jobId);
         }
         public IEnumerable<PbJobModel> GetSelectedJobs()
         {

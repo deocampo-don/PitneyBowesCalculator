@@ -112,12 +112,14 @@ namespace Launcher
 
             var frm = new PBCMain();
             frm.Show();
+            this.Hide();
         }
 
         private void LaunchPostList()
         {
             var frm = new FrmMenu();
             frm.Show();
+            this.Hide();
         }
 
         private void btnPbc_Click(object sender, EventArgs e)
