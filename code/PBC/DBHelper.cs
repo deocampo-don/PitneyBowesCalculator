@@ -291,7 +291,9 @@ VALUES ('{username}', '{password}', 1, 1)";
 
                     DateTime? lastUpdated = null;
                     if (row[1] != null)
-                        lastUpdated = DateTime.Parse(row[1].ToString());
+                        lastUpdated = row[1] == null
+    ? (DateTime?)null
+    : Convert.ToDateTime(row[1]);
 
                     list.Add((id, lastUpdated));
                 }
@@ -642,28 +644,79 @@ LIMIT 1;
     int trayCount)
     {
         string sql = $@"
-UPDATE {TablePallets}
-SET
-    TrayCount = {trayCount},
-    PackedAt = datetime('now','localtime'),
-    State = {(int)PalletState.Ready}
-WHERE Id = {palletId}
-  AND PackedAt IS NULL
-  AND State = {(int)PalletState.NotReady};
-
-UPDATE {TableJobs}
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
-WHERE Id = (
-    SELECT PBJobId
-    FROM {TablePallets}
+    UPDATE {TablePallets}
+    SET
+        TrayCount = {trayCount},
+        PackedAt = datetime('now','localtime'),
+        State = {(int)PalletState.Ready}
     WHERE Id = {palletId}
-);
-";
+      AND PackedAt IS NULL
+      AND State = {(int)PalletState.NotReady};
+
+    UPDATE {TableJobs}
+    SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+    WHERE Id = (
+        SELECT PBJobId
+        FROM {TablePallets}
+        WHERE Id = {palletId}
+    );
+    ";
 
         var result = await ExecuteAsync(sql);
 
         return result.RowsAffected;
     }
+
+    //    public static async Task<DateTime?> UpdatePalletPackingAsync(
+    //        int palletId,
+    //        int trayCount)
+    //    {
+    //        string updateSql = $@"
+    //UPDATE {TablePallets}
+    //SET
+    //    TrayCount = {trayCount},
+    //    PackedAt = strftime('%Y-%m-%d %H:%M:%f','now','localtime'),
+    //    State = {(int)PalletState.Ready}
+    //WHERE Id = {palletId}
+    //  AND PackedAt IS NULL
+    //  AND State = {(int)PalletState.NotReady};
+
+    //UPDATE {TableJobs}
+    //SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+    //WHERE Id = (
+    //    SELECT PBJobId
+    //    FROM {TablePallets}
+    //    WHERE Id = {palletId}
+    //);
+    //";
+
+    //        var writeResult = await ExecuteAsync(updateSql);
+
+    //        if (writeResult.RowsAffected == 0)
+    //            return null;
+
+    //        string querySql = $@"
+    //SELECT LastUpdated
+    //FROM {TableJobs}
+    //WHERE Id = (
+    //    SELECT PBJobId
+    //    FROM {TablePallets}
+    //    WHERE Id = {palletId}
+    //);
+    //";
+
+    //        var queryResult = await QueryAsync(querySql);
+
+    //        var row = queryResult?.Records?.FirstOrDefault();
+
+    //        if (row == null)
+    //            return null;
+
+    //        if (!row.TryGetValue("LastUpdated", out var value) || value == null)
+    //            return null;
+
+    //        return Convert.ToDateTime(value.ToString());
+    //    }
     public static async Task DeletePalletsAsync(IEnumerable<int> palletIds)
     {
         if (palletIds == null || !palletIds.Any())
@@ -1287,9 +1340,7 @@ LIMIT 1
                 job = new PbJobModel
                 {
                     JobId = jobId,
-                    JobName = !string.IsNullOrEmpty(snapshotName)
-                        ? snapshotName
-                        : row["JobName"]?.ToString(),
+                    JobName = row["JobName"]?.ToString(),
                     JobNumber = Convert.ToInt32(row["JobNumber"]),
                     IsTemp = Convert.ToInt32(row["IsTemp"]) == 1,
                     IsActive = Convert.ToInt32(row["IsActive"]) == 1,
