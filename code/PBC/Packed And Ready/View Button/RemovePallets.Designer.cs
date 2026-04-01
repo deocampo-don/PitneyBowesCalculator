@@ -32,7 +32,6 @@
             btnExit = new Krypton.Toolkit.KryptonButton();
             lblHeader = new System.Windows.Forms.Label();
             label1 = new System.Windows.Forms.Label();
-            label2 = new System.Windows.Forms.Label();
             label5 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -41,6 +40,7 @@
             btnYes1 = new Krypton.Toolkit.KryptonButton();
             btnNo1 = new Krypton.Toolkit.KryptonButton();
             groupBox1 = new System.Windows.Forms.GroupBox();
+            label2 = new System.Windows.Forms.Label();
             pnlHeader.SuspendLayout();
             panel1.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -95,47 +95,38 @@
             label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             label1.Location = new System.Drawing.Point(20, 98);
             label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(297, 21);
+            label1.Size = new System.Drawing.Size(411, 21);
             label1.TabIndex = 4;
-            label1.Text = "Removing this pallet will undo it's packed";
-            // 
-            // label2
-            // 
-            label2.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            label2.AutoSize = true;
-            label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label2.Location = new System.Drawing.Point(20, 119);
-            label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(246, 21);
-            label2.TabIndex = 5;
-            label2.Text = "status. Would you like to proceed?";
+            label1.Text = "How would you like to proceed with the selected pallet(s)?";
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label5.Font = new System.Drawing.Font("Segoe UI", 12F);
             label5.Location = new System.Drawing.Point(20, 197);
             label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(0, 19);
+            label5.Size = new System.Drawing.Size(0, 21);
             label5.TabIndex = 10;
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label4.Font = new System.Drawing.Font("Segoe UI", 12F);
             label4.Location = new System.Drawing.Point(19, 174);
             label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(0, 19);
+            label4.Size = new System.Drawing.Size(372, 21);
             label4.TabIndex = 9;
+            label4.Text = "Delete – Removes the selected pallet(s) from the job.";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             label3.Location = new System.Drawing.Point(19, 151);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(0, 19);
+            label3.Size = new System.Drawing.Size(427, 21);
             label3.TabIndex = 8;
+            label3.Text = "Unpack - Removes the packed status of the selected pallet(s)";
             // 
             // panel1
             // 
@@ -144,7 +135,7 @@
             panel1.Controls.Add(btnCancel1);
             panel1.Controls.Add(btnYes1);
             panel1.Controls.Add(btnNo1);
-            panel1.Location = new System.Drawing.Point(3, 160);
+            panel1.Location = new System.Drawing.Point(3, 232);
             panel1.Name = "panel1";
             panel1.Size = new System.Drawing.Size(455, 54);
             panel1.TabIndex = 7;
@@ -309,16 +300,26 @@
             groupBox1.Controls.Add(label2);
             groupBox1.Location = new System.Drawing.Point(1, -5);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(461, 217);
+            groupBox1.Size = new System.Drawing.Size(461, 289);
             groupBox1.TabIndex = 8;
             groupBox1.TabStop = false;
+            // 
+            // label2
+            // 
+            label2.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            label2.AutoSize = true;
+            label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label2.Location = new System.Drawing.Point(20, 119);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(0, 21);
+            label2.TabIndex = 5;
             // 
             // RemovePallets
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.White;
-            ClientSize = new System.Drawing.Size(462, 215);
+            ClientSize = new System.Drawing.Size(462, 287);
             Controls.Add(groupBox1);
             Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -337,7 +338,6 @@
         private System.Windows.Forms.Panel pnlHeader;
         private System.Windows.Forms.Label lblHeader;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
@@ -347,5 +347,6 @@
         private Krypton.Toolkit.KryptonButton btnNo1;
         private Krypton.Toolkit.KryptonButton btnCancel1;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label2;
     }
 }

@@ -200,9 +200,9 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             label1.Text = "You already have a pallet in progress.";
             label2.Text = "What would you like to do?";
 
-            label3.Text = "Merge to the ongoing pallet.";
-            label4.Text = "Delete this pallet.";
-            label5.Text = "Cancel - Finish packing the current pallet.";
+            label3.Text = "Merge - Merges the selected pallet(s) into the ongoing pallet";
+            label4.Text = "Delete – Removes the selected pallet(s) from the job.";
+            label5.Text = "Cancel - Continue packing the current pallet";
 
             btnCancel1.Visible = true;
             btnNo1.Text = "Delete";

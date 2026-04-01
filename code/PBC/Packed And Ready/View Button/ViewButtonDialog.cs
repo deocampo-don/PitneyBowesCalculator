@@ -419,16 +419,29 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                             break;
                         case RemovePallets.RemoveAction.UndoPack:
 
-                            // If there is no active pallet, only one pallet can be unpacked
+                            //unpack multiple pallets and there is no ongoing pallet
                             if (!hasActivePallet && palletIds.Count > 1)
-                            { 
-                                MessageDialogBox.ShowDialog("", "When there is no active pallet, only one pallet can be unpacked. Select only one pallet and try again.", MessageBoxButtons.OK, MessageType.Info);
-                                return;
+                            {
+                                int targetPalletId = palletIds.OrderBy(id => id).First();
+
+                                // undo only target pallet first
+                                await RqliteClient.UndoPackedPalletAsync(
+                                    new List<int> { targetPalletId },
+                                    _job.JobId);
+                                // merge remaining pallets into target
+                                await RqliteClient.MergePalletsIntoAsync(
+                                    palletIds.Where(id => id != targetPalletId),
+                                    targetPalletId);
+                            }
+                            else
+                            {
+                                await RqliteClient.UndoPackedPalletAsync(
+                                    palletIds,
+                                    _job.JobId
+                                );
                             }
 
-                            await RqliteClient.UndoPackedPalletAsync(
-                                palletIds,
-                                _job.JobId);
+                        
                             break;
 
                         default:
