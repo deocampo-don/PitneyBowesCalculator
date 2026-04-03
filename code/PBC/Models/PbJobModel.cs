@@ -14,7 +14,7 @@ public class PbJobModel
     public int JobNumber { get; set; }
     public bool IsTemp { get; set; } = false;
     public bool IsActive { get; set; }
-
+    public string LastUpdatedRaw { get; set; }
     // ===== Dates =====
     public DateTime? PackDate { get; set; }   // nullable
 

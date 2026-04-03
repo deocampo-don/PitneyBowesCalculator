@@ -201,200 +201,202 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
             this.Close();
         }
 
+        //        private async void btnRemovePallet_Click_1(object sender, EventArgs e)
+        //        {
 
-        /* -------------------------------------------------------------
-      * PRINTING
-      * ------------------------------------------------------------- */
+        //            var selectedIndices = lvPallet.GetSelectedIndices();
+
+        //            if (selectedIndices == null || selectedIndices.Count == 0)
+        //            {
+
+        //                MessageDialogBox.ShowDialog("Error", "Please select at least one pallet.", MessageBoxButtons.OK, MessageType.Info);
+        //                ;                return;
+        //            }
+
+        //            var selectedPallets = selectedIndices
+        //                .Select(i => _job.Pallets[i])
+        //                .ToList();
+
+        //            if (!selectedPallets.All(p => p.State == PalletState.Ready))
+        //            {
+
+        //                MessageDialogBox.ShowDialog(
+        //                    "Invalid Selection",
+        //                    "Only packed pallets (Ready) can be removed.",
+        //                    MessageBoxButtons.OK,
+        //                    MessageType.Warning
+        //);
+        //                return;
+        //            }
+
+        //            var palletIds = selectedPallets
+        //                .Select(p => p.PalletId)
+        //                .Where(id => id > 0)
+        //                .ToList();
+
+        //            Debug.WriteLine("PalletIds selected: " + string.Join(",", palletIds));
+
+        //            if (!palletIds.Any())
+        //            {
 
 
-        private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
+        //                MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
+        //                return;
+        //            }
+
+        //            try
+        //            {
+
+        //                var activePalletId = await RqliteClient.GetActivePalletIdAsync(_job.JobId);
+        //                bool hasActivePallet = activePalletId != null;
+
+        //                using (var dlg = new RemovePallets(hasActivePallet))
+        //                {
+        //                    if (dlg.ShowDialog(this) != DialogResult.OK)
+        //                    {
+
+        //                        return;
+        //                    }
+
+        //                    switch (dlg.Action)
+        //                    {
+        //                        case RemovePallets.RemoveAction.Merge:
+        //                            if (activePalletId == null)
+        //                            {  
+        //                                MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
+        //                                return;
+        //                            }
+        //                            await RqliteClient.MergePalletsIntoAsync(
+        //                                palletIds,
+        //                                activePalletId.Value);
+        //                            break;
+
+        //                        case RemovePallets.RemoveAction.Delete:
+        //                            await RqliteClient.DeletePalletsAsync(palletIds);
+
+        //                            break;
+        //                        case RemovePallets.RemoveAction.UndoPack:
+
+        //                            //unpack multiple pallets and there is no ongoing pallet
+        //                            if (!hasActivePallet && palletIds.Count > 1)
+        //                            {
+        //                                int targetPalletId = palletIds.OrderBy(id => id).First();
+
+        //                                // undo only target pallet first
+        //                                await RqliteClient.UndoPackedPalletAsync(
+        //                                    new List<int> { targetPalletId },
+        //                                    _job.JobId);
+        //                                // merge remaining pallets into target
+        //                                await RqliteClient.MergePalletsIntoAsync(
+        //                                    palletIds.Where(id => id != targetPalletId),
+        //                                    targetPalletId);
+        //                            }
+        //                            else
+        //                            {
+        //                                await RqliteClient.UndoPackedPalletAsync(
+        //                                    palletIds,
+        //                                    _job.JobId
+        //                                );
+        //                            }
+
+        //                            break;
+
+        //                        default:
+
+        //                            return;
+        //                    }
+        //                }
+        //                DataChanged = true;
+        //                Close();
+        //            }
+        //            catch (Exception ex)
+        //            {
+
+        //                Utils.WriteExceptionError(ex);
+        //                MessageDialogBox.ShowDialog("", "Error processing pallets:\n\n" + ex.Message, MessageBoxButtons.OK, MessageType.Error);
+        //            }
+        //        }
+        private async void btnRemovePallet_Click_1(object sender, EventArgs e)
         {
-            if (palletsToPrint == null || palletPrintIndex >= palletsToPrint.Count)
+            try
             {
-                e.HasMorePages = false;
-                return;
-            }
+                // 🔥 ALWAYS refresh first (avoid stale indices)
+                await PBCMain.Instance.RefreshSingleJobAsync(_job.JobId);
 
-            Pallet pallet = palletsToPrint[palletPrintIndex];
+                var selectedIndices = lvPallet.GetSelectedIndices();
 
-            int left = 60;
-            int colWorkOrder = left;
-            int colQty = 650;
-
-            int y = 50;
-            int bottomLimit = e.MarginBounds.Bottom - 60;
-
-            Font headerFont = new Font("Segoe UI", 18, FontStyle.Bold);
-            Font palletFont = new Font("Segoe UI", 14, FontStyle.Bold);
-            Font labelFont = new Font("Segoe UI", 10, FontStyle.Bold);
-            Font textFont = new Font("Segoe UI", 10);
-            Font footerFont = new Font("Segoe UI", 9);
-
-            Pen linePen = new Pen(Color.Black, 1);
-
-            /* ---------- HEADER ---------- */
-
-            e.Graphics.DrawString($"PB JOB {_job.JobNumber}", headerFont, Brushes.Black, left, y);
-            y += 45;
-
-            e.Graphics.DrawString($"PALLET #{palletPrintIndex + 1}", palletFont, Brushes.Black, left, y);
-            y += 30;
-
-            e.Graphics.DrawString("Printed:", labelFont, Brushes.Black, left, y);
-            e.Graphics.DrawString(DateTime.Now.ToString("MM/dd/yyyy  hh:mm tt"), textFont, Brushes.Black, left + 90, y);
-
-            e.Graphics.DrawString("Packed Date:", labelFont, Brushes.Black, 420, y);
-            e.Graphics.DrawString(
-                pallet.PackedAt?.ToString("MM/dd/yyyy  hh:mm tt") ?? "--",
-                textFont,
-                Brushes.Black,
-                540,
-                y
-            );
-
-            y += 30;
-
-            e.Graphics.DrawLine(linePen, left, y, 700, y);
-            y += 25;
-
-            /* ---------- PALLET SUMMARY ---------- */
-
-            e.Graphics.DrawString("Envelope Qty :", labelFont, Brushes.Black, left, y);
-            e.Graphics.DrawString(pallet.PalletEnvelopeQty.ToString(), textFont, Brushes.Black, left + 140, y);
-
-            e.Graphics.DrawString("Tray Count :", labelFont, Brushes.Black, 420, y);
-            e.Graphics.DrawString(pallet.TrayCount.ToString(), textFont, Brushes.Black, 540, y);
-
-            y += 25;
-
-            e.Graphics.DrawString("Scanned WO :", labelFont, Brushes.Black, left, y);
-            e.Graphics.DrawString(pallet.PalletScannedWO.ToString(), textFont, Brushes.Black, left + 140, y);
-
-            e.Graphics.DrawString("Packed Time :", labelFont, Brushes.Black, 420, y);
-            e.Graphics.DrawString(pallet.PackedAt?.ToString("hh:mm tt") ?? "", textFont, Brushes.Black, 540, y);
-
-            y += 40;
-
-            /* ---------- WORK ORDER HEADER ---------- */
-
-            e.Graphics.DrawString("WORK ORDERS", palletFont, Brushes.Black, left, y);
-            y += 30;
-
-            e.Graphics.DrawLine(linePen, left, y, 700, y);
-            y += 20;
-
-            // Column headers
-            e.Graphics.DrawString("WORK ORDER", labelFont, Brushes.Black, colWorkOrder, y);
-            e.Graphics.DrawString("QTY", labelFont, Brushes.Black, colQty, y);
-
-            y += 20;
-
-            e.Graphics.DrawLine(linePen, left, y, 700, y);
-            y += 20;
-
-            /* ---------- WORK ORDERS ---------- */
-
-            while (workOrderIndex < pallet.WorkOrders.Count)
-            {
-                var wo = pallet.WorkOrders[workOrderIndex];
-
-                if (y > bottomLimit)
+                if (selectedIndices == null || selectedIndices.Count == 0)
                 {
-                    DrawFooter(e);
-                    e.HasMorePages = true;
+                    MessageDialogBox.ShowDialog("Error", "Please select at least one pallet.", MessageBoxButtons.OK, MessageType.Info);
                     return;
                 }
 
-                e.Graphics.DrawString(wo.WorkOrderCode, textFont, Brushes.Black, colWorkOrder, y);
-                e.Graphics.DrawString(wo.Quantity.ToString(), textFont, Brushes.Black, colQty, y);
+                // 🔥 Rebuild selection from fresh model
+                var selectedPallets = selectedIndices
+                    .Where(i => i >= 0 && i < _job.Pallets.Count)
+                    .Select(i => _job.Pallets[i])
+                    .ToList();
 
-                y += 22;
-                workOrderIndex++;
-            }
+                if (!selectedPallets.Any())
+                {
+                    await PBCMain.Instance.RefreshSingleJobAsync(_job.JobId);
+                    return;
+                }
 
-            /* ---------- FOOTER ---------- */
+                // 🔒 Validate states again
+                if (!selectedPallets.All(p => p.State == PalletState.Ready))
+                {
+                    MessageDialogBox.ShowDialog(
+                        "Invalid Selection",
+                        "Only packed pallets (Ready) can be removed.",
+                        MessageBoxButtons.OK,
+                        MessageType.Warning
+                    );
+                    return;
+                }
 
-            DrawFooter(e);
+                var palletIds = selectedPallets
+                    .Select(p => p.PalletId)
+                    .Where(id => id > 0)
+                    .Distinct()
+                    .ToList();
 
-            workOrderIndex = 0;
-            palletPrintIndex++;
+                if (!palletIds.Any())
+                {
+                    MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
+                    return;
+                }
 
-            e.HasMorePages = palletPrintIndex < palletsToPrint.Count;
-        }
-
-        private void DrawFooter(PrintPageEventArgs e)
-        {
-            Font footerFont = new Font("Segoe UI", 9);
-
-            int footerLineY = e.MarginBounds.Bottom;
-
-            e.Graphics.DrawLine(Pens.Gray, e.MarginBounds.Left, footerLineY, e.MarginBounds.Right, footerLineY);
-
-            string pageText = $"Page {palletPrintIndex + 1} of {palletsToPrint.Count}";
-            SizeF size = e.Graphics.MeasureString(pageText, footerFont);
-
-            float x = e.MarginBounds.Right - size.Width;
-            float y = footerLineY + 5;
-
-            e.Graphics.DrawString(pageText, footerFont, Brushes.Black, x, y);
-        }
-
-        private async void btnRemovePallet_Click_1(object sender, EventArgs e)
-        {
-
-            var selectedIndices = lvPallet.GetSelectedIndices();
-
-            if (selectedIndices == null || selectedIndices.Count == 0)
-            {
-               
-
-                MessageDialogBox.ShowDialog("Error", "Please select at least one pallet.", MessageBoxButtons.OK, MessageType.Info);
-                ;                return;
-            }
-
-            var selectedPallets = selectedIndices
-                .Select(i => _job.Pallets[i])
-                .ToList();
-
-            if (!selectedPallets.All(p => p.State == PalletState.Ready))
-            {
-
-      
-                MessageDialogBox.ShowDialog(
-                    "Invalid Selection",
-                    "Only packed pallets (Ready) can be removed.",
-                    MessageBoxButtons.OK,
-                    MessageType.Warning
-);
-                return;
-            }
-
-            var palletIds = selectedPallets
-                .Select(p => p.PalletId)
-                .Where(id => id > 0)
-                .ToList();
-
-            Debug.WriteLine("PalletIds selected: " + string.Join(",", palletIds));
-
-            if (!palletIds.Any())
-            {
-
-                
-                MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
-                return;
-            }
-
-            try
-            {
-
+                // 🔥 get latest active pallet (still safe to fetch now)
                 var activePalletId = await RqliteClient.GetActivePalletIdAsync(_job.JobId);
                 bool hasActivePallet = activePalletId != null;
 
                 using (var dlg = new RemovePallets(hasActivePallet))
                 {
                     if (dlg.ShowDialog(this) != DialogResult.OK)
-                    {
+                        return;
 
+                    // 🔥 CRITICAL: re-check AFTER dialog
+                    await PBCMain.Instance.RefreshSingleJobAsync(_job.JobId);
+                    // AFTER refresh
+                    activePalletId = await RqliteClient.GetActivePalletIdAsync(_job.JobId);
+                    hasActivePallet = activePalletId != null;
+
+                    // 🔥 Rebuild again (DO NOT trust old selection)
+                    selectedPallets = selectedIndices
+                        .Where(i => i >= 0 && i < _job.Pallets.Count)
+                        .Select(i => _job.Pallets[i])
+                        .ToList();
+
+                    palletIds = selectedPallets
+                        .Select(p => p.PalletId)
+                        .Where(id => id > 0)
+                        .Distinct()
+                        .ToList();
+
+                    if (!palletIds.Any())
+                    {
+                        await PBCMain.Instance.RefreshSingleJobAsync(_job.JobId);
                         return;
                     }
 
@@ -403,32 +405,27 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                         case RemovePallets.RemoveAction.Merge:
                             if (activePalletId == null)
                             {
-
-                                
-                                MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
+                                MessageDialogBox.ShowDialog("", "No active pallet available.", MessageBoxButtons.OK, MessageType.Error);
                                 return;
                             }
-                            await RqliteClient.MergePalletsIntoAsync(
-                                palletIds,
-                                activePalletId.Value);
+
+                            await RqliteClient.MergePalletsIntoAsync(palletIds, activePalletId.Value);
                             break;
 
                         case RemovePallets.RemoveAction.Delete:
                             await RqliteClient.DeletePalletsAsync(palletIds);
-
                             break;
+
                         case RemovePallets.RemoveAction.UndoPack:
 
-                            //unpack multiple pallets and there is no ongoing pallet
                             if (!hasActivePallet && palletIds.Count > 1)
                             {
                                 int targetPalletId = palletIds.OrderBy(id => id).First();
 
-                                // undo only target pallet first
                                 await RqliteClient.UndoPackedPalletAsync(
                                     new List<int> { targetPalletId },
                                     _job.JobId);
-                                // merge remaining pallets into target
+
                                 await RqliteClient.MergePalletsIntoAsync(
                                     palletIds.Where(id => id != targetPalletId),
                                     targetPalletId);
@@ -437,28 +434,24 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                             {
                                 await RqliteClient.UndoPackedPalletAsync(
                                     palletIds,
-                                    _job.JobId
-                                );
+                                    _job.JobId);
                             }
-
-                        
                             break;
 
                         default:
-
                             return;
                     }
                 }
 
+                // 🔥 FINAL refresh (guarantee UI sync)
+                var ts = await RqliteClient.GetJobsLastUpdatedAsync();
+                PBCMain.Instance.MarkPendingUpdate(_job.JobId, ts);
 
                 DataChanged = true;
-
-
                 Close();
             }
             catch (Exception ex)
             {
-
                 Utils.WriteExceptionError(ex);
                 MessageDialogBox.ShowDialog("", "Error processing pallets:\n\n" + ex.Message, MessageBoxButtons.OK, MessageType.Error);
             }

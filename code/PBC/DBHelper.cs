@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -66,8 +67,20 @@ public static class RqliteClient
         if (value is string s) return "'" + s.Replace("'", "''") + "'";
         if (value is bool b) return b ? "1" : "0";
         if (value is DateTime dt)
-            return "'" + dt.ToString("yyyy-MM-dd HH:mm:ss") + "'";
+            return "'" + dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "'";
         return value.ToString();
+    }
+
+    public static DateTime? ParseUtc(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return null;
+
+        return DateTime.Parse(
+            value,
+            null,
+            System.Globalization.DateTimeStyles.AdjustToUniversal
+        ).ToLocalTime();
     }
 
     public static async Task<RqliteResult> QueryAsync(string sql)
@@ -261,9 +274,8 @@ VALUES ('{username}', '{password}', 1, 1)";
             return false;
         }
     }
-
-    public static async Task<List<(int JobId, DateTime? LastUpdated)>>
-      LoadJobUpdateInfoAsync()
+    public static async Task<List<(int JobId, string LastUpdatedRaw)>>
+        LoadJobUpdateInfoAsync()
     {
         var sql = $"SELECT Id, LastUpdated FROM {TableJobs}";
         var json = JsonConvert.SerializeObject(new[] { sql });
@@ -277,7 +289,7 @@ VALUES ('{username}', '{password}', 1, 1)";
         var body = await response.Content.ReadAsStringAsync();
         var result = JsonConvert.DeserializeObject<QueryResponse>(body);
 
-        var list = new List<(int, DateTime?)>();
+        var list = new List<(int, string)>();
 
         if (result?.results?.Count > 0)
         {
@@ -289,13 +301,9 @@ VALUES ('{username}', '{password}', 1, 1)";
                 {
                     int id = Convert.ToInt32(row[0]);
 
-                    DateTime? lastUpdated = null;
-                    if (row[1] != null)
-                        lastUpdated = row[1] == null
-    ? (DateTime?)null
-    : Convert.ToDateTime(row[1]);
+                    string raw = row[1]?.ToString(); // ✅ RAW STRING (no parsing)
 
-                    list.Add((id, lastUpdated));
+                    list.Add((id, raw));
                 }
             }
         }
@@ -394,7 +402,7 @@ VALUES
     {(trustedCert ? 1 : 0)},
     '{Escape(sqlUser)}',
     '{Escape(sqlPwd)}',
-    datetime('now')
+    strftime('%Y-%m-%dT%H:%M:%fZ','now')
 )
 ON CONFLICT(Id) DO UPDATE SET
     CpsDb = excluded.CpsDb,
@@ -405,21 +413,28 @@ ON CONFLICT(Id) DO UPDATE SET
     TrustedServerCert = excluded.TrustedServerCert,
     SqlUser = excluded.SqlUser,
     SqlPwd = excluded.SqlPwd,
-    LastUpdated = datetime('now');
+    LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now');
 ";
 
         return await ExecuteAsync(sql);
     }
+
     public static async Task<int> UpdatePbJobAsync(
         int jobId,
         string jobName,
         int jobNumber,
         bool isTemp,
-        DateTime? expectedLastUpdated)
+        string expectedLastUpdatedRaw)
     {
-        string lastUpdatedValue = expectedLastUpdated == null
-            ? "NULL"
-            : $"'{expectedLastUpdated.Value:yyyy-MM-dd HH:mm:ss}'";
+        string expectedSqlite = "NULL";
+
+        if (!string.IsNullOrEmpty(expectedLastUpdatedRaw))
+        {
+            var dt = DateTime.Parse(expectedLastUpdatedRaw);
+
+            // ⚠️ no ToUniversalTime()
+            expectedSqlite = dt.ToString("yyyy-MM-dd HH:mm:ss");
+        }
 
         string sql = $@"
 UPDATE PBJOB
@@ -427,9 +442,9 @@ SET
     JobName = {FormatValue(jobName)},
     JobNumber = {jobNumber},
     IsTemp = {(isTemp ? 1 : 0)},
-    LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+    LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id = {jobId}
-  AND LastUpdated = {lastUpdatedValue};
+  AND strftime('%Y-%m-%d %H:%M:%S', LastUpdated) = '{expectedSqlite}';
 ";
 
         var result = await ExecuteAsync(sql);
@@ -468,7 +483,7 @@ AND NOT EXISTS (
 );
 
 UPDATE {TableJobs}
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id = {jobId};
 ";
 
@@ -517,21 +532,17 @@ WHERE Id = {jobId};
             return (false, ex.Message);
         }
     }
-    public static async Task<DateTime?> GetJobsLastUpdatedAsync()
+
+    public static async Task<string> GetJobsLastUpdatedAsync()
     {
         var result = await QueryAsync(
-            $"SELECT MAX(LastUpdated) AS LastUpdated FROM {TableJobs}"
+            $"SELECT MAX(strftime('%Y-%m-%d %H:%M:%S', LastUpdated)) AS LastUpdated FROM {TableJobs}"
         );
 
         if (result.Records.Count == 0)
             return null;
 
-        var value = result.Records[0]["LastUpdated"];
-
-        if (value == null)
-            return null;
-
-        return DateTime.Parse(value.ToString());
+        return result.Records[0]["LastUpdated"]?.ToString();
     }
 
     public static async Task DeletePbJobAsync(int jobId)
@@ -559,7 +570,7 @@ AND State = {(int)PalletState.Packed_NotReady}
 AND PackedAt IS NOT NULL;
 
 UPDATE PBJOB
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id = {jobId};
 ";
 
@@ -575,7 +586,7 @@ AND State = {(int)PalletState.Ready}
 AND PackedAt IS NOT NULL;
 
 UPDATE PBJOB
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id = {jobId};
 ";
 
@@ -602,16 +613,16 @@ WHERE PalletNumber IN ({ids})
 AND State = {(int)PalletState.Ready};
 
 UPDATE {TableJobs}
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id = {jobId};
 ";
 
         var result = await ExecuteAsync(sql);
    }
-    public static async Task<DateTime?> TogglePalletReadyAsync(
-     int jobId,
-     PalletState fromState,
-     PalletState toState)
+    public static async Task<string> TogglePalletReadyAsync(
+    int jobId,
+    PalletState fromState,
+    PalletState toState)
     {
         string sql = $@"
 UPDATE {TablePallets}
@@ -620,13 +631,13 @@ WHERE PBJobId = {jobId}
 AND State = {(int)fromState};
 
 UPDATE {TableJobs}
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id = {jobId};
 ";
 
         await ExecuteAsync(sql);
 
-        // 🔥 immediately fetch exact timestamp for THIS job
+        // 🔥 fetch EXACT raw timestamp (no parsing)
         var result = await QueryAsync($@"
 SELECT LastUpdated
 FROM {TableJobs}
@@ -637,7 +648,7 @@ LIMIT 1;
         if (result.Records.Count == 0)
             return null;
 
-        return DateTime.Parse(result.Records[0]["LastUpdated"].ToString());
+        return result.Records[0]["LastUpdated"]?.ToString();
     }
     public static async Task<int> UpdatePalletPackingAsync(
     int palletId,
@@ -647,14 +658,14 @@ LIMIT 1;
     UPDATE {TablePallets}
     SET
         TrayCount = {trayCount},
-        PackedAt = datetime('now','localtime'),
+        PackedAt = strftime('%Y-%m-%dT%H:%M:%fZ','now'),
         State = {(int)PalletState.Ready}
     WHERE Id = {palletId}
       AND PackedAt IS NULL
       AND State = {(int)PalletState.NotReady};
 
     UPDATE {TableJobs}
-    SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+    SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
     WHERE Id = (
         SELECT PBJobId
         FROM {TablePallets}
@@ -667,56 +678,6 @@ LIMIT 1;
         return result.RowsAffected;
     }
 
-    //    public static async Task<DateTime?> UpdatePalletPackingAsync(
-    //        int palletId,
-    //        int trayCount)
-    //    {
-    //        string updateSql = $@"
-    //UPDATE {TablePallets}
-    //SET
-    //    TrayCount = {trayCount},
-    //    PackedAt = strftime('%Y-%m-%d %H:%M:%f','now','localtime'),
-    //    State = {(int)PalletState.Ready}
-    //WHERE Id = {palletId}
-    //  AND PackedAt IS NULL
-    //  AND State = {(int)PalletState.NotReady};
-
-    //UPDATE {TableJobs}
-    //SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
-    //WHERE Id = (
-    //    SELECT PBJobId
-    //    FROM {TablePallets}
-    //    WHERE Id = {palletId}
-    //);
-    //";
-
-    //        var writeResult = await ExecuteAsync(updateSql);
-
-    //        if (writeResult.RowsAffected == 0)
-    //            return null;
-
-    //        string querySql = $@"
-    //SELECT LastUpdated
-    //FROM {TableJobs}
-    //WHERE Id = (
-    //    SELECT PBJobId
-    //    FROM {TablePallets}
-    //    WHERE Id = {palletId}
-    //);
-    //";
-
-    //        var queryResult = await QueryAsync(querySql);
-
-    //        var row = queryResult?.Records?.FirstOrDefault();
-
-    //        if (row == null)
-    //            return null;
-
-    //        if (!row.TryGetValue("LastUpdated", out var value) || value == null)
-    //            return null;
-
-    //        return Convert.ToDateTime(value.ToString());
-    //    }
     public static async Task DeletePalletsAsync(IEnumerable<int> palletIds)
     {
         if (palletIds == null || !palletIds.Any())
@@ -749,7 +710,7 @@ DELETE FROM {TablePallets}
 WHERE Id IN ({idList});
 
 UPDATE {TableJobs}
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id IN ({jobIdList});
 ");
     }
@@ -809,7 +770,7 @@ VALUES
     {job.JobNumber},
     {(job.IsTemp ? 1 : 0)},
     1,
-    datetime('now','localtime')
+    strftime('%Y-%m-%dT%H:%M:%fZ','now')
 );
 ";
 
@@ -848,6 +809,7 @@ VALUES
         var row = result.Records.FirstOrDefault();
         if (row == null)
             return null;
+        var raw = row["LastUpdated"]?.ToString();
 
         return new PbJobModel
         {
@@ -856,7 +818,8 @@ VALUES
             JobNumber = Convert.ToInt32(row["JobNumber"]),
             IsTemp = Convert.ToInt32(row["IsTemp"]) == 1,
             IsActive = Convert.ToInt32(row["IsActive"]) == 1,
-            LastUpdated = DateTime.Parse(row["LastUpdated"].ToString())
+            LastUpdatedRaw = raw,              // ✅ comma
+            LastUpdated = ParseUtc(raw)        // ✅ last line no comma needed
         };
     }
 
@@ -865,7 +828,7 @@ VALUES
         var sql = $@"
         UPDATE PBJOB
         SET IsActive = 1,
-            LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+            LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
         WHERE Id = {jobId};
     ";
 
@@ -877,7 +840,7 @@ VALUES
         var sql = $@"
     UPDATE PBJOB
     SET IsActive = 1,
-        LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime'),
+        LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now'),
         JobName = '{newName}'
     WHERE Id = {jobId};
     ";
@@ -890,12 +853,12 @@ VALUES
             return;
 
         var idList = string.Join(",", jobIds);
-        var shippedAt = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+        var shippedAt = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
 
         string sql = $@"
 UPDATE PALLET
 SET 
-    ShippedAt = '{shippedAt}',
+    ShippedAt = strftime('%Y-%m-%dT%H:%M:%fZ','now'),
     State = {(int)PalletState.Shipped},
     JobNameSnapshot = (
         SELECT JobName 
@@ -907,7 +870,7 @@ AND State = {(int)PalletState.Ready}
 AND ShippedAt IS NULL;
 
 UPDATE PBJOB
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id IN ({idList});
 ";
 
@@ -949,7 +912,7 @@ SET State = {(int)PalletState.NotReady}
 WHERE Id = {targetPalletId};
 
 UPDATE {TableJobs}
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id = (
     SELECT PBJobId
     FROM {TablePallets}
@@ -1029,7 +992,8 @@ ORDER BY j.Id, p.PalletNumber
 
             if (!jobs.TryGetValue(jobId, out var job))
             {
-             
+
+                var raw = row["LastUpdated"]?.ToString();
 
                 job = new PbJobModel
                 {
@@ -1038,9 +1002,9 @@ ORDER BY j.Id, p.PalletNumber
                     JobNumber = Convert.ToInt32(row["JobNumber"]),
                     IsTemp = Convert.ToInt32(row["IsTemp"]) == 1,
                     IsActive = Convert.ToInt32(row["IsActive"]) == 1,
-                    LastUpdated = row["LastUpdated"] == null
-                        ? (DateTime?)null
-                        : Convert.ToDateTime(row["LastUpdated"]),
+                    LastUpdatedRaw = raw,              
+                    LastUpdated = ParseUtc(raw),       
+
                     Pallets = new List<Pallet>()
                 };
 
@@ -1060,8 +1024,8 @@ ORDER BY j.Id, p.PalletNumber
                     PBJobId = jobId,
                     PalletNumber = Convert.ToInt32(row["PalletNumber"]),
                     TrayCount = Convert.ToInt32(row["TrayCount"]),
-                    PackedAt = row["PackedAt"] == null ? (DateTime?)null : Convert.ToDateTime(row["PackedAt"]),
-                    ShippedAt = row["ShippedAt"] == null ? (DateTime?)null : Convert.ToDateTime(row["ShippedAt"]),
+                    PackedAt = ParseUtc(row["PackedAt"]?.ToString()),
+                    ShippedAt = ParseUtc(row["ShippedAt"]?.ToString()),
                     State = (PalletState)Convert.ToInt32(row["State"]),
                     WorkOrders = new List<WorkOrder>(),
 
@@ -1210,7 +1174,7 @@ SET PalletNumber = last_insert_rowid()
 WHERE Id = last_insert_rowid();
 
 UPDATE {TableJobs}
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id = {jobId};
 ");
 
@@ -1337,6 +1301,8 @@ LIMIT 1
             {
                 var snapshotName = row["JobNameSnapshot"]?.ToString();
 
+                var raw = row["LastUpdated"]?.ToString();
+
                 job = new PbJobModel
                 {
                     JobId = jobId,
@@ -1344,9 +1310,10 @@ LIMIT 1
                     JobNumber = Convert.ToInt32(row["JobNumber"]),
                     IsTemp = Convert.ToInt32(row["IsTemp"]) == 1,
                     IsActive = Convert.ToInt32(row["IsActive"]) == 1,
-                    LastUpdated = row["LastUpdated"] == null
-                        ? (DateTime?)null
-                        : Convert.ToDateTime(row["LastUpdated"]),
+
+                    LastUpdatedRaw = raw,              
+                    LastUpdated = ParseUtc(raw),      
+
                     Pallets = new List<Pallet>()
                 };
             }
@@ -1363,8 +1330,8 @@ LIMIT 1
                         PBJobId = jobId,
                         PalletNumber = Convert.ToInt32(row["PalletNumber"]),
                         TrayCount = Convert.ToInt32(row["TrayCount"]),
-                        PackedAt = row["PackedAt"] == null ? (DateTime?)null : Convert.ToDateTime(row["PackedAt"]),
-                        ShippedAt = row["ShippedAt"] == null ? (DateTime?)null : Convert.ToDateTime(row["ShippedAt"]),
+                        PackedAt = ParseUtc(row["PackedAt"]?.ToString()),
+                        ShippedAt = ParseUtc(row["ShippedAt"]?.ToString()),
                         State = (PalletState)Convert.ToInt32(row["State"]),
                         WorkOrders = new List<WorkOrder>()
                     };
@@ -1446,7 +1413,7 @@ LIMIT 1
         var sql = $@"
         UPDATE PBJOB
         SET IsActive = 0,
-            LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+            LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
         WHERE Id = {jobId};
     ";
 
@@ -1466,7 +1433,7 @@ LIMIT 1
     );
 
     UPDATE {TableJobs}
-    SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+    SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
     WHERE Id = {pallet.PBJobId};
     ";
 
@@ -1517,7 +1484,7 @@ VALUES");
 
         sql.AppendLine($@"
 UPDATE {TableJobs}
-SET LastUpdated = strftime('%Y-%m-%d %H:%M:%f','now','localtime')
+SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id = (
     SELECT PBJobId
     FROM {TablePallets}

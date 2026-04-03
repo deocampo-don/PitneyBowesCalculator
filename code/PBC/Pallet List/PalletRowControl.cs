@@ -22,7 +22,7 @@ namespace WindowsFormsApp1
         private PbJobModel _model;
         public event EventHandler<PbJobModel> EditRequested;
         public event EventHandler<PbJobModel> SoftDeleteRequested;
-        private PalletScanSession _session = new PalletScanSession();
+
         public PbJobModel BoundJob { get; private set; }
 
         public event EventHandler<PbJobModel> DeleteRequested;
@@ -42,7 +42,7 @@ namespace WindowsFormsApp1
 
             var editItem = new ToolStripMenuItem("Edit PB Job");
             editItem.Click += EditPbJob_Click;
-            
+
             var deleteItem = new ToolStripMenuItem("Delete PB Job");
             deleteItem.Click += DeletePbJob_Click;
 
@@ -127,23 +127,22 @@ namespace WindowsFormsApp1
             btn.StateDisabled.Content.ShortText.Color2 = fore;
         }
 
-      
 
 
-        private void PanelTableLayout_Paint(object sender, PaintEventArgs e)
-        {
-            if (_model.Pallets.Count == 0)
-            {
-                btnAddPallet.Text = "New Pallet";
-                btnAddPallet.StateCommon.Back.Color1 = Color.FromArgb(60, 200, 120);
-                btnPackPallet.StateCommon.Back.Color1 = Color.FromArgb(198, 198, 198);
-                btnView.StateCommon.Back.Color1 = Color.White;
-                btnView.StateCommon.Content.ShortText.Color1 = Color.FromArgb(103, 80, 164);
-                btnPackPallet.Enabled = false;
 
-            }
-        }
+        //private void PanelTableLayout_Paint(object sender, PaintEventArgs e)
+        //{
+        //    if (_model.Pallets.Count == 0)
+        //    {
+        //        btnAddPallet.Text = "New Pallet";
+        //        btnAddPallet.StateCommon.Back.Color1 = Color.FromArgb(60, 200, 120);
+        //        btnPackPallet.StateCommon.Back.Color1 = Color.FromArgb(198, 198, 198);
+        //        btnView.StateCommon.Back.Color1 = Color.White;
+        //        btnView.StateCommon.Content.ShortText.Color1 = Color.FromArgb(103, 80, 164);
+        //        btnPackPallet.Enabled = false;
 
+        //    }
+        //}
 
         private void UpdateButtonsState()
         {
@@ -220,54 +219,59 @@ namespace WindowsFormsApp1
             }
         }
         private async void kryptonButton3_Click(object sender, EventArgs e)
-{
-    if (_model == null)
-        return;
+        {
+            if (_model == null)
+                return;
 
-    var activePallet = _model.Pallets
-        .FirstOrDefault(p => p.PackedAt == null);
+            var activePallet = _model.Pallets
+                .FirstOrDefault(p => p.PackedAt == null);
 
-    if (activePallet == null)
-    {
-        MessageDialogBox.ShowDialog("", "No active pallet.", MessageBoxButtons.OK, MessageType.Info);
-        return;
-    }
+            if (activePallet == null)
+            {
+                MessageDialogBox.ShowDialog("", "No active pallet.", MessageBoxButtons.OK, MessageType.Info);
+                return;
+            }
 
-    // ⭐ Always reload from DB (concurrency safe)
-    var dbItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
-    activePallet.WorkOrders = dbItems;
+            activePallet = await EnsurePalletIsOpenAsync(activePallet);
+            if (activePallet == null)
+                return;
 
-    using (var dlg = new ViewWOListDialog())
-    {
-        dlg.SetItems(_model.JobName, _model.JobNumber.ToString(), dbItems);
+            // ⭐ Always reload from DB (concurrency safe)
+            var dbItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
+            activePallet.WorkOrders = dbItems;
 
-        dlg.ShowDialog(this);
+            using (var dlg = new ViewWOListDialog())
+            {
+                dlg.SetItems(_model.JobName, _model.JobNumber.ToString(), dbItems);
+
+                dlg.ShowDialog(this);
 
                 if (dlg.DeletedItems != null && dlg.DeletedItems.Any())
                 {
-                    // STEP 1: Reload pallet contents
+                    // 🔥 MUST CHECK HERE (NOT at the end)
+                    activePallet = await EnsurePalletIsOpenAsync(activePallet);
+                    if (activePallet == null)
+                        return;
+
                     var updatedItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
 
-                    // ⭐ If pallet was deleted in dialog → remove from model
                     if (!updatedItems.Any())
                     {
-                        _model.Pallets.Remove(activePallet);
+                        var tss = await RqliteClient.GetJobsLastUpdatedAsync();
+                        PBCMain.Instance.MarkPendingUpdate(_model.JobId, tss);
+                        return;
                     }
-                    else
-                    {
-                        activePallet.WorkOrders = updatedItems;
-                    }
+                    activePallet.WorkOrders = updatedItems;
 
                     UpdateButtonsState();
 
-                   
                     var ts = await RqliteClient.GetJobsLastUpdatedAsync();
                     PBCMain.Instance.MarkPendingUpdate(_model.JobId, ts);
 
                     PalletChanged?.Invoke(this, _model);
                 }
             }
-}
+        }
 
         private void DeletePbJob_Click(object sender, EventArgs e)
         {
@@ -384,14 +388,19 @@ namespace WindowsFormsApp1
                     p.PackedAt == null &&
                     p.ShippedAt == null);
 
-            // 2️⃣ Get totals
-            // ⭐ NEW: Force refresh from DB BEFORE computing totals
+            // 🔥 EARLY VALIDATION (UX)
+         
+            // 2️⃣ Load current totals
+            // 🔥 Only validate if pallet exists
             if (pallet != null)
             {
+                pallet = await EnsurePalletIsOpenAsync(pallet);
+                if (pallet == null)
+                    return;
+
                 pallet.WorkOrders = await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
             }
 
-            // 2️⃣ Get totals (now accurate)
             int baseEnvelope = pallet?.WorkOrders.Sum(w => w.Quantity) ?? 0;
             int baseScannedWO = pallet?.WorkOrders.Count ?? 0;
 
@@ -399,7 +408,6 @@ namespace WindowsFormsApp1
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK)
                     return;
-            
 
                 if (!dlg.ScannedWorkOrders.Any())
                 {
@@ -409,7 +417,6 @@ namespace WindowsFormsApp1
 
                 try
                 {
-                  
                     var scannedBarcodes = dlg.ScannedWorkOrders
                         .Select(x => x.Barcode)
                         .ToList();
@@ -426,11 +433,10 @@ namespace WindowsFormsApp1
                     if (!validWorkOrders.Any())
                     {
                         MessageDialogBox.ShowDialog("", "All scanned barcodes are duplicates.", MessageBoxButtons.OK, MessageType.Error);
-                        
                         return;
                     }
 
-                    // 4️⃣ Create pallet only if needed
+                    // 4️⃣ Create pallet if needed
                     if (pallet == null)
                     {
                         int palletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
@@ -446,32 +452,41 @@ namespace WindowsFormsApp1
                         _model.Pallets.Add(pallet);
                     }
 
-                    // 1️⃣ optimistic UI update (instant)
+                    // 🔥 LATE VALIDATION (race condition safety)
+                    pallet = await EnsurePalletIsOpenAsync(pallet);
+                    if (pallet == null)
+                        return;
+
+                    // 5️⃣ Optimistic UI update
                     pallet.WorkOrders.AddRange(validWorkOrders);
                     PalletChanged?.Invoke(this, _model);
 
-                    // 2️⃣ save to DB
+                    // 6️⃣ Save to DB
                     await RqliteClient.SaveWorkOrdersAsync(pallet.PalletId, validWorkOrders);
 
-                    // 3️⃣ mark your update (prevents double refresh)
+                    // 7️⃣ Mark update (prevent double refresh)
                     var ts = await RqliteClient.GetJobsLastUpdatedAsync();
                     PBCMain.Instance.MarkPendingUpdate(_model.JobId, ts);
 
-
+                    // 8️⃣ Background refresh (silent)
                     _ = Task.Run(async () =>
                     {
                         var fresh = await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
-                        pallet.WorkOrders = fresh;
+
+                        this.Invoke(new Action(() =>
+                        {
+                            pallet.WorkOrders = fresh;
+                        }));
                     });
 
+                    // 9️⃣ Show duplicates (if any)
                     if (duplicates.Any())
                     {
-
                         var message =
-     $"Inserted: {validWorkOrders.Count}\n" +
-     $"Duplicates skipped: {duplicates.Count}\n\n" +
-     $"{string.Join("\n", duplicates)}\n\n" +
-     "Duplicate Barcodes";
+                            $"Inserted: {validWorkOrders.Count}\n" +
+                            $"Duplicates skipped: {duplicates.Count}\n\n" +
+                            $"{string.Join("\n", duplicates)}\n\n" +
+                            "Duplicate Barcodes";
 
                         MessageDialogBox.ShowDialog(
                             "",
@@ -485,16 +500,41 @@ namespace WindowsFormsApp1
                 {
                     Utils.WriteExceptionError(ex);
                     MessageDialogBox.ShowDialog("", "Error saving pallet: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
-                    return;
-                }
-                finally
-                {
-                 
                 }
             }
         }
 
-     
+        private async Task<Pallet> EnsurePalletIsOpenAsync(Pallet pallet)
+        {
+            if (_model == null || pallet == null)
+                return pallet;
+
+            var fresh = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+
+            var dbPallet = fresh?.Pallets
+                .FirstOrDefault(p => p.PalletId == pallet.PalletId);
+
+            // 🚫 already packed or missing
+            if (dbPallet == null || dbPallet.PackedAt != null)
+            {
+                MessageDialogBox.ShowDialog(
+                    "Pallet Already Packed",
+                    "This pallet was already packed by another workstation.",
+                    MessageBoxButtons.OK,
+                    MessageType.Warning
+                );
+
+                await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
+                return null;
+            }
+
+            // 🔄 sync latest state
+            pallet.PackedAt = dbPallet.PackedAt;
+            pallet.State = dbPallet.State;
+
+            return pallet;
+        }
+
         private async void btnPackPallet_Click(object sender, EventArgs e)
         {
             if (_model == null)
@@ -505,7 +545,6 @@ namespace WindowsFormsApp1
 
             if (activePallet == null)
             {
-              
                 MessageDialogBox.ShowDialog("", "No active pallet to pack.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
@@ -513,12 +552,15 @@ namespace WindowsFormsApp1
             if (activePallet.PalletEnvelopeQty == 0 &&
                 activePallet.PalletScannedWO == 0)
             {
-                
                 MessageDialogBox.ShowDialog("", "Cannot pack an empty pallet.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
             int trayCount;
+
+            activePallet = await EnsurePalletIsOpenAsync(activePallet);
+            if (activePallet == null)
+                return;
 
             using (var dlg = new PackPalletDIalog())
             {
@@ -536,30 +578,38 @@ namespace WindowsFormsApp1
 
             try
             {
-               
+
                 var rows = await RqliteClient.UpdatePalletPackingAsync(
-     activePallet.PalletId,
-     trayCount
- );
-                
+        activePallet.PalletId,
+        trayCount
+    );
 
                 if (rows == 0)
                 {
-
                     MessageDialogBox.ShowDialog(
-    "Pallet Already Packed",
-    "This pallet was already packed by another workstation.",
-    MessageBoxButtons.OK,
-    MessageType.Info
-);
+                        "Pallet Already Packed",
+                        "This pallet was already packed by another workstation.",
+                        MessageBoxButtons.OK,
+                        MessageType.Info
+                    );
 
-                    PalletChanged?.Invoke(this, _model);
+                    await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
+                  
                     return;
+                   
                 }
 
+                // ✅ success path
                 activePallet.TrayCount = trayCount;
                 activePallet.PackedAt = DateTime.Now;
                 activePallet.State = PalletState.Ready;
+
+                UpdateButtonsState();
+
+                var tss = await RqliteClient.GetJobsLastUpdatedAsync();
+                PBCMain.Instance.MarkPendingUpdate(_model.JobId, tss);
+
+                PalletChanged?.Invoke(this, _model);
             }
             catch (Exception ex)
             {
@@ -567,14 +617,9 @@ namespace WindowsFormsApp1
                 MessageDialogBox.ShowDialog("", "Error saving pack data: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
-
-            UpdateButtonsState();
-
-            
-            var ts = await RqliteClient.GetJobsLastUpdatedAsync();
-            PBCMain.Instance.MarkPendingUpdate(_model.JobId, ts);
-
-            PalletChanged?.Invoke(this, _model);
         }
+
     }
+
+
 }

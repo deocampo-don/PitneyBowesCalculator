@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -120,68 +121,6 @@ namespace WindowsFormsApp1.Packed_And_Ready
            
         }
 
-        //private async void chkbxStatus_CheckedChanged(object sender, EventArgs e)
-        //{
-        //    if (_isBinding)
-        //        return;
-
-        //    if (_modelpbjob == null)
-        //        return;
-
-        //    try
-        //    {
-        //        if (chkbxStatus.Checked)
-        //        {
-        //            // Update memory immediately
-        //            foreach (var p in _modelpbjob.Pallets
-        //                .Where(p => p.State == PalletState.Packed_NotReady))
-        //            {
-        //                p.State = PalletState.Ready;
-        //            }
-
-        //            txtStatus.Text = "Ready to Ship";
-        //            txtStatus.StateCommon.ShortText.Color1 =
-        //                ColorTranslator.FromHtml("#34C759");
-
-        //            PackedDataChanged?.Invoke(this, _modelpbjob);
-
-        //            // Update database
-        //            await RqliteClient.TogglePalletReadyAsync(
-        //                _modelpbjob.JobId,
-        //                PalletState.Packed_NotReady,
-        //                PalletState.Ready);
-        //        }
-        //        else
-        //        {
-        //            foreach (var p in _modelpbjob.Pallets
-        //                .Where(p => p.State == PalletState.Ready))
-        //            {
-        //                p.State = PalletState.Packed_NotReady;
-        //            }
-
-        //            txtStatus.Text = "Not Ready";
-        //            txtStatus.StateCommon.ShortText.Color1 =
-        //                ColorTranslator.FromHtml("#FF383C");
-
-        //            PackedDataChanged?.Invoke(this, _modelpbjob);
-
-        //            await RqliteClient.TogglePalletReadyAsync(
-        //                _modelpbjob.JobId,
-        //                PalletState.Ready,
-        //                PalletState.Packed_NotReady);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Utils.WriteExceptionError(ex);
-        //        MessageDialogBox.ShowDialog(
-        //            "Database Error",
-        //            ex.Message,
-        //            MessageBoxButtons.OK,
-        //            MessageType.Error
-        //        );
-        //    }
-        //}
         private async void chkbxStatus_CheckedChanged(object sender, EventArgs e)
         {
             if (_isBinding || _modelpbjob == null)
@@ -202,27 +141,26 @@ namespace WindowsFormsApp1.Packed_And_Ready
                     ? PalletState.Ready
                     : PalletState.Packed_NotReady;
 
-    
                 foreach (var p in _modelpbjob.Pallets)
                 {
                     if (p.State == fromState)
                         p.State = toState;
                 }
 
- 
                 txtStatus.Text = isReady ? "Ready to Ship" : "Not Ready";
                 txtStatus.StateCommon.ShortText.Color1 =
                     ColorTranslator.FromHtml(isReady ? "#34C759" : "#FF383C");
 
-    
                 var ts = await RqliteClient.TogglePalletReadyAsync(
                     _modelpbjob.JobId,
                     fromState,
                     toState
                 );
 
-         
-                PBCMain.Instance.MarkPendingUpdate(_modelpbjob.JobId, ts);
+                if (!string.IsNullOrEmpty(ts))
+                {
+                    PBCMain.Instance.MarkPendingUpdate(_modelpbjob.JobId, ts);
+                }
             }
             catch (Exception ex)
             {
