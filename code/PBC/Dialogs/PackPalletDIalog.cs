@@ -35,6 +35,7 @@ namespace WindowsFormsApp1.DIalogs
                 e.SuppressKeyPress = true;
                 btnOk.PerformClick();
             }
+            if (e.KeyCode == Keys.Escape) { this.Close(); }
         }
 
         private void btnOk_Click(object sender, EventArgs e)
@@ -59,12 +60,7 @@ namespace WindowsFormsApp1.DIalogs
 
             if (!int.TryParse(tbTrays.Text.Trim(), out int trays) || trays <= 0)
             {
-            /*    MessageBox.Show(
-                    "Please enter a valid tray quantity greater than 0.",
-                    "Invalid Input",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            */
+          
                 MessageDialogBox.ShowDialog(
                     "Invalid Input",
                     "Please enter a valid tray quantity greater than 0.",

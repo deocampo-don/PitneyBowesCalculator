@@ -117,7 +117,7 @@
             tbWoBarcode.StateCommon.Border.Rounding = 5F;
             tbWoBarcode.StateCommon.Content.Padding = new System.Windows.Forms.Padding(10);
             tbWoBarcode.TabIndex = 1;
-            tbWoBarcode.TextChanged += tbWoBarcode_TextChanged;
+        
             // 
             // label2
             // 

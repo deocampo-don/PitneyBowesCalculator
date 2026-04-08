@@ -475,7 +475,7 @@ namespace WindowsFormsApp1
       jobNumber,
       dialog.IsTemp,
       job.LastUpdatedRaw);   // ✅ EXACT DB VALUE
-                        MessageBox.Show("Editrequested ID " + job.JobId);
+                        
                         if (rows == 0)
                         {
 

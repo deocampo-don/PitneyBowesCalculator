@@ -39,7 +39,18 @@ namespace WindowsFormsApp1
 
         }
 
-        private void RoundedModal_KeyDown(object sender, KeyEventArgs e) { if (e.KeyCode == Keys.Escape) { this.Close(); } }
+        private void RoundedModal_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Escape) 
+            { 
+                this.Close(); 
+            }
+            if (e.KeyCode == Keys.Enter)
+            {
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
+            
+        }
 
         private void kryptonButton1_Click(object sender, EventArgs e)
         {

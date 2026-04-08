@@ -18,9 +18,11 @@ namespace WindowsFormsApp1
             InitializeComponent();
             FormHelper.ApplyRoundedCorners(this);
             ShadowHelper.ApplyShadow(this);
+            this.KeyPreview = true; this.KeyDown += RoundedModal_KeyDown;
 
         }
 
+        private void RoundedModal_KeyDown(object sender, KeyEventArgs e) { if (e.KeyCode == Keys.Escape) { this.Close(); } }
         public void SetItems(string jobName, string jobNum, IEnumerable<WorkOrder> items)
         {
 
@@ -53,54 +55,7 @@ namespace WindowsFormsApp1
             this.Close();
         }
 
-        //private async void btnClearWo_Click(object sender, EventArgs e)
-        //{
-        //    var selectedRows = woFlowRows.Controls
-        //.OfType<WorkOrderRowControl>()
-        //.Where(r => r.IsSelected)
-        //.ToList();
-
-        //    if (!selectedRows.Any())
-        //    {
-
-        //        MessageDialogBox.ShowDialog("", "No work orders selected.", MessageBoxButtons.OK, MessageType.Info);
-        //        return;
-        //    }
-
-        //    var confirm = MessageDialogBox.ShowDialog(
-        //        "Confirm Delete",
-        //        "Delete selected work orders?",
-        //        MessageBoxButtons.YesNo,
-        //        MessageType.Warning
-        //    );
-
-        //    if (confirm != DialogResult.Yes)
-        //        return;
-
-        //    DeletedItems = selectedRows
-        //        .Select(r => r.BoundItem)
-        //        .ToList();
-
-        //    try
-        //    {
-        //        await RqliteClient.DeleteWorkOrdersAsync(
-        //            DeletedItems.Select(w => w.Id)
-        //        );
-
-        //        // Remove from dialog list
-        //        foreach (var wo in DeletedItems)
-        //            _items.Remove(wo);
-        //        if (DeletedItems.Count == 0){
-        //            MessageDialogBox.ShowDialog("", "Pallet is now empty. Deleting pallet..", MessageBoxButtons.OK, MessageType.Info);
-        //        }
-        //        SetItems(jobname,jobn,_items);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Utils.WriteExceptionError(ex);             
-        //        MessageDialogBox.ShowDialog("", "Delete failed: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
-        //    }
-        //}
+     
         private async void btnClearWo_Click(object sender, EventArgs e)
         {
             var selectedRows = woFlowRows.Controls

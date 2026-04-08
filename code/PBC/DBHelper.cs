@@ -402,6 +402,8 @@ ON CONFLICT(Id) DO UPDATE SET
         return await ExecuteAsync(sql);
     }
 
+
+
     public static async Task<int> UpdatePbJobAsync(
         int jobId,
         string jobName,
@@ -409,17 +411,34 @@ ON CONFLICT(Id) DO UPDATE SET
         bool isTemp,
         string expectedLastUpdatedRaw)
     {
-        string expectedSqlite = "NULL";
-
-        if (!string.IsNullOrEmpty(expectedLastUpdatedRaw))
+        try
         {
-            var dt = DateTime.Parse(expectedLastUpdatedRaw);
+            var checkSql = $@"
+SELECT Id, JobName, JobNumber, IsTemp, LastUpdated
+FROM PBJOB
+WHERE Id = {jobId};
+";
 
-            // ⚠️ no ToUniversalTime()
-            expectedSqlite = dt.ToString("yyyy-MM-dd HH:mm:ss");
-        }
+            var checkResult = await QueryAsync(checkSql);
 
-        string sql = $@"
+            if (checkResult == null || !checkResult.Success || checkResult.Records.Count == 0)
+            {
+                return 0;
+            }
+
+            var row = checkResult.Records[0];
+            string dbLastUpdated = row["LastUpdated"]?.ToString();
+
+            bool match = string.Equals(
+                (expectedLastUpdatedRaw ?? "").Trim(),
+                (dbLastUpdated ?? "").Trim(),
+                StringComparison.Ordinal);
+
+            string whereLastUpdated = string.IsNullOrWhiteSpace(expectedLastUpdatedRaw)
+                ? "LastUpdated IS NULL"
+                : $"strftime('%Y-%m-%dT%H:%M:%f', LastUpdated) = strftime('%Y-%m-%dT%H:%M:%f', '{Escape(expectedLastUpdatedRaw)}')";
+
+            string sql = $@"
 UPDATE PBJOB
 SET
     JobName = {FormatValue(jobName)},
@@ -427,11 +446,18 @@ SET
     IsTemp = {(isTemp ? 1 : 0)},
     LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
 WHERE Id = {jobId}
-  AND strftime('%Y-%m-%d %H:%M:%S', LastUpdated) = '{expectedSqlite}';
+  AND {whereLastUpdated};
 ";
 
-        var result = await ExecuteAsync(sql);
-        return result.RowsAffected;
+            var result = await ExecuteAsync(sql);
+
+            return result.RowsAffected;
+        }
+        catch (Exception e)
+        {
+            Utils.WriteExceptionError(e);
+            throw;
+        }
     }
 
     public static async Task DeleteWorkOrdersAndMaybePalletAsync(
@@ -516,18 +542,7 @@ WHERE Id = {jobId};
         }
     }
 
-    //public static async Task<string> GetJobsLastUpdatedAsync()
-    //{
-    //    var result = await QueryAsync(
-    //        // ✅ Use %f to keep fractional seconds — matches what UpdatePalletPackingAsync writes
-    //        $"SELECT MAX(strftime('%Y-%m-%dT%H:%M:%fZ', LastUpdated)) AS LastUpdated FROM {TableJobs}"
-    //    );
 
-    //    if (result.Records.Count == 0)
-    //        return null;
-    //    Debug.WriteLine(result.Records[0]["LastUpdated"]?.ToString());
-    //    return result.Records[0]["LastUpdated"]?.ToString();
-    //}
     public static async Task<string> GetJobsLastUpdatedAsync()
     {
         var result = await QueryAsync(
@@ -631,12 +646,14 @@ LIMIT 1;
 
         return result.Records[0]["LastUpdated"]?.ToString();
     }
+
     public static async Task<int> UpdatePalletPackingAsync(int palletId, int trayCount)
     {
-        // Generate timestamp in C# — guaranteed unique per call
+        // Generate a unique timestamp per call
         var ts = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
 
-        string sql = $@"
+        // 1️⃣ Try to pack the pallet (THIS is the critical operation)
+        string packSql = $@"
 UPDATE {TablePallets}
 SET
     TrayCount = {trayCount},
@@ -645,7 +662,16 @@ SET
 WHERE Id = {palletId}
   AND PackedAt IS NULL
   AND State = {(int)PalletState.NotReady};
+";
 
+        var packResult = await ExecuteAsync(packSql);
+
+        // ❌ If no rows affected → someone else already packed it
+        if (packResult.RowsAffected == 0)
+            return 0;
+
+        // 2️⃣ Only update job timestamp if pack succeeded
+        string jobSql = $@"
 UPDATE {TableJobs}
 SET LastUpdated = '{ts}'
 WHERE Id = (
@@ -653,28 +679,12 @@ WHERE Id = (
 );
 ";
 
-        var result = await ExecuteAsync(sql);
-        return result.RowsAffected;
+        await ExecuteAsync(jobSql);
+
+        // ✅ Success
+        return 1;
     }
 
-    public static async Task<string> GetJobLastUpdatedByIdAsync(int jobId)
-    {
-        var result = await QueryAsync($@"
-        SELECT LastUpdated
-        FROM PBJOB
-        WHERE Id = {jobId}
-        LIMIT 1;
-    ");
-
-        if (result.Records.Count == 0)
-            return null;
-
-        var raw = result.Records[0]["LastUpdated"]?.ToString();
-
-        Debug.WriteLine($"[DB DIRECT FETCH] Job={jobId} | TS='{raw}'");
-
-        return raw;
-    }
     public static async Task DeletePalletsAsync(IEnumerable<int> palletIds)
     {
         if (palletIds == null || !palletIds.Any())
@@ -1104,41 +1114,6 @@ ORDER BY j.Id, p.PalletNumber
             return (false, ex.Message);
         }
     }
-    //public static async Task<int> GetOrCreateWorkingPalletAsync(int jobId)
-    //{
-    //    var existing = await QueryAsync($@"
-    //    SELECT Id
-    //    FROM {TablePallets}
-    //    WHERE PBJobId = {jobId}
-    //    AND State = {(int)PalletState.NotReady}
-    //    AND PackedAt IS NULL
-    //    LIMIT 1
-    //");
-
-    //    if (existing.Records.Count > 0)
-    //        return Convert.ToInt32(existing.Records[0]["Id"]);
-
-    //    await ExecuteAsync($@"
-    //    INSERT INTO {TablePallets}
-    //    (PBJobId, State, TrayCount)
-    //    VALUES ({jobId}, {(int)PalletState.NotReady}, 0);
-
-    //    UPDATE {TablePallets}
-    //    SET PalletNumber = Id
-    //    WHERE Id = last_insert_rowid();
-
-    //    UPDATE {TableJobs}
-    //    SET LastUpdated = CURRENT_TIMESTAMP
-    //    WHERE Id = {jobId};
-    //");
-
-    //    var result = await QueryAsync("SELECT last_insert_rowid() AS Id");
-
-    //    if (result.Records.Count == 0)
-    //        throw new Exception("Failed to locate active pallet.");
-
-    //    return Convert.ToInt32(result.Records[0]["Id"]);
-    //}
 
     public static async Task<int> GetJobsCountAsync()
     {

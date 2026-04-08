@@ -281,15 +281,9 @@ namespace WindowsFormsApp1.Dialogs
                 MessageDialogBox.ShowDialog("", "No scans.", MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
-
             DialogResult = DialogResult.OK;
             Close();
         }
-        private void tbWoBarcode_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
      
     }
 }

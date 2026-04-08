@@ -33,6 +33,7 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
             InitializeContextMenu();
+         
             this.AutoScaleMode = AutoScaleMode.Dpi;
         }
 
@@ -442,6 +443,99 @@ namespace WindowsFormsApp1
             return (pallet, fresh);
         }
 
+        //        private async void btnPackPallet_Click(object sender, EventArgs e)
+        //        {
+        //            if (_model == null)
+        //                return;
+
+        //            var activePallet = _model.Pallets
+        //                .FirstOrDefault(p => p.PackedAt == null);
+
+        //            if (activePallet == null)
+        //            {
+        //                MessageDialogBox.ShowDialog("", "No active pallet to pack.", MessageBoxButtons.OK, MessageType.Info);
+        //                return;
+        //            }
+
+        //            if (activePallet.PalletEnvelopeQty == 0 &&
+        //                activePallet.PalletScannedWO == 0)
+        //            {
+        //                MessageDialogBox.ShowDialog("", "Cannot pack an empty pallet.", MessageBoxButtons.OK, MessageType.Info);
+        //                return;
+        //            }
+
+        //            int trayCount;
+
+        //            (activePallet, _) = await EnsurePalletIsOpenAsync(activePallet);
+        //            if (activePallet == null)
+        //                return;
+
+        //            using (var dlg = new PackPalletDIalog())
+        //            {
+        //                if (dlg.ShowDialog(this) != DialogResult.OK)
+        //                    return;
+
+        //                if (dlg.TrayCount <= 0)
+        //                {
+        //                    MessageDialogBox.ShowDialog("", "Tray count must be greater than 0.", MessageBoxButtons.OK, MessageType.Info);
+        //                    return;
+        //                }
+
+        //                trayCount = dlg.TrayCount;
+        //            }
+
+        //            try
+        //            {
+
+        //                int packedPalletId = activePallet.PalletId;
+
+        //                var rows = await RqliteClient.UpdatePalletPackingAsync(
+        //                    activePallet.PalletId,
+        //                    trayCount
+        //                );
+
+
+        //                if (rows == 0)
+        //                {
+        //                    MessageDialogBox.ShowDialog(
+        //                        "Pallet Already Packed",
+        //                        "This pallet was already packed by another workstation.",
+        //                        MessageBoxButtons.OK,
+        //                        MessageType.Info
+        //                    );
+
+        //                    await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
+        //                    return;
+        //                }
+
+        //                var toPrint = MessageDialogBox.ShowDialog(
+        //    "",
+        //    "Print the packed pallet?",
+        //    MessageBoxButtons.YesNo,
+        //    MessageType.Info
+        //);
+
+        //                if (toPrint == DialogResult.Yes)
+        //                {
+        //                    var palletToPrint = _model.Pallets
+        //                        .Where(p => p.PalletId == packedPalletId && p.PackedAt != null)
+        //                        .ToList();
+
+        //                    await Task.Run(() =>
+        //                    {
+        //                        PrintEngine.Print(e =>
+        //                            PrintLayouts.DrawPallets(e, _model, palletToPrint)
+        //                        );
+        //                    });
+        //                }
+        //                await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                Utils.WriteExceptionError(ex);
+        //                MessageDialogBox.ShowDialog("", "Error saving pack data: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
+        //            }
+        //        }
         private async void btnPackPallet_Click(object sender, EventArgs e)
         {
             if (_model == null)
@@ -485,21 +579,13 @@ namespace WindowsFormsApp1
 
             try
             {
-           
-               
-                Debug.WriteLine($"[PACK CLICK] Job={_model.JobId}");
+                int packedPalletId = activePallet.PalletId;
 
                 var rows = await RqliteClient.UpdatePalletPackingAsync(
-                    activePallet.PalletId,
+                    packedPalletId,
                     trayCount
                 );
 
-
-                Debug.WriteLine($"[PACK RESULT] Job={_model.JobId} | Rows={rows}");
-
-                // 🔥 FETCH EXACT DB VALUE AFTER UPDATE
-                var rawTs = await RqliteClient.GetJobLastUpdatedByIdAsync(_model.JobId);
-                Debug.WriteLine($"[PACK DB TS AFTER WRITE] Job={_model.JobId} | TS='{rawTs}'");
                 if (rows == 0)
                 {
                     MessageDialogBox.ShowDialog(
@@ -513,8 +599,40 @@ namespace WindowsFormsApp1
                     return;
                 }
 
-              
+                // Only the successful workstation reaches here
                 await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
+
+                var toPrint = MessageDialogBox.ShowDialog(
+                    "",
+                    "Print the packed pallet?",
+                    MessageBoxButtons.YesNo,
+                    MessageType.Info
+                );
+
+                if (toPrint == DialogResult.Yes)
+                {
+                    var palletToPrint = _model.Pallets
+                        .Where(p => p.PalletId == packedPalletId && p.PackedAt != null)
+                        .ToList();
+
+                    if (palletToPrint.Count == 0)
+                    {
+                        MessageDialogBox.ShowDialog(
+                            "",
+                            "Packed pallet not found for printing.",
+                            MessageBoxButtons.OK,
+                            MessageType.Info
+                        );
+                        return;
+                    }
+
+                    await Task.Run(() =>
+                    {
+                        PrintEngine.Print(e =>
+                            PrintLayouts.DrawPallets(e, _model, palletToPrint)
+                        );
+                    });
+                }
             }
             catch (Exception ex)
             {

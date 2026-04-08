@@ -41,11 +41,6 @@ namespace WindowsFormsApp1.Picked_Up
         {
             this.ResumeLayout();
         }
-        public void RemoveItem(int jobId)
-        {
-            RemoveItemsByJobId(jobId); // reuse logic
-        }
-
         public void AddItem(PbJobModel job)
         {
             // 🔥 prevent duplicates

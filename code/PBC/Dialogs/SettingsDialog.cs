@@ -31,9 +31,22 @@ namespace WindowsFormsApp1.Dialogs
             tbClientMaxRetry.Text = Program.AppINI._rqClientMaxRetries.ToString();
             tbClientDelay.Text = Program.AppINI._rqClientDelayMs.ToString();
             this.TopLevel = true;
-         
-        }
+            this.KeyPreview = true; this.KeyDown += RoundedModal_KeyDown;
 
+        }
+        private void RoundedModal_KeyDown(object sender, KeyEventArgs e) { 
+            if (e.KeyCode == Keys.Escape) 
+            {   
+                if (SettingsChanged || tbDefPrint.Text != Program.AppINI._defaultPrinter || tbPrinterIP.Text != Program.AppINI._printerIP || tbPrinterPort.Text != Program.AppINI._printerPort
+                    || tbAppRefFreq.Text != Program.AppINI._appRefresh.ToString() || tbRqClientAdd.Text != Program.AppINI._rqClientAddress || tbClientMaxRetry.Text != Program.AppINI._rqClientMaxRetries.ToString() || tbClientDelay.Text != Program.AppINI._rqClientDelayMs.ToString()) {
+                    var result = MessageDialogBox.ShowDialog("Settings Changed", "You have unsaved changes. Are you sure you want to exit?", MessageBoxButtons.YesNo, MessageType.Warning);
+                    if (result != DialogResult.Yes)
+                        return;
+                }
+                this.Close(); 
+            } 
+        
+        }
 
         private void btnAdmin_Click(object sender, EventArgs e)
         {
@@ -70,12 +83,16 @@ namespace WindowsFormsApp1.Dialogs
 
             if (!int.TryParse(tbAppRefFreq.Text, out int refresh))
                 errors.Add("App Refresh Frequency (must be number)");
+            else if (refresh < 1000)
+                errors.Add("App Refresh Frequency must be at least 1000");
 
             if (!int.TryParse(tbClientMaxRetry.Text, out int retries))
                 errors.Add("Client Max Retries (must be number)");
 
             if (!int.TryParse(tbClientDelay.Text, out int delay))
                 errors.Add("Client Delay (must be number)");
+            else if (delay < 1000)
+                errors.Add("Client Delay must be at least 1000");
 
             if (errors.Count > 0)
             {
@@ -129,8 +146,7 @@ namespace WindowsFormsApp1.Dialogs
                 MessageDialogBox.ShowDialog("", err, MessageBoxButtons.OK, MessageType.Error);
                 return;
             }
-
-           
+    
             MessageDialogBox.ShowDialog("", "Settings saved.", MessageBoxButtons.OK, MessageType.Info);
             SettingsChanged = true;
             this.DialogResult = DialogResult.OK;
