@@ -274,38 +274,21 @@ VALUES ('{username}', '{password}', 1, 1)";
             return false;
         }
     }
-    public static async Task<List<(int JobId, string LastUpdatedRaw)>>
-        LoadJobUpdateInfoAsync()
+    public static async Task<List<(int JobId, string LastUpdatedRaw)>> LoadJobUpdateInfoAsync()
     {
         var sql = $"SELECT Id, LastUpdated FROM {TableJobs}";
-        var json = JsonConvert.SerializeObject(new[] { sql });
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var response = await httpClient.PostAsync(
-            DefaultEndPoint + "/db/query",
-            content
-        );
-
-        var body = await response.Content.ReadAsStringAsync();
-        var result = JsonConvert.DeserializeObject<QueryResponse>(body);
+        // ✅ Use QueryAsync instead of raw PostAsync
+        // This goes through ParseQueryResponse which normalizes timestamp format
+        var result = await QueryAsync(sql);
 
         var list = new List<(int, string)>();
 
-        if (result?.results?.Count > 0)
+        foreach (var row in result.Records)
         {
-            var r = result.results[0];
-
-            if (r.values != null)
-            {
-                foreach (var row in r.values)
-                {
-                    int id = Convert.ToInt32(row[0]);
-
-                    string raw = row[1]?.ToString(); // ✅ RAW STRING (no parsing)
-
-                    list.Add((id, raw));
-                }
-            }
+            int id = Convert.ToInt32(row["Id"]);
+            string raw = row["LastUpdated"]?.ToString();
+            list.Add((id, raw));
         }
 
         return list;
@@ -533,16 +516,32 @@ WHERE Id = {jobId};
         }
     }
 
+    //public static async Task<string> GetJobsLastUpdatedAsync()
+    //{
+    //    var result = await QueryAsync(
+    //        // ✅ Use %f to keep fractional seconds — matches what UpdatePalletPackingAsync writes
+    //        $"SELECT MAX(strftime('%Y-%m-%dT%H:%M:%fZ', LastUpdated)) AS LastUpdated FROM {TableJobs}"
+    //    );
+
+    //    if (result.Records.Count == 0)
+    //        return null;
+    //    Debug.WriteLine(result.Records[0]["LastUpdated"]?.ToString());
+    //    return result.Records[0]["LastUpdated"]?.ToString();
+    //}
     public static async Task<string> GetJobsLastUpdatedAsync()
     {
         var result = await QueryAsync(
-            $"SELECT MAX(strftime('%Y-%m-%d %H:%M:%S', LastUpdated)) AS LastUpdated FROM {TableJobs}"
+            $"SELECT MAX(LastUpdated) || '' AS LastUpdated FROM {TableJobs}"
         );
 
         if (result.Records.Count == 0)
             return null;
 
-        return result.Records[0]["LastUpdated"]?.ToString();
+        var raw = result.Records[0]["LastUpdated"]?.ToString();
+
+        Debug.WriteLine($"[DB LASTUPDATED FETCH] Raw={raw} | Thread={Environment.CurrentManagedThreadId}");
+
+        return raw;
     }
 
     public static async Task DeletePbJobAsync(int jobId)
@@ -576,34 +575,16 @@ WHERE Id = {jobId};
 
         await ExecuteAsync(sql);
     }
-    public static async Task SetJobNotReadyAsync(int jobId)
-    {
-        string sql = $@"
-UPDATE PALLET
-SET State = {(int)PalletState.Packed_NotReady}
-WHERE PBJobId = {jobId}
-AND State = {(int)PalletState.Ready}
-AND PackedAt IS NOT NULL;
 
-UPDATE PBJOB
-SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
-WHERE Id = {jobId};
-";
-
-        await ExecuteAsync(sql);
-    }
     public static async Task UndoPackedPalletAsync(List<int> palletIds, int jobId)
     {
         if (palletIds == null || palletIds.Count == 0)
         {
-            Debug.WriteLine("UndoPackedPalletAsync: palletIds is empty.");
+         
             return;
         }
 
         var ids = string.Join(",", palletIds);
-
-        Debug.WriteLine($"UndoPackedPalletAsync: palletIds = {ids}");
-        Debug.WriteLine($"UndoPackedPalletAsync: jobId = {jobId}");
 
         string sql = $@"
 UPDATE {TablePallets}
@@ -650,34 +631,50 @@ LIMIT 1;
 
         return result.Records[0]["LastUpdated"]?.ToString();
     }
-    public static async Task<int> UpdatePalletPackingAsync(
-    int palletId,
-    int trayCount)
+    public static async Task<int> UpdatePalletPackingAsync(int palletId, int trayCount)
     {
-        string sql = $@"
-    UPDATE {TablePallets}
-    SET
-        TrayCount = {trayCount},
-        PackedAt = strftime('%Y-%m-%dT%H:%M:%fZ','now'),
-        State = {(int)PalletState.Ready}
-    WHERE Id = {palletId}
-      AND PackedAt IS NULL
-      AND State = {(int)PalletState.NotReady};
+        // Generate timestamp in C# — guaranteed unique per call
+        var ts = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
 
-    UPDATE {TableJobs}
-    SET LastUpdated = strftime('%Y-%m-%dT%H:%M:%fZ','now')
-    WHERE Id = (
-        SELECT PBJobId
-        FROM {TablePallets}
-        WHERE Id = {palletId}
-    );
-    ";
+        string sql = $@"
+UPDATE {TablePallets}
+SET
+    TrayCount = {trayCount},
+    PackedAt = '{ts}',
+    State = {(int)PalletState.Ready}
+WHERE Id = {palletId}
+  AND PackedAt IS NULL
+  AND State = {(int)PalletState.NotReady};
+
+UPDATE {TableJobs}
+SET LastUpdated = '{ts}'
+WHERE Id = (
+    SELECT PBJobId FROM {TablePallets} WHERE Id = {palletId}
+);
+";
 
         var result = await ExecuteAsync(sql);
-
         return result.RowsAffected;
     }
 
+    public static async Task<string> GetJobLastUpdatedByIdAsync(int jobId)
+    {
+        var result = await QueryAsync($@"
+        SELECT LastUpdated
+        FROM PBJOB
+        WHERE Id = {jobId}
+        LIMIT 1;
+    ");
+
+        if (result.Records.Count == 0)
+            return null;
+
+        var raw = result.Records[0]["LastUpdated"]?.ToString();
+
+        Debug.WriteLine($"[DB DIRECT FETCH] Job={jobId} | TS='{raw}'");
+
+        return raw;
+    }
     public static async Task DeletePalletsAsync(IEnumerable<int> palletIds)
     {
         if (palletIds == null || !palletIds.Any())
@@ -1192,75 +1189,7 @@ LIMIT 1
 
         return Convert.ToInt32(inserted.Records[0]["Id"]);
     }
-    //    public static async Task<int> GetOrCreateWorkingPalletAsync(int jobId)
-    //    {
-    //        Debug.WriteLine("[PALLET] Request pallet for Job " + jobId);
-
-    //        // 1️⃣ Try existing pallet
-    //        var existing = await QueryAsync($@"
-    //SELECT Id
-    //FROM {TablePallets}
-    //WHERE PBJobId = {jobId}
-    //AND PackedAt IS NULL
-    //ORDER BY Id DESC
-    //LIMIT 1
-    //");
-
-    //        if (existing.Records.Count > 0)
-    //        {
-    //            int palletId = Convert.ToInt32(existing.Records[0]["Id"]);
-    //            Debug.WriteLine($"[PALLET] Using existing pallet {palletId}");
-    //            return palletId;
-    //        }
-
-    //        Debug.WriteLine("[PALLET] No active pallet found. Creating new pallet...");
-
-    //        // 2️⃣ Insert pallet
-    //        await ExecuteAsync($@"
-    //INSERT INTO {TablePallets}
-    //(PBJobId, PalletNumber, State, TrayCount)
-    //VALUES
-    //(
-    //    {jobId},
-    //    0,
-    //    {(int)PalletState.NotReady},
-    //    0
-    //);
-    //");
-
-    //        // 3️⃣ Fetch the pallet we just inserted
-    //        var inserted = await QueryAsync($@"
-    //SELECT Id
-    //FROM {TablePallets}
-    //WHERE PBJobId = {jobId}
-    //AND PackedAt IS NULL
-    //ORDER BY Id DESC
-    //LIMIT 1
-    //");
-
-    //        if (inserted.Records.Count == 0)
-    //            throw new Exception("Failed to retrieve inserted pallet.");
-
-    //        int palletIdNew = Convert.ToInt32(inserted.Records[0]["Id"]);
-
-    //        Debug.WriteLine($"[PALLET] Inserted pallet {palletIdNew}");
-
-    //        // 4️⃣ Set PalletNumber = Id
-    //        await ExecuteAsync($@"
-    //UPDATE {TablePallets}
-    //SET PalletNumber = {palletIdNew}
-    //WHERE Id = {palletIdNew};
-    //");
-
-    //        // 5️⃣ Update job timestamp
-    //        await ExecuteAsync($@"
-    //UPDATE {TableJobs}
-    //SET LastUpdated = datetime('now','localtime')
-    //WHERE Id = {jobId};
-    //");
-
-    //        return palletIdNew;
-    //    }
+   
     public static async Task<PbJobModel> LoadSingleJobGraphAsync(int jobId)
     {
         var result = await QueryAsync($@"
@@ -1360,7 +1289,13 @@ LIMIT 1
 
     private static List<Dictionary<string, object>> ParseQueryResponse(string body)
     {
-        var result = JsonConvert.DeserializeObject<QueryResponse>(body);
+        
+        //var result = JsonConvert.DeserializeObject<QueryResponse>(body);
+        //suggested by claude
+        var result = JsonConvert.DeserializeObject<QueryResponse>(body, new JsonSerializerSettings
+        {
+            DateParseHandling = DateParseHandling.None
+        });
         var rows = new List<Dictionary<string, object>>();
 
         if (result?.results?.Count > 0)
@@ -1374,7 +1309,19 @@ LIMIT 1
                     var dict = new Dictionary<string, object>();
 
                     for (int c = 0; c < r.columns.Length; c++)
-                        dict[r.columns[c]] = r.values[i][c];
+                    {
+                        var val = r.values[i][c];
+
+                        // ✅ Prevent Newtonsoft from auto-converting datetime strings
+                        // JToken auto-parses ISO dates into DateTime, then ToString()
+                        // reformats them in local culture — losing fractional seconds.
+                        if (val is Newtonsoft.Json.Linq.JValue jv)
+                            dict[r.columns[c]] = jv.Type == Newtonsoft.Json.Linq.JTokenType.Date
+                                ? jv.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")  // preserve exact format
+                                : jv.Value;
+                        else
+                            dict[r.columns[c]] = val;
+                    }
 
                     rows.Add(dict);
                 }
@@ -1383,7 +1330,7 @@ LIMIT 1
 
         return rows;
     }
- 
+
     public static async Task<List<WorkOrder>> LoadWorkOrdersAsync(int palletId)
     {
         var result = await QueryAsync($@"

@@ -140,7 +140,30 @@ namespace WindowsFormsApp1.Packed_And_Ready
             packedFlowRow.Controls.Add(row);
         }
 
+        public int GetItemIndex(int jobId)
+        {
+            var controls = packedFlowRow.Controls.OfType<PackedRowControl>().ToList();
+            for (int i = 0; i < controls.Count; i++)
+            {
+                if (controls[i].BoundJob?.JobId == jobId)
+                    return i;
+            }
+            return -1;
+        }
 
+        public void InsertItem(PbJobModel job, int index)
+        {
+            var row = new PackedRowControl();
+            row.Bind(job);
+
+            row.ViewDialogClosed += (_, __) =>
+            {
+                PackedDataChanged?.Invoke(this, job);
+            };
+
+            packedFlowRow.Controls.Add(row);
+            packedFlowRow.Controls.SetChildIndex(row, index);
+        }
 
     }
 }

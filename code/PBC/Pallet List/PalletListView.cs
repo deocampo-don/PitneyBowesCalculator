@@ -87,10 +87,7 @@ namespace WindowsFormsApp1
                     Utils.WriteExceptionError(ex);
                 }
             };
-            row.DeleteRequested += async (_, j) =>
-            {
-                DeleteRequested?.Invoke(this, j);
-            };
+     
             row.PalletChanged += (_, j) =>
                 PalletChanged?.Invoke(this, j);
             row.EditRequested += (_, j) =>
@@ -127,7 +124,40 @@ namespace WindowsFormsApp1
         
         }
 
+        public int GetItemIndex(int jobId)
+        {
+            var controls = rowsContainer.Controls.OfType<PalletRowControl>().ToList();
+            for (int i = 0; i < controls.Count; i++)
+            {
+                if (controls[i].BoundJob?.JobId == jobId)
+                    return i;
+            }
+            return -1;
+        }
 
+        public void InsertItem(PbJobModel job, int index)
+        {
+            var row = new PalletRowControl();
+            row.Bind(job);
+
+            // ✅ Wire all events — same as AddItem
+            row.DeleteRequested += async (_, j) =>
+            {
+                try { DeleteRequested?.Invoke(this, j); }
+                catch (Exception ex)
+                {
+                    Utils.WriteUnexpectedError("DeleteRequested event failed");
+                    Utils.WriteExceptionError(ex);
+                }
+            };
+            row.PalletChanged += (_, j) => PalletChanged?.Invoke(this, j);
+            row.EditRequested += (_, j) => EditRequested?.Invoke(this, j);
+            row.SoftDeleteRequested += (_, j) => SoftDeleteRequested?.Invoke(this, j);
+            row.Dock = DockStyle.Top;
+
+            rowsContainer.Controls.Add(row);
+            rowsContainer.Controls.SetChildIndex(row, index); // ✅ restore original position
+        }
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);

@@ -126,6 +126,28 @@ namespace WindowsFormsApp1.Picked_Up
             }
         }
 
+        public void SortByShippedDateDescending()
+        {
+            // Get all rows with their bound job's shipped date
+            var rows = pickflowRows.Controls
+                .OfType<PickedUpRowControl>()
+                .OrderByDescending(r => r.BoundJob?.ShippedDate)
+                .ToList();
+
+            if (!rows.Any())
+                return;
+
+            pickflowRows.SuspendLayout();
+
+            // Reorder controls in the FlowLayoutPanel
+            for (int i = 0; i < rows.Count; i++)
+            {
+                pickflowRows.Controls.SetChildIndex(rows[i], i);
+            }
+
+            pickflowRows.ResumeLayout();
+        }
+
         public void RemoveItemsByJobId(int jobId)
         {
             if (!_rowsByJobId.TryGetValue(jobId, out var rows))

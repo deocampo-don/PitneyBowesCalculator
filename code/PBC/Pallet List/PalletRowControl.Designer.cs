@@ -180,7 +180,7 @@
             btnAddPallet.TabIndex = 0;
             btnAddPallet.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             btnAddPallet.Values.Text = "New Pallet";
-            btnAddPallet.Click += btnAddPallet_Click;
+            btnAddPallet.Click += btnAddPallet_Click_1;
             // 
             // btnPackPallet
             // 
@@ -225,7 +225,7 @@
             btnView.TabIndex = 2;
             btnView.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             btnView.Values.Text = "View";
-            btnView.Click += kryptonButton3_Click;
+            btnView.Click += btnView_Click_1;
             // 
             // leftPanel
             // 
@@ -275,7 +275,6 @@
             lblAxRef.StateCommon.ShortText.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             lblAxRef.TabIndex = 3;
             lblAxRef.Values.Text = "23412";
-          
             // 
             // roundedPanel1
             // 
