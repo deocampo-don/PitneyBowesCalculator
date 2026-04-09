@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1.Packed_And_Ready.View_Button
+﻿namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
 {
     partial class RemovePallets
     {

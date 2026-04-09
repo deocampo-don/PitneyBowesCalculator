@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using WindowsFormsApp1.Picked_Up;
+using PitneyBowesCalculator.Picked_Up;
 
-namespace WindowsFormsApp1.Packed_And_Ready
+namespace PitneyBowesCalculator.Packed_And_Ready
 {
     public partial class PackedListView : UserControl
     {

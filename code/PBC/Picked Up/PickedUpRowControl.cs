@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using WindowsFormsApp1.Packed_And_Ready.View_Button;
+using PitneyBowesCalculator.Packed_And_Ready.View_Button;
 
-namespace WindowsFormsApp1.Picked_Up
+namespace PitneyBowesCalculator.Picked_Up
 {
     public partial class PickedUpRowControl : UserControl
     {

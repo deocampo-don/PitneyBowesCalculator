@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using PitneyBowesCalculator;
 
-namespace WindowsFormsApp1
+namespace PitneyBowesCalculator
 {
     public static class Program
     {

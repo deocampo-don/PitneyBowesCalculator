@@ -1,4 +1,5 @@
 ﻿using Jds2;
+using PitneyBowesCalculator;
 using System;
 using System.Diagnostics;
 using System.Drawing.Printing;
@@ -6,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Windows;
-using WindowsFormsApp1;
 
 public static class PrintHelper
 {
@@ -33,7 +33,7 @@ public static class PrintHelper
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Network printer failed: " + ex.Message);
+                Utils.WriteExceptionError(ex);
             }
         }
 
@@ -56,7 +56,7 @@ public static class PrintHelper
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("Default printer failed: " + ex.Message);
+                    Utils.WriteExceptionError (ex);
                 }
             }
         }

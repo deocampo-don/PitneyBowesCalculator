@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1.Dialogs
+﻿namespace PitneyBowesCalculator.Dialogs
 {
     partial class LoginDialog
     {

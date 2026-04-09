@@ -9,12 +9,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WindowsFormsApp1.Dialogs;
+using PitneyBowesCalculator.Dialogs;
 using System.Drawing;
-using WindowsFormsApp1.Packed_And_Ready.View_Button;
+using PitneyBowesCalculator.Packed_And_Ready.View_Button;
+using PitneyBowesCalculator;
 
 
-namespace WindowsFormsApp1
+namespace PitneyBowesCalculator
 {
     public partial class PBCMain : Form
     {// -----------------------------
@@ -216,7 +217,7 @@ namespace WindowsFormsApp1
                     lvBuild.BeginUpdate();
                     packedListView2.BeginUpdate();
                     pickedUpListView.BeginUpdate();
-                    Debug.WriteLine($"[POLL TICK] Start | isPolling={_isPolling} | Time={DateTime.Now:HH:mm:ss.fff}");
+           
                     await PollForUpdatesAsync();
                 }
                 catch (Exception ex)
@@ -258,11 +259,11 @@ namespace WindowsFormsApp1
             var dbTimestamp = await RqliteClient.GetJobsLastUpdatedAsync();
             var dbCount = await RqliteClient.GetJobsCountAsync();
 
-            Debug.WriteLine($"[POLL GUARD RAW] dbTs='{dbTimestamp}' | localTs='{_lastJobsTimestamp}'");
+            
 
             if (_lastJobsTimestamp == dbTimestamp && dbCount == _lastJobsCount)
             {
-                Debug.WriteLine("[POLL SKIP] No changes detected");
+             
                 return;
             }
             _lastJobsTimestamp = dbTimestamp;
@@ -309,21 +310,21 @@ namespace WindowsFormsApp1
                     if (!_jobsById.TryGetValue(jobId, out var local))
                         continue;
 
-                    Debug.WriteLine($"[POLL CHECK JOB RAW] Job={jobId} | local='{local.LastUpdatedRaw}' | db='{lastUpdatedRaw}'");
+              
 
                     if (local.LastUpdatedRaw != lastUpdatedRaw)
                     {
-                        Debug.WriteLine($"[POLL CHANGE DETECTED] Job={jobId}");
+                 
 
                         if (ShouldIgnoreOwnUpdate(jobId, lastUpdatedRaw))
                         {
-                            Debug.WriteLine($"[POLL IGNORE OWN] Job={jobId}");
+                    
                             _lastProcessedUpdates[jobId] = lastUpdatedRaw;
                             local.LastUpdatedRaw = lastUpdatedRaw;
                             continue;
                         }
 
-                        Debug.WriteLine($"[POLL REFRESH TRIGGER] Job={jobId}");
+                    
                         await RefreshSingleJobAsync(jobId);
 
                         _lastProcessedUpdates[jobId] = lastUpdatedRaw;
@@ -457,28 +458,31 @@ namespace WindowsFormsApp1
 
             lvBuild.EditRequested += async (_, job) =>
             {
-
                 using (var dialog = new CreatePBJobDialog(job))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
                         if (!int.TryParse(dialog.JobNumber, out int jobNumber) || jobNumber <= 0)
-
                         {
-                            MessageDialogBox.ShowDialog("", "Job number must contain digits", MessageBoxButtons.OK, MessageType.Info);
+                            MessageDialogBox.ShowDialog(
+                                "",
+                                "Job number must contain digits",
+                                MessageBoxButtons.OK,
+                                MessageType.Info
+                            );
                             return;
                         }
 
-                        var rows = await RqliteClient.UpdatePbJobAsync(
+                        var (rows, newLastUpdated) = await RqliteClient.UpdatePbJobAsync(
       job.JobId,
       dialog.JobName,
       jobNumber,
       dialog.IsTemp,
-      job.LastUpdatedRaw);   // ✅ EXACT DB VALUE
-                        
+      job.LastUpdatedRaw
+  );
+
                         if (rows == 0)
                         {
-
                             MessageDialogBox.ShowDialog(
                                 "Update Conflict",
                                 "This job was modified by another workstation.\nPlease reopen and try again.",
@@ -490,7 +494,17 @@ namespace WindowsFormsApp1
                             return;
                         }
 
-                        await RefreshSingleJobAsync(job.JobId);
+                        job.JobName = dialog.JobName;
+                        job.JobNumber = jobNumber;
+                        job.IsTemp = dialog.IsTemp;
+                        job.LastUpdatedRaw = newLastUpdated;
+                        job.LastUpdated = RqliteClient.ParseUtc(newLastUpdated);
+
+                  
+                        RefreshSingleJobUI(job);
+
+                        // Optional background sync (no await)
+                        _ = Task.Run(() => RefreshSingleJobAsync(job.JobId));
                     }
                 }
             };
@@ -569,12 +583,14 @@ namespace WindowsFormsApp1
         // -----------------------------
         private void RefreshSingleJobUI(PbJobModel job)
         {
-            Debug.WriteLine($"[UI DATA] Job={job.JobId} | PalletStates={string.Join(",", job.Pallets.Select(p => p.State))}");
-            // 1️⃣ Capture indexes BEFORE removing
+          
             int buildIndex = lvBuild?.GetItemIndex(job.JobId) ?? -1;
+            
             int packedIndex = packedListView2?.GetItemIndex(job.JobId) ?? -1;
+      
 
-            RemoveJobFromUI(job.JobId);
+            // ❗ IMPORTANT: Remove only from Build + Packed (NOT Shipment)
+            RemoveJobFromUI_ExceptShipment(job.JobId);
 
             // 2️⃣ Build view — restore original position
             if (job.IsActive)
@@ -591,6 +607,8 @@ namespace WindowsFormsApp1
                             p.State == PalletState.Packed_NotReady)
                 .ToList();
 
+
+            // THEN ADD BACK
             if (job.IsActive && packedPallets.Any())
             {
                 var packedJob = new PbJobModel
@@ -610,28 +628,39 @@ namespace WindowsFormsApp1
                     packedListView2?.AddItem(packedJob);
             }
 
-            // 4️⃣ Shipment view
+            // 4️⃣ Shipment view (APPEND ONLY, NO DELETE)
             var shipmentRows = job.Pallets
                 .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
                 .GroupBy(p => new { p.ShippedAt.Value, p.JobNameSnapshot })
-                .Select(group => new PbJobModel
-                {
-                    JobId = job.JobId,
-                    JobName = group.Key.JobNameSnapshot,
-                    JobNumber = job.JobNumber,
-                    IsTemp = job.IsTemp,
-                    LastUpdated = job.LastUpdated,
-                    ShippedDate = group.Key.Value,
-                    Pallets = group.ToList()
-                })
-                .ToList();
+              .Select(group =>
+              {
+                  var pallets = group.ToList();
+
+                  return new PbJobModel
+                  {
+                      JobId = job.JobId,
+                      JobName = group.Key.JobNameSnapshot,
+                      JobNumber = job.JobNumber,
+                      IsTemp = job.IsTemp,
+                      LastUpdated = job.LastUpdated,
+                      ShippedDate = group.Key.Value,
+                      Pallets = pallets
+                  };
+              });
 
             foreach (var row in shipmentRows)
-                pickedUpListView?.AddItem(row);
+            {
+                    pickedUpListView?.AddItem(row);
+            }
 
             pickedUpListView?.SortByShippedDateDescending();
-        
-            Debug.WriteLine($"[UI REFRESH] Job {job.JobId} | buildIndex={buildIndex} packedIndex={packedIndex}");
+        }
+        private void RemoveJobFromUI_ExceptShipment(int jobId)
+        {
+            lvBuild?.RemoveItem(jobId);
+            packedListView2?.RemoveItem(jobId);
+
+      
         }
 
         private void RemoveJobFromUI(int jobId)
@@ -693,52 +722,86 @@ namespace WindowsFormsApp1
             pickedUpListView?.SetItems(_shipmentRows);
         }
 
+        //public async Task RefreshSingleJobAsync(int jobId)
+        //{
+
+
+        //    var updated = await RqliteClient.LoadSingleJobGraphAsync(jobId);
+
+
+        //    if (updated == null)
+        //        return;
+
+        //    if (!_jobsById.TryGetValue(jobId, out var existing))
+        //        return;
+
+        //    // Update model properties
+        //    if (updated.LastUpdatedRaw != existing.LastUpdatedRaw)
+        //    {
+        //        existing.JobName = updated.JobName;
+        //        existing.JobNumber = updated.JobNumber;
+        //        existing.IsTemp = updated.IsTemp;
+        //    }
+
+        //    existing.LastUpdated = updated.LastUpdated;
+        //    existing.LastUpdatedRaw = updated.LastUpdatedRaw;
+
+        //    foreach (var updatedPallet in updated.Pallets)
+        //    {
+        //        var existingPallet = existing.Pallets
+        //            .FirstOrDefault(p => p.PalletId == updatedPallet.PalletId);
+
+        //        if (existingPallet != null)
+        //            updatedPallet.JobNameSnapshot ??= existingPallet.JobNameSnapshot;
+        //    }
+
+        //    existing.Pallets = updated.Pallets;
+        //    existing.ShippedDate = updated.Pallets
+        //        .Where(p => p.State == PalletState.Shipped)
+        //        .Select(p => p.ShippedAt)
+        //        .FirstOrDefault();
+
+        //    _jobsById[jobId] = existing;
+
+
+        //    RefreshSingleJobUI(existing);
+        //}
         public async Task RefreshSingleJobAsync(int jobId)
         {
-            Debug.WriteLine($"[REFRESH START] Job={jobId}");
-
             var updated = await RqliteClient.LoadSingleJobGraphAsync(jobId);
 
-            Debug.WriteLine($"[REFRESH DB RESULT] Job={jobId} | Pallets={updated?.Pallets?.Count}");
             if (updated == null)
                 return;
 
             if (!_jobsById.TryGetValue(jobId, out var existing))
                 return;
-            Debug.WriteLine($"[REFRESH COMPARE] Job={jobId} | oldTS={existing.LastUpdatedRaw} | newTS={updated.LastUpdatedRaw}");
-            // Update model properties
-            if (updated.LastUpdatedRaw != existing.LastUpdatedRaw)
-            {
-                existing.JobName = updated.JobName;
-                existing.JobNumber = updated.JobNumber;
-                existing.IsTemp = updated.IsTemp;
-            }
+
+            // Always update base fields
+            existing.JobNumber = updated.JobNumber;
+            existing.IsTemp = updated.IsTemp;
 
             existing.LastUpdated = updated.LastUpdated;
             existing.LastUpdatedRaw = updated.LastUpdatedRaw;
 
-            foreach (var updatedPallet in updated.Pallets)
-            {
-                var existingPallet = existing.Pallets
-                    .FirstOrDefault(p => p.PalletId == updatedPallet.PalletId);
-
-                if (existingPallet != null)
-                    updatedPallet.JobNameSnapshot ??= existingPallet.JobNameSnapshot;
-            }
-
+            // Replace pallets completely (source of truth = DB)
             existing.Pallets = updated.Pallets;
-            existing.ShippedDate = updated.Pallets
+
+            // Compute shipped date
+            existing.ShippedDate = existing.Pallets
                 .Where(p => p.State == PalletState.Shipped)
                 .Select(p => p.ShippedAt)
                 .FirstOrDefault();
 
-            _jobsById[jobId] = existing;
+            // 🔥 CRITICAL: Resolve JobName from snapshot if shipped
+            var snapshotName = existing.Pallets
+                .Where(p => p.State == PalletState.Shipped)
+                .Select(p => p.JobNameSnapshot)
+                .FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
 
-            Debug.WriteLine($"Before: {existing.Pallets.Count}");
-            Debug.WriteLine($"After : {updated.Pallets.Count}");
+            existing.JobName = updated.JobName;
+
             RefreshSingleJobUI(existing);
         }
-
         public void MarkPendingUpdate(int jobId, string timestamp)
         {
             if (string.IsNullOrEmpty(timestamp))
@@ -1012,83 +1075,7 @@ namespace WindowsFormsApp1
             Utils.GenerateReport(jobs, dtPickUpFrom, dtPickUpTo);
         }
 
-        //private async void btnShipPallets_Click_1(object sender, EventArgs e)
-        //{
-        //    var selectedJobs = packedListView2.GetReadyJobs().ToList();
-
-        //    if (!selectedJobs.Any())
-        //    {
-        //        MessageDialogBox.ShowDialog("", "No jobs selected.", MessageBoxButtons.OK, MessageType.Info);
-        //        return;
-        //    }
-
-        //    var jobIds = selectedJobs.Select(j => j.JobId).ToArray();
-
-        //    using (var dlg = new ShipPalletsConfirmationDialog())
-        //    {
-        //        if (dlg.ShowDialog(this) != DialogResult.OK)
-        //            return;
-        //    }
-
-        //    try
-        //    {
-        //        //Utils.showStatusAndSpinner(lbPrintShip, pbPrintShip, $"Shipping {jobIds.Length} pallets...");
-        //        lbPrintShip.Visible = true;
-        //        lbPrintShip.Text = $"Preparing...";
-        //        progressBarShip.Visible = true;
-        //        progressBarShip.Style = ProgressBarStyle.Marquee; // 🔥 unknown duration
-
-        //        Cursor.Current = Cursors.WaitCursor;
-        //        this.Enabled = false;
-
-        //        // 🔥 DB update
-        //        await RqliteClient.ShipPalletsAsync(jobIds);
-
-        //        var now = DateTime.Now;
-        //        foreach (var job in selectedJobs)
-        //        {
-        //            job.ShippedDate = now;
-        //        }
-
-        //        // 🔥 switch to printing state
-        //        this.Invoke(new Action(() =>
-        //        {
-        //            lbPrintShip.Text = "Generating PDF...";
-        //        }));
-
-        //        // 🔥 SINGLE PDF (background thread)
-        //        await Task.Run(() =>
-        //        {
-        //            PrintEngine.Print(e => PrintLayouts.SummaryShip(e, selectedJobs));
-        //        });
-
-        //        // 🔥 Refresh once
-        //        await LoadJobsAsync();
-
-        //        //Utils.hideStatusAndSpinner(lbPrintShip, pbPrintShip, "Pallets shipped successfully");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Utils.WriteUnexpectedError(
-        //            $"Ship pallets | Count={jobIds.Length}, JobIds={string.Join(",", jobIds)}"
-        //        );
-
-        //        //Utils.errorStatusAndSpinner(lbPrintShip, pbPrintShip, "Shipping failed");
-
-        //        ShowDatabaseError(ex);
-        //    }
-        //    finally
-        //    {
-        //        lbPrintShip.Visible = false;
-        //        progressBarShip.Visible=false;
-        //        Cursor.Current = Cursors.Default;
-        //        this.Enabled = true;
-        //        //Utils.hideNow(lbPrintShip, pbPrintShip);
-
-        //        progressBarShip.Style = ProgressBarStyle.Blocks;
-        //        progressBarShip.Value = 0;
-        //    }
-        //}
+     
         private async void btnShipPallets_Click_1(object sender, EventArgs e)
         {
             try

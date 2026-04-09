@@ -109,8 +109,8 @@ public static class PrintLayouts
             e.Graphics.DrawString(job.TotalEnvelopeOfJob.ToString(), textFont, Brushes.Black, colQty, y + 5);
             e.Graphics.DrawString(job.TotalTraysOfJob.ToString(), textFont, Brushes.Black, colTrays, y + 5);
             e.Graphics.DrawString(job.Pallets.Count.ToString(), textFont, Brushes.Black, colPallets, y + 5);
-            e.Graphics.DrawString(job.ShippedDate?.ToString("MM/dd/yyyy hh:mm tt") ?? "--",
-                textFont, Brushes.Black, colShip, y + 5);
+            e.Graphics.DrawString(job.LastPackedTime?.ToString("MM/dd/yyyy hh:mm tt") ?? "--",
+    textFont, Brushes.Black, colShip, y + 5);
 
             y += rowHeight;
             alt = !alt;

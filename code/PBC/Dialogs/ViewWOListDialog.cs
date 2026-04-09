@@ -1,10 +1,11 @@
-﻿using System;
+﻿using PitneyBowesCalculator;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using WindowsFormsApp1.Models;
+using PitneyBowesCalculator.Models;
 
-namespace WindowsFormsApp1
+namespace PitneyBowesCalculator
 {
     public partial class ViewWOListDialog : Form
     {

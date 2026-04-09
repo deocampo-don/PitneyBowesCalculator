@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1.Picked_Up
+﻿namespace PitneyBowesCalculator.Picked_Up
 {
     partial class PickedUpListView
     {

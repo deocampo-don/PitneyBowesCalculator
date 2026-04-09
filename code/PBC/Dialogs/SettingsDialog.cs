@@ -1,4 +1,5 @@
 ﻿using Krypton.Toolkit;
+using PitneyBowesCalculator;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WindowsFormsApp1.Dialogs
+namespace PitneyBowesCalculator.Dialogs
 {
     public partial class SettingsDialog : Form
     {

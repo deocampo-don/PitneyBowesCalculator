@@ -2,8 +2,8 @@
 	<PropertyGroup>
 		<TargetFramework>net9.0-windows</TargetFramework>
 		<OutputType>WinExe</OutputType>
-		<RootNamespace>WindowsFormsApp1</RootNamespace>
-		<AssemblyName>WindowsFormsApp1</AssemblyName>
+		<RootNamespace>PitneyBowesCalculator</RootNamespace>
+		<AssemblyName>PitneyBowesCalculator</AssemblyName>
 		
 
 		<PublishUrl>C:\Users\donjadeo\OneDrive - myidemia\Bureau\</PublishUrl>
@@ -16,6 +16,7 @@
 
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<UseWindowsForms>true</UseWindowsForms>
+		<AssemblyTitle>PitneyBowesCalculator</AssemblyTitle>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="Resources\error.png" />

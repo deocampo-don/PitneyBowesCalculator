@@ -1,5 +1,6 @@
 ﻿using Jds2;
 using Jds2.Interfaces;
+using PitneyBowesCalculator;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,7 +17,7 @@ using System.Windows.Forms;
 
 
 
-namespace WindowsFormsApp1.Packed_And_Ready.View_Button
+namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
 {
     public partial class ViewButtonDialog : Form
     {
@@ -151,6 +152,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
                     ? pallet.PackedAt.Value.ToString("hh:mm tt")
                     : string.Empty;
             }
+            
         }
 
         /* -------------------------------------------------------------
@@ -234,7 +236,7 @@ namespace WindowsFormsApp1.Packed_And_Ready.View_Button
         //                .Where(id => id > 0)
         //                .ToList();
 
-        //            Debug.WriteLine("PalletIds selected: " + string.Join(",", palletIds));
+        //            ("PalletIds selected: " + string.Join(",", palletIds));
 
         //            if (!palletIds.Any())
         //            {

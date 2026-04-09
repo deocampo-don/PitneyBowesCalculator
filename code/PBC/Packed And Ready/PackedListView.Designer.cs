@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1.Packed_And_Ready
+﻿namespace PitneyBowesCalculator.Packed_And_Ready
 {
     partial class PackedListView
     {

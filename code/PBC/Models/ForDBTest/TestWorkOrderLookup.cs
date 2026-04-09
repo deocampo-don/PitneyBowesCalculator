@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace WindowsFormsApp1.Services
+namespace PitneyBowesCalculator.Models.ForDBTest
 {
     public class TestWorkOrderLookup : IWorkOrderLookup
     {

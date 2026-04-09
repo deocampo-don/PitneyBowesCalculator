@@ -22,9 +22,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WindowsFormsApp1.Properties;
+using PitneyBowesCalculator.Properties;
 
-namespace WindowsFormsApp1
+namespace PitneyBowesCalculator
 {
     internal static class Utils
     {
@@ -298,7 +298,7 @@ namespace WindowsFormsApp1
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("Network printer failed: " + ex.Message);
+                   Utils.WriteExceptionError(ex);
                 }
             }
 
@@ -321,19 +321,14 @@ namespace WindowsFormsApp1
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine("Default printer failed: " + ex.Message);
+                        Utils.WriteExceptionError(ex);
                     }
                 }
             }
 
-            /* -------------------------------------------------------------
-               NO PRINTER AVAILABLE
-            ------------------------------------------------------------- */
+      
             MessageDialogBox.ShowDialog("Printing error", "No reachable network printer and no default printer configured.\n" + "Configure printer in settings first!", MessageBoxButtons.OK, MessageType.Error);
-            //throw new Exception(
-            //    "No reachable network printer and no default printer configured.\n\n" +
-            //    "Configure printer in settings first!"
-            //);
+      
         }
 
         private static void PrintPdfToNetworkPrinter(string pdfPath, string ip, int port)

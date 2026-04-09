@@ -1,13 +1,14 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using PitneyBowesCalculator;
 using System;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WindowsFormsApp1.Packed_And_Ready.View_Button;
+using PitneyBowesCalculator.Packed_And_Ready.View_Button;
 
-namespace WindowsFormsApp1.Packed_And_Ready
+namespace PitneyBowesCalculator.Packed_And_Ready
 {
     public partial class PackedRowControl : UserControl
     {

@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1.DIalogs
+﻿namespace PitneyBowesCalculator.DIalogs
 {
     partial class PackPalletDIalog
     {

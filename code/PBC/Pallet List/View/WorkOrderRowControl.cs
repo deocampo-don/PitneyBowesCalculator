@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using WindowsFormsApp1.Models;
+using PitneyBowesCalculator.Models;
 
-namespace WindowsFormsApp1
+namespace PitneyBowesCalculator
 {
     public partial class WorkOrderRowControl : UserControl
     {

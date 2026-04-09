@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details
+﻿namespace PitneyBowesCalculator.Packed_And_Ready.View_Button.Pallets_Details
 {
     partial class PalletDetailsListView
     {

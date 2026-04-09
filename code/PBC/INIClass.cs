@@ -7,9 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WindowsFormsApp1;
 
-namespace WindowsFormsApp1
+namespace PitneyBowesCalculator
 {
     public class INIClass
     {

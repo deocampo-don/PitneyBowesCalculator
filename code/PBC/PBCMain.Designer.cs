@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WindowsFormsApp1
+namespace PitneyBowesCalculator
 {
     partial class PBCMain
     {
@@ -55,10 +55,10 @@ namespace WindowsFormsApp1
             panel1 = new System.Windows.Forms.Panel();
             chkbxSelectAll = new System.Windows.Forms.CheckBox();
             btnShipPallets = new System.Windows.Forms.Button();
-            packedListView2 = new WindowsFormsApp1.Packed_And_Ready.PackedListView();
+            packedListView2 = new PitneyBowesCalculator.Packed_And_Ready.PackedListView();
             pgPicked = new Krypton.Navigator.KryptonPage();
             kryptonPanel2 = new Krypton.Toolkit.KryptonPanel();
-            pickedUpListView = new WindowsFormsApp1.Picked_Up.PickedUpListView();
+            pickedUpListView = new PitneyBowesCalculator.Picked_Up.PickedUpListView();
             kryptonPanel6 = new Krypton.Toolkit.KryptonPanel();
             tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             cbPackedSelectAll = new System.Windows.Forms.CheckBox();

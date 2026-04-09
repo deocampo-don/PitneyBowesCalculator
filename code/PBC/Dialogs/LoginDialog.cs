@@ -10,8 +10,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Security.Cryptography;
 using System.Text;
+using PitneyBowesCalculator;
 
-namespace WindowsFormsApp1.Dialogs
+namespace PitneyBowesCalculator.Dialogs
 {
     public partial class LoginDialog : Form
     {

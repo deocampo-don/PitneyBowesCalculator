@@ -1,9 +1,10 @@
 ﻿
+using PitneyBowesCalculator;
 using System;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace WindowsFormsApp1.DIalogs
+namespace PitneyBowesCalculator.DIalogs
 {
     public partial class PackPalletDIalog : Form
     {

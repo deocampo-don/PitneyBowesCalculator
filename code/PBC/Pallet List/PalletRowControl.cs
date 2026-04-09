@@ -1,4 +1,5 @@
 ﻿using Krypton.Toolkit;
+using PitneyBowesCalculator;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,14 +8,11 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WindowsFormsApp1.Dialogs;
-using WindowsFormsApp1.DIalogs;
-using WindowsFormsApp1.Models;
-using WindowsFormsApp1.Services;
+using PitneyBowesCalculator.Dialogs;
+using PitneyBowesCalculator.DIalogs;
 
 
-
-namespace WindowsFormsApp1
+namespace PitneyBowesCalculator
 {
     public partial class PalletRowControl : UserControl
     {
@@ -331,7 +329,7 @@ namespace WindowsFormsApp1
             int baseEnvelope = pallet?.WorkOrders.Sum(w => w.Quantity) ?? 0;
             int baseScannedWO = pallet?.WorkOrders.Count ?? 0;
 
-            using (var dlg = new AddToPalletDialog(baseEnvelope, baseScannedWO))
+            using (var dlg = new PitneyBowesCalculator.Dialogs.AddToPalletDialog(baseEnvelope, baseScannedWO))
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK)
                     return;

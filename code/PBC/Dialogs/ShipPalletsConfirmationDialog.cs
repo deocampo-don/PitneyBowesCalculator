@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WindowsFormsApp1.Packed_And_Ready.View_Button
+namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
 {
 
     public partial class ShipPalletsConfirmationDialog : Form

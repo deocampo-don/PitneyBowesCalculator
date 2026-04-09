@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WindowsFormsApp1.Packed_And_Ready;
+using PitneyBowesCalculator.Packed_And_Ready;
 
-namespace WindowsFormsApp1.Picked_Up
+namespace PitneyBowesCalculator.Picked_Up
 {
     public partial class PickedUpListView : UserControl
     {
@@ -18,21 +18,12 @@ namespace WindowsFormsApp1.Picked_Up
         public PickedUpListView()
         {
             InitializeComponent();
-        }
+			pickflowRows.Resize += (_, __) => ResizeRowsToHost();
+		}
        
         public event EventHandler<PbJobModel> PalletChanged;
 
-        public void RefreshItem(PbJobModel job)
-        {
-            if (_rowsByJobId.TryGetValue(job.JobId, out var rows))
-            {
-                foreach (var row in rows)
-                {
-                    row.Bind(job);
-                }
-            }
-        }
-        public void BeginUpdate()
+		public void BeginUpdate()
         {
             this.SuspendLayout();
         }
@@ -41,30 +32,32 @@ namespace WindowsFormsApp1.Picked_Up
         {
             this.ResumeLayout();
         }
-        public void AddItem(PbJobModel job)
-        {
-            // 🔥 prevent duplicates
-            if (_rowsByJobId.ContainsKey(job.JobId))
-            {
-                RemoveItemsByJobId(job.JobId);
-            }
+		public void AddItem(PbJobModel job)
+		{
+			if (!_rowsByJobId.TryGetValue(job.JobId, out var list))
+			{
+				list = new List<PickedUpRowControl>();
+				_rowsByJobId[job.JobId] = list;
+			}
 
-            var row = new PickedUpRowControl();
-            row.Bind(job);
+			// 🔥 Prevent duplicates (same shipment)
+			bool exists = list.Any(r =>
+				r.BoundJob?.ShippedDate == job.ShippedDate &&
+				r.BoundJob?.JobName == job.JobName);
 
-            pickflowRows.Controls.Add(row);
+			if (exists)
+				return;
 
-            if (!_rowsByJobId.TryGetValue(job.JobId, out var list))
-            {
-                list = new List<PickedUpRowControl>();
-                _rowsByJobId[job.JobId] = list;
-            }
-            list.Add(row);
+			var row = new PickedUpRowControl();
+			row.Bind(job);
 
-            BeginInvoke(new Action(ResizeRowsToHost));
-        }
+			pickflowRows.Controls.Add(row);
+			list.Add(row);
 
-        public void SetAllSelected(bool isSelected)
+			BeginInvoke(new Action(ResizeRowsToHost));
+		}
+
+		public void SetAllSelected(bool isSelected)
         {
             foreach (var row in pickflowRows.Controls.OfType<PickedUpRowControl>())
             {
@@ -163,5 +156,7 @@ namespace WindowsFormsApp1.Picked_Up
                 .Where(row => row.IsChecked)
                 .Select(row => row.BoundJob);
         }
+
+
     }
 }

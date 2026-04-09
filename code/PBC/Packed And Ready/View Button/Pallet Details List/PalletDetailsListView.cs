@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details
+namespace PitneyBowesCalculator.Packed_And_Ready.View_Button.Pallets_Details
 {
     public partial class PalletDetailsListView : UserControl
     {

@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApp1.Packed_And_Ready.View_Button
+﻿namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
 {
     partial class ViewButtonDialog
     {
@@ -46,7 +46,7 @@
             pnlPalletNum = new System.Windows.Forms.Panel();
             lvPallet = new PalletNumListViewList();
             pnlDetails = new System.Windows.Forms.Panel();
-            lvPalletDetails = new WindowsFormsApp1.Packed_And_Ready.View_Button.Pallets_Details.PalletDetailsListView();
+            lvPalletDetails = new PitneyBowesCalculator.Packed_And_Ready.View_Button.Pallets_Details.PalletDetailsListView();
             groupBox1 = new System.Windows.Forms.GroupBox();
             lbStatus = new Krypton.Toolkit.KryptonLabel();
             pbSpinner = new System.Windows.Forms.PictureBox();

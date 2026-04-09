@@ -9,10 +9,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
-using WindowsFormsApp1.Dialogs;
+using PitneyBowesCalculator.Dialogs;
 using System.Security.Cryptography;
+using PitneyBowesCalculator;
 
-namespace WindowsFormsApp1
+namespace PitneyBowesCalculator
 {
     public partial class SettingsDialogAdmin : Form
     {

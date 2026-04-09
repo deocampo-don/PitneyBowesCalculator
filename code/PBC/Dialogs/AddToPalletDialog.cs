@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WindowsFormsApp1.Properties;
-using WindowsFormsApp1.Services;
+
 using Microsoft.Data.SqlClient;
-namespace WindowsFormsApp1.Dialogs
+using PitneyBowesCalculator;
+namespace PitneyBowesCalculator.Dialogs
 {
     public partial class AddToPalletDialog : Form
     {

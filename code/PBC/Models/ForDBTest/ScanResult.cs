@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WindowsFormsApp1.Models.ForDBTest
+namespace PitneyBowesCalculator.Models.ForDBTest
 {
     public class ScanResult
     {
