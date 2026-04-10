@@ -13,6 +13,7 @@ namespace PitneyBowesCalculator
         public List<WorkOrder> DeletedItems { get; private set; }
         private string jobname;
         private string jobn;
+        private int _jobId; // ✅ added
 
         public ViewWOListDialog()
         {
@@ -20,15 +21,15 @@ namespace PitneyBowesCalculator
             FormHelper.ApplyRoundedCorners(this);
             ShadowHelper.ApplyShadow(this);
             this.KeyPreview = true; this.KeyDown += RoundedModal_KeyDown;
-
         }
 
         private void RoundedModal_KeyDown(object sender, KeyEventArgs e) { if (e.KeyCode == Keys.Escape) { this.Close(); } }
-        public void SetItems(string jobName, string jobNum, IEnumerable<WorkOrder> items)
-        {
 
+        public void SetItems(string jobName, string jobNum, int jobId, IEnumerable<WorkOrder> items) // ✅ jobId added
+        {
             jobname = jobName;
             jobn = jobNum;
+            _jobId = jobId; // ✅ added
             lbPbName.Text = jobname;
             lbPbNum.Text = jobn;
 
@@ -41,22 +42,18 @@ namespace PitneyBowesCalculator
             {
                 var row = new WorkOrderRowControl();
                 row.Bind(_items[i]);
-
                 row.ShowDivider = i < _items.Count - 1;
-
                 woFlowRows.Controls.Add(row);
             }
 
             woFlowRows.ResumeLayout();
         }
 
-
         private void btnCancelWo_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-     
         private async void btnClearWo_Click(object sender, EventArgs e)
         {
             var selectedRows = woFlowRows.Controls
@@ -89,6 +86,22 @@ namespace PitneyBowesCalculator
                 var ids = DeletedItems.Select(w => w.Id).ToList();
                 var palletId = DeletedItems.First().PalletId;
 
+                // ✅ Guard: re-check pallet state from DB before deleting anything
+                var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_jobId);
+                var freshPallet = freshJob?.Pallets.FirstOrDefault(p => p.PalletId == palletId);
+
+                if (freshPallet == null || freshPallet.PackedAt != null)
+                {
+                    MessageDialogBox.ShowDialog(
+                        "Pallet Already Packed",
+                        "This pallet was packed by another workstation. Changes cannot be made.",
+                        MessageBoxButtons.OK,
+                        MessageType.Warning
+                    );
+                    this.Close();
+                    return;
+                }
+
                 // ✅ SINGLE atomic call (prevents double refresh)
                 await RqliteClient.DeleteWorkOrdersAndMaybePalletAsync(ids, palletId);
 
@@ -109,7 +122,7 @@ namespace PitneyBowesCalculator
                 }
 
                 // ✅ Rebind UI
-                SetItems(jobname, jobn, _items);
+                SetItems(jobname, jobn, _jobId, _items);
             }
             catch (Exception ex)
             {

@@ -363,6 +363,19 @@ namespace PitneyBowesCalculator
                     // 4️⃣ Create pallet if needed
                     if (pallet == null)
                     {
+                        // Guard: ensure job still exists before creating a pallet
+                        var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+                        if (freshJob == null)
+                        {
+                            MessageDialogBox.ShowDialog(
+                                "Job Deleted",
+                                "This job has been deleted by another workstation.",
+                                MessageBoxButtons.OK,
+                                MessageType.Warning
+                            );
+                            return;
+                        }
+
                         int palletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
 
                         pallet = new Pallet
@@ -418,11 +431,30 @@ namespace PitneyBowesCalculator
 
             var fresh = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
 
-            var dbPallet = fresh?.Pallets
+            if (fresh == null)
+            {
+                MessageDialogBox.ShowDialog(
+                    "Job Deleted",
+                    "This job has been deleted by another workstation.",
+                    MessageBoxButtons.OK,
+                    MessageType.Warning
+                );
+                return (null, null);
+            }
+
+            var dbPallet = fresh.Pallets
                 .FirstOrDefault(p => p.PalletId == pallet.PalletId);
 
             if (dbPallet == null)
+            {
+                MessageDialogBox.ShowDialog(
+                    "Pallet Deleted",
+                    "This pallet has been deleted by another workstation.",
+                    MessageBoxButtons.OK,
+                    MessageType.Warning
+                );
                 return (null, null);
+            }
 
             if (dbPallet.PackedAt != null)
             {
@@ -440,100 +472,6 @@ namespace PitneyBowesCalculator
 
             return (pallet, fresh);
         }
-
-        //        private async void btnPackPallet_Click(object sender, EventArgs e)
-        //        {
-        //            if (_model == null)
-        //                return;
-
-        //            var activePallet = _model.Pallets
-        //                .FirstOrDefault(p => p.PackedAt == null);
-
-        //            if (activePallet == null)
-        //            {
-        //                MessageDialogBox.ShowDialog("", "No active pallet to pack.", MessageBoxButtons.OK, MessageType.Info);
-        //                return;
-        //            }
-
-        //            if (activePallet.PalletEnvelopeQty == 0 &&
-        //                activePallet.PalletScannedWO == 0)
-        //            {
-        //                MessageDialogBox.ShowDialog("", "Cannot pack an empty pallet.", MessageBoxButtons.OK, MessageType.Info);
-        //                return;
-        //            }
-
-        //            int trayCount;
-
-        //            (activePallet, _) = await EnsurePalletIsOpenAsync(activePallet);
-        //            if (activePallet == null)
-        //                return;
-
-        //            using (var dlg = new PackPalletDIalog())
-        //            {
-        //                if (dlg.ShowDialog(this) != DialogResult.OK)
-        //                    return;
-
-        //                if (dlg.TrayCount <= 0)
-        //                {
-        //                    MessageDialogBox.ShowDialog("", "Tray count must be greater than 0.", MessageBoxButtons.OK, MessageType.Info);
-        //                    return;
-        //                }
-
-        //                trayCount = dlg.TrayCount;
-        //            }
-
-        //            try
-        //            {
-
-        //                int packedPalletId = activePallet.PalletId;
-
-        //                var rows = await RqliteClient.UpdatePalletPackingAsync(
-        //                    activePallet.PalletId,
-        //                    trayCount
-        //                );
-
-
-        //                if (rows == 0)
-        //                {
-        //                    MessageDialogBox.ShowDialog(
-        //                        "Pallet Already Packed",
-        //                        "This pallet was already packed by another workstation.",
-        //                        MessageBoxButtons.OK,
-        //                        MessageType.Info
-        //                    );
-
-        //                    await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
-        //                    return;
-        //                }
-
-        //                var toPrint = MessageDialogBox.ShowDialog(
-        //    "",
-        //    "Print the packed pallet?",
-        //    MessageBoxButtons.YesNo,
-        //    MessageType.Info
-        //);
-
-        //                if (toPrint == DialogResult.Yes)
-        //                {
-        //                    var palletToPrint = _model.Pallets
-        //                        .Where(p => p.PalletId == packedPalletId && p.PackedAt != null)
-        //                        .ToList();
-
-        //                    await Task.Run(() =>
-        //                    {
-        //                        PrintEngine.Print(e =>
-        //                            PrintLayouts.DrawPallets(e, _model, palletToPrint)
-        //                        );
-        //                    });
-        //                }
-        //                await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                Utils.WriteExceptionError(ex);
-        //                MessageDialogBox.ShowDialog("", "Error saving pack data: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
-        //            }
-        //        }
         private async void btnPackPallet_Click(object sender, EventArgs e)
         {
             if (_model == null)
@@ -577,10 +515,8 @@ namespace PitneyBowesCalculator
 
             try
             {
-                int packedPalletId = activePallet.PalletId;
-
                 var rows = await RqliteClient.UpdatePalletPackingAsync(
-                    packedPalletId,
+                    activePallet.PalletId,
                     trayCount
                 );
 
@@ -597,40 +533,18 @@ namespace PitneyBowesCalculator
                     return;
                 }
 
-                // Only the successful workstation reaches here
+                // ✅ Update model state
+                activePallet.TrayCount = trayCount;
+                activePallet.PackedAt = DateTime.Now;
+                activePallet.State = PalletState.Ready;
+
+                // ✅ Get timestamp AFTER save
+                var savedJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+                if (savedJob?.LastUpdatedRaw != null)
+                    PBCMain.Instance.MarkPendingUpdate(_model.JobId, savedJob.LastUpdatedRaw);
+
+             
                 await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
-
-                var toPrint = MessageDialogBox.ShowDialog(
-                    "",
-                    "Print the packed pallet?",
-                    MessageBoxButtons.YesNo,
-                    MessageType.Info
-                );
-
-                if (toPrint == DialogResult.Yes)
-                {
-                    var palletToPrint = _model.Pallets
-                        .Where(p => p.PalletId == packedPalletId && p.PackedAt != null)
-                        .ToList();
-
-                    if (palletToPrint.Count == 0)
-                    {
-                        MessageDialogBox.ShowDialog(
-                            "",
-                            "Packed pallet not found for printing.",
-                            MessageBoxButtons.OK,
-                            MessageType.Info
-                        );
-                        return;
-                    }
-
-                    await Task.Run(() =>
-                    {
-                        PrintEngine.Print(e =>
-                            PrintLayouts.DrawPallets(e, _model, palletToPrint)
-                        );
-                    });
-                }
             }
             catch (Exception ex)
             {
@@ -657,19 +571,17 @@ namespace PitneyBowesCalculator
             if (activePallet == null)
                 return;
 
-            // ⭐ Always reload from DB (concurrency safe)
             var dbItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
             activePallet.WorkOrders = dbItems;
 
             using (var dlg = new ViewWOListDialog())
             {
-                dlg.SetItems(_model.JobName, _model.JobNumber.ToString(), dbItems);
+                dlg.SetItems(_model.JobName, _model.JobNumber.ToString(), _model.JobId, dbItems); // ✅ _model.JobId added
 
                 dlg.ShowDialog(this);
 
                 if (dlg.DeletedItems != null && dlg.DeletedItems.Any())
                 {
-                    // 🔥 MUST CHECK HERE (NOT at the end)
                     (activePallet, _) = await EnsurePalletIsOpenAsync(activePallet);
                     if (activePallet == null)
                         return;
@@ -678,20 +590,25 @@ namespace PitneyBowesCalculator
 
                     if (!updatedItems.Any())
                     {
+                        MessageDialogBox.ShowDialog(
+                            "Pallet Updated",
+                            "All work orders have been removed by another workstation.",
+                            MessageBoxButtons.OK,
+                            MessageType.Warning
+                        );
+
                         var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
                         if (freshJob?.LastUpdatedRaw != null)
                             PBCMain.Instance.MarkPendingUpdate(_model.JobId, freshJob.LastUpdatedRaw);
                         return;
                     }
+
                     activePallet.WorkOrders = updatedItems;
-
                     UpdateButtonsState();
-
                     PalletChanged?.Invoke(this, _model);
                 }
             }
         }
-
 
     }
 

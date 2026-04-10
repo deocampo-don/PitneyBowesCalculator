@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PitneyBowesCalculator.Picked_Up;
@@ -116,7 +117,15 @@ namespace PitneyBowesCalculator.Packed_And_Ready
             }
 
         }
+        public int GetScrollPosition()
+        {
+            return packedFlowRow.AutoScrollPosition.Y * -1;
+        }
 
+        public void SetScrollPosition(int y)
+        {
+            packedFlowRow.AutoScrollPosition = new Point(0, y);
+        }
         public void RemoveItem(int jobId)
         {
             var row = packedFlowRow.Controls

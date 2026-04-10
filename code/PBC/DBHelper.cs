@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using PitneyBowesCalculator;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
@@ -82,6 +83,60 @@ public static class RqliteClient
             .DateTime;
     }
 
+    //public static async Task<RqliteResult> QueryAsync(string sql)
+    //{
+    //    int maxRetries = Program.AppINI._rqClientMaxRetries;
+    //    int delayMs = Program.AppINI._rqClientDelayMs;
+    //    int attempt = 0;
+
+    //    while (true)
+    //    {
+    //        try
+    //        {
+    //            var json = JsonConvert.SerializeObject(new[] { sql });
+    //            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+    //            var response = await httpClient.PostAsync(
+    //                DefaultEndPoint + "/db/query",
+    //                content
+    //            );
+
+    //            response.EnsureSuccessStatusCode();
+
+    //            var body = await response.Content.ReadAsStringAsync();
+
+    //            return new RqliteResult
+    //            {
+    //                Success = true,
+    //                Records = ParseQueryResponse(body)
+    //            };
+    //        }
+    //        catch (HttpRequestException ex)
+    //        {
+
+    //            attempt++;
+
+
+    //            Utils.WriteUnexpectedError(
+    //                $"Rqlite query retry {attempt}/{maxRetries}"
+    //            );
+
+
+    //            if (attempt >= maxRetries)
+    //            {
+    //                Utils.WriteUnexpectedError(
+    //                    $"Rqlite query failed after {attempt} attempts"
+    //                );
+
+    //                Utils.WriteExceptionError(ex);
+    //                throw;
+    //            }
+
+    //            await Task.Delay(delayMs);
+    //        }
+    //    }
+    //}
+
     public static async Task<RqliteResult> QueryAsync(string sql)
     {
         int maxRetries = Program.AppINI._rqClientMaxRetries;
@@ -104,23 +159,38 @@ public static class RqliteClient
 
                 var body = await response.Content.ReadAsStringAsync();
 
+                var parsed = ParseQueryResponse(body);
+                var records = new List<Dictionary<string, object>>();
+
+                if (parsed?.values != null && parsed.columns != null)
+                {
+                    for (int i = 0; i < parsed.values.Length; i++)
+                    {
+                        var dict = new Dictionary<string, object>();
+
+                        for (int c = 0; c < parsed.columns.Length; c++)
+                        {
+                            dict[parsed.columns[c]] = parsed.values[i][c];
+                        }
+
+                        records.Add(dict);
+                    }
+                }
+
                 return new RqliteResult
                 {
                     Success = true,
-                    Records = ParseQueryResponse(body)
+                    Records = records
                 };
             }
             catch (HttpRequestException ex)
             {
-               
                 attempt++;
 
-           
                 Utils.WriteUnexpectedError(
                     $"Rqlite query retry {attempt}/{maxRetries}"
                 );
 
-                
                 if (attempt >= maxRetries)
                 {
                     Utils.WriteUnexpectedError(
@@ -181,7 +251,12 @@ public static class RqliteClient
         if (!response.IsSuccessStatusCode)
             throw new Exception(body);
 
-        var result = JsonConvert.DeserializeObject<QueryResponse>(body);
+        var settings = new JsonSerializerSettings
+        {
+            DateParseHandling = DateParseHandling.None
+        };
+
+        var result = JsonConvert.DeserializeObject<RootObject>(body, settings);
 
         var value = result?.results?
             .FirstOrDefault()?
@@ -189,42 +264,21 @@ public static class RqliteClient
             .FirstOrDefault()?
             .FirstOrDefault();
 
+        if (value is JValue jv)
+            return jv.Value;
+
         return value;
     }
     private static string Escape(string value)
     {
         return value?.Replace("'", "''") ?? "";
     }
-   
+
 
     public static async Task<RqliteResult> SelectAsync(string table, string where = "")
     {
         var sql = $"SELECT * FROM \"{table}\" {where}";
-
-        var json = JsonConvert.SerializeObject(new[] { sql });
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        var response = await httpClient.PostAsync(
-            DefaultEndPoint + "/db/query",
-            content
-        );
-
-        var body = await response.Content.ReadAsStringAsync();
-
-        if (!response.IsSuccessStatusCode)
-        {
-            return new RqliteResult
-            {
-                Success = false,
-                Records = new List<Dictionary<string, object>>()
-            };
-        }
-
-        return new RqliteResult
-        {
-            Success = true,
-            Records = ParseQueryResponse(body)
-        };
+        return await QueryAsync(sql);
     }
 
     public static async Task<bool> ValidateAdminAsync(string username, string password)
@@ -232,9 +286,9 @@ public static class RqliteClient
         try
         {
             var result = await SelectAsync(
-     "users",
-     $"WHERE Username = '{username}' AND PassWord = '{password}' LIMIT 1"
- );
+                "users",
+                $"WHERE Username = '{Escape(username)}' AND PassWord = '{Escape(password)}' LIMIT 1"
+            );
 
             return result?.Records?.Count > 0;
         }
@@ -400,72 +454,22 @@ ON CONFLICT(Id) DO UPDATE SET
         return await ExecuteAsync(sql);
     }
 
-
-
-    //    public static async Task<int> UpdatePbJobAsync(
-    //        int jobId,
-    //        string jobName,
-    //        int jobNumber,
-    //        bool isTemp,
-    //        string expectedLastUpdatedRaw)
-    //    {
-    //        try
-    //        {
-    //            var checkSql = $@"
-    //SELECT Id, JobName, JobNumber, IsTemp, LastUpdated
-    //FROM PBJOB
-    //WHERE Id = {jobId};
-    //";
-
-    //            var checkResult = await QueryAsync(checkSql);
-
-    //            if (checkResult == null || !checkResult.Success || checkResult.Records.Count == 0)
-    //            {
-    //                return 0;
-    //            }
-
-    //            var row = checkResult.Records[0];
-    //            string dbLastUpdated = row["LastUpdated"]?.ToString();
-
-    //            string whereLastUpdated = string.IsNullOrWhiteSpace(expectedLastUpdatedRaw)
-    //     ? "LastUpdated IS NULL"
-    //     : $"LastUpdated = '{Escape(expectedLastUpdatedRaw)}'";
-
-    //            string sql = $@"
-    //UPDATE PBJOB
-    //SET
-    //    JobName = {FormatValue(jobName)},
-    //    JobNumber = {jobNumber},
-    //    IsTemp = {(isTemp ? 1 : 0)},
-    //    LastUpdated = '{UtcNowString()}'
-    //WHERE Id = {jobId}
-    //  AND {whereLastUpdated};
-    //";
-
-    //            var result = await ExecuteAsync(sql);
-
-    //            return result.RowsAffected;
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            Utils.WriteExceptionError(e);
-    //            throw;
-    //        }
-    //    }
     public static async Task<(int rowsAffected, string newLastUpdated)> UpdatePbJobAsync(
-        int jobId,
-        string jobName,
-        int jobNumber,
-        bool isTemp,
-        string expectedLastUpdatedRaw)
+     int jobId,
+     string jobName,
+     int jobNumber,
+     bool isTemp,
+     string expectedLastUpdatedRaw)
     {
         try
         {
             var now = UtcNowString();
 
+            // ✅ Use strftime to normalize both sides of the comparison
+            // This handles any precision stored in DB regardless of origin
             string whereLastUpdated = string.IsNullOrWhiteSpace(expectedLastUpdatedRaw)
                 ? "LastUpdated IS NULL"
-                : $"LastUpdated = '{Escape(expectedLastUpdatedRaw)}'";
+                : $"strftime('%Y-%m-%dT%H:%M:%fZ', LastUpdated) = strftime('%Y-%m-%dT%H:%M:%fZ', '{Escape(expectedLastUpdatedRaw)}')";
 
             string sql = $@"
 UPDATE PBJOB
@@ -479,7 +483,6 @@ WHERE Id = {jobId}
 ";
 
             var result = await ExecuteAsync(sql);
-
             return (result.RowsAffected, result.RowsAffected == 1 ? now : null);
         }
         catch (Exception e)
@@ -489,16 +492,15 @@ WHERE Id = {jobId}
         }
     }
 
+    // ✅ Fix — capture at top like all other methods
     public static async Task DeleteWorkOrdersAndMaybePalletAsync(
-    List<int> workOrderIds,
-    int palletId)
+        List<int> workOrderIds,
+        int palletId)
     {
         var idList = string.Join(",", workOrderIds);
 
-        // ✅ get jobId FIRST (safe)
         var result = await QueryAsync($@"
-SELECT PBJobId
-FROM {TablePallets}
+SELECT PBJobId FROM {TablePallets}
 WHERE Id = {palletId}
 LIMIT 1;
 ");
@@ -507,10 +509,9 @@ LIMIT 1;
             return;
 
         int jobId = Convert.ToInt32(result.Records[0]["PBJobId"]);
+        var now = UtcNowString(); // ✅ capture once
 
-        // ✅ single atomic execution (no CTE)
         string sql = $@"
-
 DELETE FROM {TablePalletWorkOrders}
 WHERE Id IN ({idList});
 
@@ -521,13 +522,12 @@ AND NOT EXISTS (
 );
 
 UPDATE {TableJobs}
-SET LastUpdated = '{UtcNowString()}'
+SET LastUpdated = '{now}'
 WHERE Id = {jobId};
 ";
 
         await ExecuteAsync(sql);
     }
-    
     public static async Task<(bool Success, string Error)> TestSqlConnectionAsync(
   string server,
   string db,
@@ -603,32 +603,14 @@ DELETE FROM {TableJobs}
 WHERE Id = {jobId};
 ");
     }
-    public static async Task SetJobReadyAsync(int jobId)
-    {
-        string sql = $@"
-UPDATE PALLET
-SET State = {(int)PalletState.Ready}
-WHERE PBJobId = {jobId}
-AND State = {(int)PalletState.Packed_NotReady}
-AND PackedAt IS NOT NULL;
-
-UPDATE PBJOB
-SET LastUpdated = '{UtcNowString()}'
-WHERE Id = {jobId};
-";
-
-        await ExecuteAsync(sql);
-    }
 
     public static async Task UndoPackedPalletAsync(List<int> palletIds, int jobId)
     {
         if (palletIds == null || palletIds.Count == 0)
-        {
-         
             return;
-        }
 
         var ids = string.Join(",", palletIds);
+        var now = UtcNowString();
 
         string sql = $@"
 UPDATE {TablePallets}
@@ -638,17 +620,19 @@ WHERE PalletNumber IN ({ids})
 AND State = {(int)PalletState.Ready};
 
 UPDATE {TableJobs}
-SET LastUpdated = '{UtcNowString()}'
+SET LastUpdated = '{now}'
 WHERE Id = {jobId};
 ";
 
-        var result = await ExecuteAsync(sql);
-   }
+        await ExecuteAsync(sql);
+    }
     public static async Task<string> TogglePalletReadyAsync(
     int jobId,
     PalletState fromState,
     PalletState toState)
     {
+        var now = UtcNowString(); // ✅ capture once
+
         string sql = $@"
 UPDATE {TablePallets}
 SET State = {(int)toState}
@@ -656,32 +640,22 @@ WHERE PBJobId = {jobId}
 AND State = {(int)fromState};
 
 UPDATE {TableJobs}
-SET LastUpdated = '{UtcNowString()}'
+SET LastUpdated = '{now}'
 WHERE Id = {jobId};
 ";
 
         await ExecuteAsync(sql);
 
-        // 🔥 fetch EXACT raw timestamp (no parsing)
-        var result = await QueryAsync($@"
-SELECT LastUpdated
-FROM {TableJobs}
-WHERE Id = {jobId}
-LIMIT 1;
-");
-
-        if (result.Records.Count == 0)
-            return null;
-
-        return result.Records[0]["LastUpdated"]?.ToString();
+        // ✅ Return the exact timestamp we wrote — no extra DB round trip needed
+        return now;
     }
 
     public static async Task<int> UpdatePalletPackingAsync(int palletId, int trayCount)
     {
-
         var now = UtcNowString();
-        // 1️⃣ Try to pack the pallet (THIS is the critical operation)
-        string packSql = $@"
+
+        // 1️⃣ Pack pallet — optimistic lock
+        var packResult = await ExecuteAsync($@"
 UPDATE {TablePallets}
 SET
     TrayCount = {trayCount},
@@ -690,26 +664,21 @@ SET
 WHERE Id = {palletId}
   AND PackedAt IS NULL
   AND State = {(int)PalletState.NotReady};
-";
+");
 
-        var packResult = await ExecuteAsync(packSql);
-
-        // ❌ If no rows affected → someone else already packed it
+        // ❌ Already packed by another workstation
         if (packResult.RowsAffected == 0)
             return 0;
 
-        // 2️⃣ Only update job timestamp if pack succeeded
-        string jobSql = $@"
+        // 2️⃣ Update job timestamp — same 'now'
+        await ExecuteAsync($@"
 UPDATE {TableJobs}
 SET LastUpdated = '{now}'
 WHERE Id = (
     SELECT PBJobId FROM {TablePallets} WHERE Id = {palletId}
 );
-";
+");
 
-        await ExecuteAsync(jobSql);
-    
-        // ✅ Success
         return 1;
     }
 
@@ -862,31 +831,31 @@ VALUES
             LastUpdated = ParseUtc(raw)        // ✅ last line no comma needed
         };
     }
-
     public static async Task ReactivatePbJobAsync(int jobId)
     {
         var sql = $@"
-        UPDATE PBJOB
-        SET IsActive = 1,
-            LastUpdated = '{UtcNowString()}'
-        WHERE Id = {jobId};
-    ";
+UPDATE PBJOB
+SET IsActive = 1,
+    LastUpdated = '{UtcNowString()}'
+WHERE Id = {jobId};
+";
 
         await ExecuteAsync(sql);
     }
-
     public static async Task ReactivatePbJobAndRenameAsync(int jobId, string newName)
     {
         var sql = $@"
-    UPDATE PBJOB
-    SET IsActive = 1,
-        LastUpdated = '{UtcNowString()}',
-        JobName = '{newName}'
-    WHERE Id = {jobId};
-    ";
+UPDATE PBJOB
+SET IsActive = 1,
+    LastUpdated = '{UtcNowString()}',
+    JobName = '{Escape(newName)}'
+WHERE Id = {jobId};
+";
         Utils.WriteUnexpectedError($"Renaming JobId={jobId} to '{newName}'");
         await ExecuteAsync(sql);
     }
+
+
     public static async Task ShipPalletsAsync(IEnumerable<int> jobIds)
     {
         if (jobIds == null || !jobIds.Any())
@@ -1196,37 +1165,37 @@ LIMIT 1
 
         return Convert.ToInt32(inserted.Records[0]["Id"]);
     }
-   
+
     public static async Task<PbJobModel> LoadSingleJobGraphAsync(int jobId)
     {
         var result = await QueryAsync($@"
-    SELECT
-        j.Id AS JobId,
-        j.JobName,
-        j.JobNumber,
-        j.IsTemp,
-        j.IsActive,
-        j.LastUpdated,
+SELECT
+    j.Id AS JobId,
+    j.JobName,
+    j.JobNumber,
+    j.IsTemp,
+    j.IsActive,
+    j.LastUpdated,
 
-        p.Id AS PalletId,
-        p.PalletNumber,
-        p.PackedAt,
-        p.ShippedAt,
-        p.State,
-        p.JobNameSnapshot,
-        p.TrayCount,
+    p.Id AS PalletId,
+    p.PalletNumber,
+    p.PackedAt,
+    p.ShippedAt,
+    p.State,
+    p.JobNameSnapshot,
+    p.TrayCount,
 
-        w.Id AS WorkOrderId,
-        w.Barcode,
-        w.WorkOrder,
-        w.Quantity
+    w.Id AS WorkOrderId,
+    w.Barcode,
+    w.WorkOrder,
+    w.Quantity
 
-    FROM PBJOB j
-    LEFT JOIN PALLET p ON p.PBJobId = j.Id
-    LEFT JOIN WORKORDERS w ON w.PalletId = p.Id
-    WHERE j.Id = {jobId}
-    ORDER BY p.PalletNumber
-    ");
+FROM PBJOB j
+LEFT JOIN PALLET p ON p.PBJobId = j.Id
+LEFT JOIN WORKORDERS w ON w.PalletId = p.Id
+WHERE j.Id = {jobId}
+ORDER BY p.PalletNumber
+");
 
         PbJobModel job = null;
         var pallets = new Dictionary<int, Pallet>();
@@ -1235,8 +1204,7 @@ LIMIT 1
         {
             if (job == null)
             {
-                var snapshotName = row["JobNameSnapshot"]?.ToString();
-
+                // ✅ Simple — ParseQueryResponse now normalizes everything
                 var raw = row["LastUpdated"]?.ToString();
 
                 job = new PbJobModel
@@ -1246,10 +1214,8 @@ LIMIT 1
                     JobNumber = Convert.ToInt32(row["JobNumber"]),
                     IsTemp = Convert.ToInt32(row["IsTemp"]) == 1,
                     IsActive = Convert.ToInt32(row["IsActive"]) == 1,
-
-                    LastUpdatedRaw = raw,              
-                    LastUpdated = ParseUtc(raw),      
-
+                    LastUpdatedRaw = raw,
+                    LastUpdated = ParseUtc(raw),
                     Pallets = new List<Pallet>()
                 };
             }
@@ -1295,50 +1261,41 @@ LIMIT 1
         return job;
     }
 
-    private static List<Dictionary<string, object>> ParseQueryResponse(string body)
+    private static QueryResult ParseQueryResponse(string json)
     {
-        
-        //var result = JsonConvert.DeserializeObject<QueryResponse>(body);
-        //suggested by claude
-        var result = JsonConvert.DeserializeObject<QueryResponse>(body, new JsonSerializerSettings
+        var settings = new JsonSerializerSettings
         {
-            DateParseHandling = DateParseHandling.None
-        });
-        var rows = new List<Dictionary<string, object>>();
+            DateParseHandling = DateParseHandling.None // 🔥 CRITICAL
+        };
 
-        if (result?.results?.Count > 0)
+        var root = JsonConvert.DeserializeObject<RootObject>(json, settings);
+
+        if (root?.results == null || root.results.Length == 0)
+            return new QueryResult();
+
+        var r = root.results[0];
+
+        if (r.values == null || r.columns == null)
+            return new QueryResult();
+
+        // 🔥 Normalize ALL values to raw strings (no Date parsing, no formatting)
+        for (int i = 0; i < r.values.Length; i++)
         {
-            var r = result.results[0];
-
-            if (r.values != null)
+            for (int c = 0; c < r.values[i].Length; c++)
             {
-                for (int i = 0; i < r.values.Length; i++)
-                {
-                    var dict = new Dictionary<string, object>();
+                var val = r.values[i][c];
 
-                    for (int c = 0; c < r.columns.Length; c++)
-                    {
-                        var val = r.values[i][c];
-
-                        // ✅ Prevent Newtonsoft from auto-converting datetime strings
-                        // JToken auto-parses ISO dates into DateTime, then ToString()
-                        // reformats them in local culture — losing fractional seconds.
-                        if (val is Newtonsoft.Json.Linq.JValue jv)
-                            dict[r.columns[c]] = jv.Type == Newtonsoft.Json.Linq.JTokenType.Date
-                                ? jv.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")  // preserve exact format
-                                : jv.Value;
-                        else
-                            dict[r.columns[c]] = val;
-                    }
-
-                    rows.Add(dict);
-                }
+                // preserve EXACT string from DB
+                r.values[i][c] = val is JValue jv ? jv.Value : val;
             }
         }
 
-        return rows;
+        return new QueryResult
+        {
+            columns = r.columns,
+            values = r.values
+        };
     }
-
     public static async Task<List<WorkOrder>> LoadWorkOrdersAsync(int palletId)
     {
         var result = await QueryAsync($@"
@@ -1489,12 +1446,20 @@ WHERE Id = (
         public int rows_affected { get; set;     }
     }
 
-    private class QueryResponse
-    {
-        public List<QueryResult> results { get; set; }
-    }
+
 
     private class QueryResult
+    {
+        public string[] columns { get; set; }
+        public object[][] values { get; set; }
+    }
+
+    private class RootObject
+    {
+        public Result[] results { get; set; }
+    }
+
+    private class Result
     {
         public string[] columns { get; set; }
         public object[][] values { get; set; }

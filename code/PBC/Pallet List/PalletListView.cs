@@ -31,8 +31,13 @@ namespace PitneyBowesCalculator
                 .OfType<PalletRowControl>()
                 .FirstOrDefault(r => r.BoundJob?.JobId == jobId);
 
-            if (row != null)
-                rowsContainer.Controls.Remove(row);
+            if (row == null) return;
+
+            // ✅ Suspend layout during remove to prevent scroll reset
+            rowsContainer.SuspendLayout();
+            rowsContainer.Controls.Remove(row);
+            row.Dispose();
+            rowsContainer.ResumeLayout();
         }
         public void AddItem(PbJobModel job)
         {
@@ -104,7 +109,6 @@ namespace PitneyBowesCalculator
             var row = new PalletRowControl();
             row.Bind(job);
 
-            // ✅ Wire all events — same as AddItem
             row.DeleteRequested += async (_, j) =>
             {
                 try { DeleteRequested?.Invoke(this, j); }
@@ -119,8 +123,11 @@ namespace PitneyBowesCalculator
             row.SoftDeleteRequested += (_, j) => SoftDeleteRequested?.Invoke(this, j);
             row.Dock = DockStyle.Top;
 
+            // ✅ Suspend layout during insert to prevent scroll reset
+            rowsContainer.SuspendLayout();
             rowsContainer.Controls.Add(row);
-            rowsContainer.Controls.SetChildIndex(row, index); // ✅ restore original position
+            rowsContainer.Controls.SetChildIndex(row, index);
+            rowsContainer.ResumeLayout();
         }
         protected override void OnResize(EventArgs e)
         {
@@ -138,6 +145,21 @@ namespace PitneyBowesCalculator
             }
         }
 
-      
+        public int GetScrollPosition()
+        {
+            // ✅ KryptonPanel wraps a standard panel internally
+            // AutoScrollPosition.Y is negative, so negate it
+            return scrollHost.AutoScrollPosition.Y * -1;
+        }
+
+        public void SetScrollPosition(int y)
+        {
+            // ✅ Defer until after layout is fully computed
+            BeginInvoke(new Action(() =>
+            {
+                scrollHost.AutoScrollPosition = new Point(0, y);
+                scrollHost.AutoScrollPosition = new Point(0, y); // double set for WinForms quirk
+            }));
+        }
     }
 }

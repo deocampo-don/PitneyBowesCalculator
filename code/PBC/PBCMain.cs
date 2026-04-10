@@ -24,7 +24,7 @@ namespace PitneyBowesCalculator
         private readonly List<PbJobModel> _pbJobs = new();
         private Dictionary<int, PbJobModel> _jobsById = new();
         private List<PbJobModel> _shipmentRows = new();
-        private int _buildScrollY = 0;
+        private bool _isShipping = false;
 
         // -----------------------------
         // Polling
@@ -49,7 +49,7 @@ namespace PitneyBowesCalculator
         // -----------------------------
         private bool _isConnected = false;
         private bool _isReconnecting = false;
-        private HashSet<int> _updatingJobs = new();
+        
         // -----------------------------
         // Constructor
         // -----------------------------
@@ -252,6 +252,7 @@ namespace PitneyBowesCalculator
 
         private async Task PollForUpdatesAsync()
         {
+            if (_isShipping) return;
             if (!await RqliteClient.IsDatabaseAvailableAsync())
                 throw new InvalidOperationException("Database offline");
 
@@ -350,6 +351,9 @@ namespace PitneyBowesCalculator
                     RemoveJobFromUI(local.JobId);
                 }
             }
+
+            if (_lastProcessedUpdates.Count > 500)
+                _lastProcessedUpdates.Clear();
         }
 
 
@@ -379,7 +383,16 @@ namespace PitneyBowesCalculator
                         {
                             BeginInvoke(new Action(async () =>
                             {
-                                await OnDatabaseConnectedAsync();
+                                try
+                                {
+                                    await OnDatabaseConnectedAsync();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Utils.WriteUnexpectedError("OnDatabaseConnectedAsync failed after reconnect");
+                                    Utils.WriteExceptionError(ex);
+                                    ShowDatabaseError(ex);
+                                }
                             }));
                         }
                         else
@@ -420,7 +433,8 @@ namespace PitneyBowesCalculator
 
             lvBuild.DeleteRequested += async (_, job) =>
             {
-                if (job == null) return;
+                if (job == null || _isPolling) return;
+              
 
                 try
                 {
@@ -445,8 +459,12 @@ namespace PitneyBowesCalculator
                 {
                     await RqliteClient.SoftDeletePbJobAsync(job.JobId);
 
-                    job.IsActive = false;
+                    // ✅ Get exact timestamp after write
+                    var fresh = await RqliteClient.LoadSingleJobGraphAsync(job.JobId);
+                    if (fresh?.LastUpdatedRaw != null)
+                        MarkPendingUpdate(job.JobId, fresh.LastUpdatedRaw);
 
+                    job.IsActive = false;
                     RefreshSingleJobUI(job);
                 }
                 catch (Exception ex)
@@ -472,15 +490,17 @@ namespace PitneyBowesCalculator
                             );
                             return;
                         }
-
+                        // 🔥 REFRESH LATEST TIMESTAMP BEFORE UPDATE
+                        var fresh = await RqliteClient.LoadSingleJobGraphAsync(job.JobId);
+                        var expectedLastUpdated = fresh?.LastUpdatedRaw ?? job.LastUpdatedRaw;
                         var (rows, newLastUpdated) = await RqliteClient.UpdatePbJobAsync(
       job.JobId,
       dialog.JobName,
       jobNumber,
       dialog.IsTemp,
-      job.LastUpdatedRaw
+      expectedLastUpdated
   );
-
+                    
                         if (rows == 0)
                         {
                             MessageDialogBox.ShowDialog(
@@ -499,12 +519,10 @@ namespace PitneyBowesCalculator
                         job.IsTemp = dialog.IsTemp;
                         job.LastUpdatedRaw = newLastUpdated;
                         job.LastUpdated = RqliteClient.ParseUtc(newLastUpdated);
-
-                  
+                        MarkPendingUpdate(job.JobId, newLastUpdated);
                         RefreshSingleJobUI(job);
 
-                        // Optional background sync (no await)
-                        _ = Task.Run(() => RefreshSingleJobAsync(job.JobId));
+                     
                     }
                 }
             };
@@ -583,32 +601,40 @@ namespace PitneyBowesCalculator
         // -----------------------------
         private void RefreshSingleJobUI(PbJobModel job)
         {
-          
             int buildIndex = lvBuild?.GetItemIndex(job.JobId) ?? -1;
-            
             int packedIndex = packedListView2?.GetItemIndex(job.JobId) ?? -1;
-      
 
-            // ❗ IMPORTANT: Remove only from Build + Packed (NOT Shipment)
-            RemoveJobFromUI_ExceptShipment(job.JobId);
+            // ✅ Save scroll positions before any changes
+            int buildScroll = lvBuild?.GetScrollPosition() ?? 0;
+            int packedScroll = packedListView2?.GetScrollPosition() ?? 0;
 
-            // 2️⃣ Build view — restore original position
+            // Remove from all 3 views
+            lvBuild?.RemoveItem(job.JobId);
+            packedListView2?.RemoveItem(job.JobId);
+            pickedUpListView?.RemoveItemsByJobId(job.JobId);
+
+            // Build view
             if (job.IsActive)
             {
                 if (buildIndex >= 0)
+                {
                     lvBuild?.InsertItem(job, buildIndex);
+                    lvBuild?.SetScrollPosition(buildScroll);
+                }
                 else
                     lvBuild?.AddItem(job);
             }
 
-            // 3️⃣ Packed view — restore original position
+            // ✅ Restore build scroll position
+            if (buildIndex >= 0)
+                lvBuild?.SetScrollPosition(buildScroll);
+
+            // Packed view
             var packedPallets = job.Pallets
                 .Where(p => p.State == PalletState.Ready ||
                             p.State == PalletState.Packed_NotReady)
                 .ToList();
 
-
-            // THEN ADD BACK
             if (job.IsActive && packedPallets.Any())
             {
                 var packedJob = new PbJobModel
@@ -628,39 +654,34 @@ namespace PitneyBowesCalculator
                     packedListView2?.AddItem(packedJob);
             }
 
-            // 4️⃣ Shipment view (APPEND ONLY, NO DELETE)
+            // ✅ Restore packed scroll position
+            if (packedIndex >= 0)
+                packedListView2?.SetScrollPosition(packedScroll);
+
+            // Shipment view
             var shipmentRows = job.Pallets
                 .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
                 .GroupBy(p => new { p.ShippedAt.Value, p.JobNameSnapshot })
-              .Select(group =>
-              {
-                  var pallets = group.ToList();
-
-                  return new PbJobModel
-                  {
-                      JobId = job.JobId,
-                      JobName = group.Key.JobNameSnapshot,
-                      JobNumber = job.JobNumber,
-                      IsTemp = job.IsTemp,
-                      LastUpdated = job.LastUpdated,
-                      ShippedDate = group.Key.Value,
-                      Pallets = pallets
-                  };
-              });
+                .Select(group => new PbJobModel
+                {
+                    JobId = job.JobId,
+                    JobName = group.Key.JobNameSnapshot,
+                    JobNumber = job.JobNumber,
+                    IsTemp = job.IsTemp,
+                    LastUpdated = job.LastUpdated,
+                    ShippedDate = group.Key.Value,
+                    Pallets = group.ToList()
+                })
+                .ToList();
 
             foreach (var row in shipmentRows)
-            {
-                    pickedUpListView?.AddItem(row);
-            }
+                pickedUpListView?.AddItem(row);
 
             pickedUpListView?.SortByShippedDateDescending();
-        }
-        private void RemoveJobFromUI_ExceptShipment(int jobId)
-        {
-            lvBuild?.RemoveItem(jobId);
-            packedListView2?.RemoveItem(jobId);
 
-      
+            _shipmentRows.RemoveAll(r => r.JobId == job.JobId);
+            _shipmentRows.AddRange(shipmentRows);
+            _shipmentRows = _shipmentRows.OrderByDescending(s => s.ShippedDate).ToList();
         }
 
         private void RemoveJobFromUI(int jobId)
@@ -722,50 +743,7 @@ namespace PitneyBowesCalculator
             pickedUpListView?.SetItems(_shipmentRows);
         }
 
-        //public async Task RefreshSingleJobAsync(int jobId)
-        //{
-
-
-        //    var updated = await RqliteClient.LoadSingleJobGraphAsync(jobId);
-
-
-        //    if (updated == null)
-        //        return;
-
-        //    if (!_jobsById.TryGetValue(jobId, out var existing))
-        //        return;
-
-        //    // Update model properties
-        //    if (updated.LastUpdatedRaw != existing.LastUpdatedRaw)
-        //    {
-        //        existing.JobName = updated.JobName;
-        //        existing.JobNumber = updated.JobNumber;
-        //        existing.IsTemp = updated.IsTemp;
-        //    }
-
-        //    existing.LastUpdated = updated.LastUpdated;
-        //    existing.LastUpdatedRaw = updated.LastUpdatedRaw;
-
-        //    foreach (var updatedPallet in updated.Pallets)
-        //    {
-        //        var existingPallet = existing.Pallets
-        //            .FirstOrDefault(p => p.PalletId == updatedPallet.PalletId);
-
-        //        if (existingPallet != null)
-        //            updatedPallet.JobNameSnapshot ??= existingPallet.JobNameSnapshot;
-        //    }
-
-        //    existing.Pallets = updated.Pallets;
-        //    existing.ShippedDate = updated.Pallets
-        //        .Where(p => p.State == PalletState.Shipped)
-        //        .Select(p => p.ShippedAt)
-        //        .FirstOrDefault();
-
-        //    _jobsById[jobId] = existing;
-
-
-        //    RefreshSingleJobUI(existing);
-        //}
+     
         public async Task RefreshSingleJobAsync(int jobId)
         {
             var updated = await RqliteClient.LoadSingleJobGraphAsync(jobId);
@@ -776,29 +754,19 @@ namespace PitneyBowesCalculator
             if (!_jobsById.TryGetValue(jobId, out var existing))
                 return;
 
-            // Always update base fields
+            existing.JobName = updated.JobName;
             existing.JobNumber = updated.JobNumber;
             existing.IsTemp = updated.IsTemp;
-
+            existing.IsActive = updated.IsActive;
             existing.LastUpdated = updated.LastUpdated;
             existing.LastUpdatedRaw = updated.LastUpdatedRaw;
-
-            // Replace pallets completely (source of truth = DB)
             existing.Pallets = updated.Pallets;
-
-            // Compute shipped date
             existing.ShippedDate = existing.Pallets
                 .Where(p => p.State == PalletState.Shipped)
                 .Select(p => p.ShippedAt)
                 .FirstOrDefault();
 
-            // 🔥 CRITICAL: Resolve JobName from snapshot if shipped
-            var snapshotName = existing.Pallets
-                .Where(p => p.State == PalletState.Shipped)
-                .Select(p => p.JobNameSnapshot)
-                .FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
-
-            existing.JobName = updated.JobName;
+            _jobsById[jobId] = existing;
 
             RefreshSingleJobUI(existing);
         }
@@ -813,10 +781,7 @@ namespace PitneyBowesCalculator
             }
         }
 
-        public void UnmarkJobUpdating(int jobId)
-        {
-            _updatingJobs.Remove(jobId);
-        }
+   
         private bool ShouldIgnoreOwnUpdate(int jobId, string dbTimestamp)
         {
             if (dbTimestamp == null)
@@ -960,7 +925,26 @@ namespace PitneyBowesCalculator
                             await RqliteClient.ReactivatePbJobAsync(existingJob.JobId);
                         }
 
-                        await LoadJobsAsync();
+                        // ✅ Load fresh state for this job only
+                        var reactivated = await RqliteClient.LoadSingleJobGraphAsync(existingJob.JobId);
+
+                        if (reactivated != null)
+                        {
+                            // ✅ Update in-memory collections
+                            if (_jobsById.ContainsKey(reactivated.JobId))
+                            {
+                                _pbJobs.Remove(_jobsById[reactivated.JobId]);
+                            }
+
+                            _pbJobs.Add(reactivated);
+                            _jobsById[reactivated.JobId] = reactivated;
+
+                            // ✅ Suppress poll cycle for this job
+                            MarkPendingUpdate(reactivated.JobId, reactivated.LastUpdatedRaw);
+
+                            // ✅ Single job UI refresh
+                            RefreshSingleJobUI(reactivated);
+                        }
 
                         MessageDialogBox.ShowDialog(
                             "Reactivated",
@@ -969,7 +953,7 @@ namespace PitneyBowesCalculator
                             MessageType.Info
                         );
 
-                        return; // 🔥 IMPORTANT: STOP HERE
+                        return;
                     }
 
                     // =========================
@@ -986,9 +970,22 @@ namespace PitneyBowesCalculator
                         $"Create PB Job | JobNumber={jobNumber}, JobName={job.JobName}, IsTemp={job.IsTemp}"
                     );
 
-                    await RqliteClient.InsertPbJobAsync(job);
+                    int newJobId = await RqliteClient.InsertPbJobAsync(job);
 
-                    await LoadJobsAsync();
+                    // ✅ Load fresh state for the new job only
+                    var newJob = await RqliteClient.LoadSingleJobGraphAsync(newJobId);
+
+                    if (newJob != null)
+                    {
+                        _pbJobs.Add(newJob);
+                        _jobsById[newJob.JobId] = newJob;
+
+                        // ✅ Suppress poll cycle for this job
+                        MarkPendingUpdate(newJob.JobId, newJob.LastUpdatedRaw);
+
+                        // ✅ Single job UI refresh
+                        RefreshSingleJobUI(newJob);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -1075,7 +1072,7 @@ namespace PitneyBowesCalculator
             Utils.GenerateReport(jobs, dtPickUpFrom, dtPickUpTo);
         }
 
-     
+
         private async void btnShipPallets_Click_1(object sender, EventArgs e)
         {
             try
@@ -1102,10 +1099,30 @@ namespace PitneyBowesCalculator
                         return;
                 }
 
-                // 🔥 RELOAD AFTER DIALOG (CRITICAL)
-                await LoadJobsAsync();
+                // ✅ Reload only selected jobs instead of full LoadJobsAsync
+                var reloadedJobs = new List<PbJobModel>();
 
-                selectedJobs = packedListView2.GetReadyJobs().ToList();
+                foreach (var id in jobIds)
+                {
+                    var fresh = await RqliteClient.LoadSingleJobGraphAsync(id);
+                    if (fresh == null) continue;
+
+                    // ✅ Update in-memory state
+                    if (_jobsById.TryGetValue(fresh.JobId, out var existing))
+                    {
+                        existing.LastUpdatedRaw = fresh.LastUpdatedRaw;
+                        existing.Pallets = fresh.Pallets;
+                    }
+
+                    reloadedJobs.Add(fresh);
+                }
+
+                // ✅ Re-derive selected jobs from reloaded data
+                selectedJobs = reloadedJobs
+                    .Where(j => j.Pallets.Any(p =>
+                        p.State == PalletState.Ready &&
+                        p.PackedAt.HasValue))
+                    .ToList();
 
                 if (!selectedJobs.Any())
                 {
@@ -1129,9 +1146,7 @@ namespace PitneyBowesCalculator
                         continue;
 
                     if (job.LastUpdatedRaw != originalTs)
-                    {
                         changedJobs.Add(job.JobId);
-                    }
                 }
 
                 if (changedJobs.Any())
@@ -1158,35 +1173,55 @@ namespace PitneyBowesCalculator
                 progressBarShip.Visible = true;
                 progressBarShip.Style = ProgressBarStyle.Marquee;
 
+                _isShipping = true;
                 Cursor.Current = Cursors.WaitCursor;
+               
                 this.Enabled = false;
 
                 // 🔥 DB UPDATE
                 await RqliteClient.ShipPalletsAsync(jobIds);
 
-                // 🔥 RELOAD FRESH DATA FOR PRINTING (CRITICAL)
+                // ✅ Reload fresh data + mark pending in one pass
                 var freshJobs = new List<PbJobModel>();
 
                 foreach (var id in jobIds)
                 {
-                    var job = await RqliteClient.LoadSingleJobGraphAsync(id);
-                    if (job != null)
-                        freshJobs.Add(job);
+                    var fresh = await RqliteClient.LoadSingleJobGraphAsync(id);
+                    if (fresh == null) continue;
+
+                    freshJobs.Add(fresh);
+
+                    // ✅ Suppress poll cycle for each shipped job
+                    if (fresh.LastUpdatedRaw != null)
+                        MarkPendingUpdate(id, fresh.LastUpdatedRaw);
                 }
 
-                // 🔥 UPDATE UI TEXT
                 lbPrintShip.Text = "Generating PDF...";
 
-                // 🔥 PRINT WITH FRESH DATA
                 await Task.Run(() =>
                 {
                     PrintEngine.Print(e => PrintLayouts.SummaryShip(e, freshJobs));
                 });
 
-                // 🔥 FINAL UI SYNC (SAFE)
-                foreach (var id in jobIds)
+                // ✅ Final UI sync using already-loaded fresh data
+                foreach (var fresh in freshJobs)
                 {
-                    await RefreshSingleJobAsync(id);
+                    if (_jobsById.TryGetValue(fresh.JobId, out var existing))
+                    {
+                        existing.JobName = fresh.JobName;
+                        existing.JobNumber = fresh.JobNumber;
+                        existing.IsTemp = fresh.IsTemp;
+                        existing.LastUpdated = fresh.LastUpdated;
+                        existing.LastUpdatedRaw = fresh.LastUpdatedRaw;
+                        existing.Pallets = fresh.Pallets;
+                        existing.ShippedDate = fresh.Pallets
+                            .Where(p => p.State == PalletState.Shipped)
+                            .Select(p => p.ShippedAt)
+                            .FirstOrDefault();
+
+                        _jobsById[existing.JobId] = existing;
+                        RefreshSingleJobUI(existing);
+                    }
                 }
             }
             catch (Exception ex)
@@ -1194,18 +1229,18 @@ namespace PitneyBowesCalculator
                 Utils.WriteUnexpectedError(
                     $"Ship pallets | JobIds={string.Join(",", packedListView2.GetReadyJobs().Select(j => j.JobId))}"
                 );
-
                 ShowDatabaseError(ex);
             }
             finally
             {
                 lbPrintShip.Visible = false;
                 progressBarShip.Visible = false;
+                _isShipping = false;
                 Cursor.Current = Cursors.Default;
                 this.Enabled = true;
-
                 progressBarShip.Style = ProgressBarStyle.Blocks;
                 progressBarShip.Value = 0;
+              
             }
         }
 
