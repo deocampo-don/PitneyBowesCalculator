@@ -470,8 +470,11 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
             {
                 var selectedIndices = lvPallet.GetSelectedIndices();
 
+                // ✅ Validate selection early
                 if (selectedIndices == null || selectedIndices.Count == 0)
                 {
+                    Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "");
+
                     MessageDialogBox.ShowDialog(
                         "No Selection",
                         "Select pallet(s) to print.",
@@ -485,7 +488,25 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
                     .Select(i => _job.Pallets[i])
                     .ToList();
 
-                // 🔥 Use helper-based printing
+                // ✅ Optional: ensure pallets are packed
+                var invalid = selectedPallets
+                    .Where(p => p.PackedAt == null)
+                    .ToList();
+
+                if (invalid.Any())
+                {
+                    Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "");
+
+                    MessageDialogBox.ShowDialog(
+                        "Invalid Selection",
+                        "Only packed pallets can be printed.",
+                        MessageBoxButtons.OK,
+                        MessageType.Warning
+                    );
+                    return;
+                }
+
+                // ✅ Run print safely
                 await Task.Run(() =>
                 {
                     PrintEngine.Print(e =>
@@ -493,16 +514,18 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
                     );
                 });
 
+                // ✅ Only reached if NO exception
                 Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Printed successfully!");
             }
             catch (Exception ex)
             {
                 Utils.WriteExceptionError(ex);
-                Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Printer not available!");
+
+                Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Print failed!");
 
                 MessageDialogBox.ShowDialog(
                     "Printing Error",
-                    ex.Message,
+                    "Failed to print pallet.\n\n" + ex.Message,
                     MessageBoxButtons.OK,
                     MessageType.Warning
                 );

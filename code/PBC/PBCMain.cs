@@ -311,23 +311,53 @@ namespace PitneyBowesCalculator
                     if (!_jobsById.TryGetValue(jobId, out var local))
                         continue;
 
-              
-
                     if (local.LastUpdatedRaw != lastUpdatedRaw)
                     {
-                 
-
                         if (ShouldIgnoreOwnUpdate(jobId, lastUpdatedRaw))
                         {
-                    
                             _lastProcessedUpdates[jobId] = lastUpdatedRaw;
                             local.LastUpdatedRaw = lastUpdatedRaw;
                             continue;
                         }
 
-                        if (_staleCallbacks.TryGetValue(jobId, out var callback))
-                            callback?.Invoke();
-                        await RefreshSingleJobAsync(jobId);
+                        // ✅ Only notify stale if pallet structure changed
+                        // Work order additions should NOT trigger the banner
+                        if (_staleCallbacks.ContainsKey(jobId))
+                        {
+                            var freshForCheck = await RqliteClient.LoadSingleJobGraphAsync(jobId);
+
+                            if (freshForCheck != null && HasPalletStateChanged(jobId, freshForCheck))
+                            {
+                                if (_staleCallbacks.TryGetValue(jobId, out var callback))
+                                    callback?.Invoke();
+                            }
+
+                            // ✅ Pass the already-loaded fresh job to avoid double fetch
+                            if (freshForCheck != null)
+                            {
+                                if (!_jobsById.TryGetValue(jobId, out var existing))
+                                    return;
+
+                                existing.JobName = freshForCheck.JobName;
+                                existing.JobNumber = freshForCheck.JobNumber;
+                                existing.IsTemp = freshForCheck.IsTemp;
+                                existing.IsActive = freshForCheck.IsActive;
+                                existing.LastUpdated = freshForCheck.LastUpdated;
+                                existing.LastUpdatedRaw = freshForCheck.LastUpdatedRaw;
+                                existing.Pallets = freshForCheck.Pallets;
+                                existing.ShippedDate = freshForCheck.Pallets
+                                    .Where(p => p.State == PalletState.Shipped)
+                                    .Select(p => p.ShippedAt)
+                                    .FirstOrDefault();
+
+                                _jobsById[jobId] = existing;
+                                RefreshSingleJobUI(existing);
+                            }
+                        }
+                        else
+                        {
+                            await RefreshSingleJobAsync(jobId);
+                        }
 
                         _lastProcessedUpdates[jobId] = lastUpdatedRaw;
                     }
@@ -1255,6 +1285,33 @@ namespace PitneyBowesCalculator
 
         public void UnregisterStaleCallback(int jobId)
             => _staleCallbacks.Remove(jobId);
+        private bool HasPalletStateChanged(int jobId, PbJobModel updated)
+        {
+            if (!_jobsById.TryGetValue(jobId, out var existing))
+                return false;
+
+            // Compare pallet count
+            if (existing.Pallets.Count != updated.Pallets.Count)
+                return true;
+
+            // Compare each pallet's state and PackedAt
+            foreach (var updatedPallet in updated.Pallets)
+            {
+                var existingPallet = existing.Pallets
+                    .FirstOrDefault(p => p.PalletId == updatedPallet.PalletId);
+
+                if (existingPallet == null)
+                    return true; // new pallet appeared
+
+                if (existingPallet.State != updatedPallet.State)
+                    return true; // state changed (packed, unpacked, shipped)
+
+                if (existingPallet.PackedAt != updatedPallet.PackedAt)
+                    return true; // packed state changed
+            }
+
+            return false;
+        }
     }
 }
 

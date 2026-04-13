@@ -545,6 +545,44 @@ namespace PitneyBowesCalculator
 
              
                 await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
+                // ✅ Ask user if they want to print
+                var result = MessageDialogBox.ShowDialog(
+                    "Print Pallet",
+                    "Do you want to print the packed pallet?",
+                    MessageBoxButtons.YesNo,
+                    MessageType.Info
+                );
+
+                if (result == DialogResult.Yes)
+                {
+                    try
+                    {
+                        // Reload latest data to ensure accuracy
+                        var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+
+                        if (freshJob != null)
+                        {
+                            var palletsToPrint = freshJob.Pallets
+    .Where(p => p.PalletId == activePallet.PalletId && p.PackedAt != null)
+    .ToList();
+
+                            PrintEngine.Print(e =>
+                            {
+                                PrintLayouts.DrawPallets(e, freshJob, palletsToPrint);
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Utils.WriteExceptionError(ex);
+                        MessageDialogBox.ShowDialog(
+                            "",
+                            "Error printing pallet: " + ex.Message,
+                            MessageBoxButtons.OK,
+                            MessageType.Warning
+                        );
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -609,8 +647,6 @@ namespace PitneyBowesCalculator
                 }
             }
         }
-
     }
-
-
 }
+    
