@@ -49,7 +49,7 @@ namespace PitneyBowesCalculator
         // -----------------------------
         private bool _isConnected = false;
         private bool _isReconnecting = false;
-        
+        private readonly Dictionary<int, Action> _staleCallbacks = new();
         // -----------------------------
         // Constructor
         // -----------------------------
@@ -325,7 +325,8 @@ namespace PitneyBowesCalculator
                             continue;
                         }
 
-                    
+                        if (_staleCallbacks.TryGetValue(jobId, out var callback))
+                            callback?.Invoke();
                         await RefreshSingleJobAsync(jobId);
 
                         _lastProcessedUpdates[jobId] = lastUpdatedRaw;
@@ -1248,6 +1249,12 @@ namespace PitneyBowesCalculator
         {
             packedListView2.SetAllSelected(chkbxSelectAll.Checked);
         }
+
+        public void RegisterStaleCallback(int jobId, Action callback)
+    => _staleCallbacks[jobId] = callback;
+
+        public void UnregisterStaleCallback(int jobId)
+            => _staleCallbacks.Remove(jobId);
     }
 }
 

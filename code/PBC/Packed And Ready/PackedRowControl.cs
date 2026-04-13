@@ -107,21 +107,25 @@ namespace PitneyBowesCalculator.Packed_And_Ready
 
             Form parentForm = this.FindForm();
 
-            
-
             using (var dlg = new ViewButtonDialog(_modelpbjob))
             {
+                // ✅ Register stale callback before showing
+                PBCMain.Instance.RegisterStaleCallback(_modelpbjob.JobId, () =>
+                {
+                    dlg.NotifyStaleData();
+                });
+
                 dlg.ShowDialog(parentForm);
+
+                // ✅ Always unregister when dialog closes
+                PBCMain.Instance.UnregisterStaleCallback(_modelpbjob.JobId);
 
                 if (dlg.DataChanged)
                 {
                     ViewDialogClosed?.Invoke(this, EventArgs.Empty);
                 }
             }
-
-           
         }
-
         private async void chkbxStatus_CheckedChanged(object sender, EventArgs e)
         {
             if (_isBinding || _modelpbjob == null)

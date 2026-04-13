@@ -31,7 +31,8 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
         private int workOrderIndex = 0;
         private int currentPage = 1;
         private int totalPages = 1;
-
+        private Panel _staleBanner;
+        private bool _isStale = false;
         public bool DataChanged { get; private set; }
 
         /* -------------------------------------------------------------
@@ -71,7 +72,7 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
             CSSDesign.AddPanelBorder(pnlDetails, Color.Silver, 1);
             CSSDesign.AddPanelBorder(pnlPalletNum, Color.Silver, 1);
 
-
+            BuildStaleBanner();
 
 
             //onload select first item
@@ -509,6 +510,123 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
             finally
             {
                 btnPrintPallet.Enabled = true;
+            }
+        }
+
+        private void BuildStaleBanner()
+        {
+            _staleBanner = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 40,
+                BackColor = Color.FromArgb(230, 126, 34),
+                Visible = false
+            };
+
+            var btnRefresh = new Button
+            {
+                Text = "Refresh",
+                Dock = DockStyle.Right,
+                Width = 80,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.FromArgb(211, 84, 0),
+                ForeColor = Color.White,
+                Cursor = Cursors.Hand,
+                Font = new Font("Segoe UI", 9f, FontStyle.Bold)
+            };
+            btnRefresh.FlatAppearance.BorderSize = 0;
+            btnRefresh.Click += async (s, e) => await RefreshFromDbAsync();
+
+            var lbl = new Label
+            {
+                Text = "⚠  Data has been updated by another workstation.",
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 9f, FontStyle.Regular),
+                AutoSize = false,
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
+            };
+
+            // ✅ Button first so it docks right, label fills remaining
+            _staleBanner.Controls.Add(btnRefresh);
+            _staleBanner.Controls.Add(lbl);
+
+            this.Controls.Add(_staleBanner);
+            _staleBanner.BringToFront();
+        }
+
+        public void NotifyStaleData()
+        {
+            if (this.IsDisposed || !this.IsHandleCreated)
+                return;
+
+            if (this.InvokeRequired)
+            {
+                this.Invoke((Action)NotifyStaleData);
+                return;
+            }
+
+            _isStale = true;
+            _staleBanner.Visible = true;
+
+            // ✅ Disable remove while stale to prevent acting on stale data
+            btnRemovePallet.Enabled = false;
+        }
+
+        private async Task RefreshFromDbAsync()
+        {
+            try
+            {
+                var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_job.JobId);
+
+                if (freshJob == null)
+                {
+                    MessageDialogBox.ShowDialog(
+                        "Job Deleted",
+                        "This job has been deleted by another workstation.",
+                        MessageBoxButtons.OK,
+                        MessageType.Warning
+                    );
+                    this.Close();
+                    return;
+                }
+
+                // ✅ Apply same filter as packedListView2 in PBCMain.RefreshSingleJobUI
+                freshJob.Pallets = freshJob.Pallets
+                    .Where(p => p.State == PalletState.Ready ||
+                                p.State == PalletState.Packed_NotReady)
+                    .ToList();
+
+                if (!freshJob.Pallets.Any())
+                {
+                    MessageDialogBox.ShowDialog(
+                        "No Pallets",
+                        "All pallets have been removed or shipped by another workstation.",
+                        MessageBoxButtons.OK,
+                        MessageType.Warning
+                    );
+                    this.Close();
+                    return;
+                }
+
+                // ✅ Update local model with filtered pallets
+                _job = freshJob;
+
+                // ✅ Reload all UI from fresh filtered data
+                LoadHeaderInfo();
+                lvPallet.SetItems(_job);
+                lvPallet.SelectFirstPallet();
+
+                // ✅ Clear stale state
+                _isStale = false;
+                _staleBanner.Visible = false;
+                btnRemovePallet.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                Utils.WriteExceptionError(ex);
+                MessageDialogBox.ShowDialog("", "Refresh failed: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
             }
         }
     }
