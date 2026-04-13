@@ -874,6 +874,17 @@ namespace PitneyBowesCalculator
 
         private async void btnAddPBJob_Click(object sender, EventArgs e)
         {
+
+            if (!_isConnected)
+            {
+                MessageDialogBox.ShowDialog(
+                    "Database Offline",
+                    "Cannot add PB Job while database is offline.",
+                    MessageBoxButtons.OK,
+                    MessageType.Warning
+                );
+                return;
+            }
             using (var dlg = new CreatePBJobDialog())
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK)

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
-using WindowsFormsApp1;
+using PitneyBowesCalculator;
 using Post_List_Tool;
 
 namespace Launcher
@@ -18,100 +18,98 @@ namespace Launcher
 
         private void Launcher_Load(object sender, EventArgs e)
         {
-            _isInitializing = true; // prevent events during setup
+            _isInitializing = true;
 
             InitializeConfig();
 
             BackgroundImage = Properties.Resources.launcherBg;
             BackgroundImageLayout = ImageLayout.Stretch;
 
-            // ✅ Load default from INI → update UI
+            // Load saved default app
             string defaultApp = launcherINI?.StartUpScreen ?? "";
 
             rbPbcDef.Checked = defaultApp.Equals("PBC", StringComparison.OrdinalIgnoreCase);
             rbPlDef.Checked = defaultApp.Equals("POSTLIST", StringComparison.OrdinalIgnoreCase);
 
-            _isInitializing = false; // allow events after UI is set
+            _isInitializing = false;
 
-            // SHIFT override -> force show launcher
+            // SHIFT key -> show launcher always
             if ((ModifierKeys & Keys.Shift) == Keys.Shift)
                 return;
 
             if (string.IsNullOrEmpty(defaultApp))
                 return;
 
-            // ✅ Auto launch
+            // Auto-launch
+            // Auto-launch
             switch (defaultApp.ToUpper())
             {
                 case "PBC":
-                    LaunchPBC();
-                    this.Hide();
+                    this.Hide();     // ✅ Hide first
+                    LaunchPBC();     // ✅ Then start child app
                     break;
 
                 case "POSTLIST":
-                    LaunchPostList();
                     this.Hide();
+                    LaunchPostList();
                     break;
             }
+
         }
 
         private void InitializeConfig()
         {
             string err;
-
-            string configPath = Path.Combine(Application.StartupPath, "config.ini");
+            string configPath = ConfigPath.GetMainConfigPath();
 
             launcherINI = new INIClass(configPath);
 
             if (!File.Exists(configPath))
             {
                 launcherINI.BuildNewIni(out err);
-
                 if (!string.IsNullOrEmpty(err))
                 {
-
-                    MessageDialogBox.ShowDialog("", "Failed to create config.ini\n" + err, MessageBoxButtons.OK, MessageType.Info);
+                    MessageDialogBox.ShowDialog("",
+                        "Failed to create config.ini\n" + err,
+                        MessageBoxButtons.OK,
+                        MessageType.Info);
                     return;
                 }
             }
 
             if (!launcherINI.GetINIVars(out err))
             {
-
-                MessageDialogBox.ShowDialog("", "Failed to load configuration\n" + err, MessageBoxButtons.OK, MessageType.Info);
+                MessageDialogBox.ShowDialog("",
+                    "Failed to load configuration\n" + err,
+                    MessageBoxButtons.OK,
+                    MessageType.Info);
             }
         }
 
         private void LaunchPBC()
         {
             string err;
+            string configPath = ConfigPath.GetMainConfigPath();
 
-            string configPath = Path.Combine(Application.StartupPath, "config.ini");
-
-            WindowsFormsApp1.Program.AppINI = new INIClass(configPath);
+            PitneyBowesCalculator.Program.AppINI = new INIClass(configPath);
 
             if (!File.Exists(configPath))
             {
-                WindowsFormsApp1.Program.AppINI.BuildNewIni(out err);
-
+                PitneyBowesCalculator.Program.AppINI.BuildNewIni(out err);
                 if (!string.IsNullOrEmpty(err))
                 {
-                    //MessageBox.Show("Failed to create config.ini\n" + err);
                     MessageDialogBox.ShowDialog("", "Failed to create config.ini\n" + err, MessageBoxButtons.OK, MessageType.Info);
                     return;
                 }
             }
 
-            if (!WindowsFormsApp1.Program.AppINI.GetINIVars(out err))
+            if (!PitneyBowesCalculator.Program.AppINI.GetINIVars(out err))
             {
-
-                //MessageBox.Show("Failed to load configuration\n" + err);
                 MessageDialogBox.ShowDialog("", "Failed to load configuration\n" + err, MessageBoxButtons.OK, MessageType.Info);
                 return;
             }
 
-            var frm = new PBCMain();
-            frm.Show();
+            new PBCMain().Show();
             this.Hide();
         }
 
@@ -141,25 +139,34 @@ namespace Launcher
 
         private void rbPbcDef_CheckedChanged(object sender, EventArgs e)
         {
-            if (_isInitializing || launcherINI == null)
-                return;
+            if (_isInitializing || !rbPbcDef.Checked) return;
 
-            if (rbPbcDef.Checked)
-            {
-                launcherINI.SetStartUpScreen("PBC");
-                launcherINI.UpdateStartUpScreen(out _);
-            }
+            launcherINI.SetStartUpScreen("PBC");
+            launcherINI.UpdateStartUpScreen(out _);
+            launcherINI.GetINIVars(out _);
         }
 
         private void rbPlDef_CheckedChanged(object sender, EventArgs e)
         {
-            if (_isInitializing || launcherINI == null)
-                return;
+            if (_isInitializing || !rbPlDef.Checked) return;
 
-            if (rbPlDef.Checked)
+            launcherINI.SetStartUpScreen("POSTLIST");
+            launcherINI.UpdateStartUpScreen(out _);
+            launcherINI.GetINIVars(out _);
+        }
+
+        public static class ConfigPath
+        {
+            public static string GetMainConfigPath()
             {
-                launcherINI.SetStartUpScreen("POSTLIST");
-                launcherINI.UpdateStartUpScreen(out _);
+                string path = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "PBC",
+                    "config.ini"
+                );
+
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                return path;
             }
         }
     }
