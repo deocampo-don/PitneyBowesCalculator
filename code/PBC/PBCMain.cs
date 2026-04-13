@@ -464,6 +464,7 @@ namespace PitneyBowesCalculator
 
             lvBuild.DeleteRequested += async (_, job) =>
             {
+                if (!EnsureConnected()) return;
                 if (job == null || _isPolling) return;
               
 
@@ -484,6 +485,7 @@ namespace PitneyBowesCalculator
 
             lvBuild.SoftDeleteRequested += async (_, job) =>
             {
+                if (!EnsureConnected()) return;
                 if (job == null) return;
 
                 try
@@ -507,6 +509,7 @@ namespace PitneyBowesCalculator
 
             lvBuild.EditRequested += async (_, job) =>
             {
+                if (!EnsureConnected()) return;
                 using (var dialog = new CreatePBJobDialog(job))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
@@ -875,16 +878,7 @@ namespace PitneyBowesCalculator
         private async void btnAddPBJob_Click(object sender, EventArgs e)
         {
 
-            if (!_isConnected)
-            {
-                MessageDialogBox.ShowDialog(
-                    "Database Offline",
-                    "Cannot add PB Job while database is offline.",
-                    MessageBoxButtons.OK,
-                    MessageType.Warning
-                );
-                return;
-            }
+            if (!EnsureConnected()) return;
             using (var dlg = new CreatePBJobDialog())
             {
                 if (dlg.ShowDialog(this) != DialogResult.OK)
@@ -1117,6 +1111,7 @@ namespace PitneyBowesCalculator
 
         private async void btnShipPallets_Click_1(object sender, EventArgs e)
         {
+            if (!EnsureConnected()) return;
             try
             {
                 var selectedJobs = packedListView2.GetReadyJobs().ToList();
@@ -1322,6 +1317,21 @@ namespace PitneyBowesCalculator
             }
 
             return false;
+        }
+
+        public bool EnsureConnected()
+        {
+            if (!_isConnected)
+            {
+                MessageDialogBox.ShowDialog(
+                    "Database Offline",
+                    "Please wait for reconnection.",
+                    MessageBoxButtons.OK,
+                    MessageType.Warning
+                );
+                return false;
+            }
+            return true;
         }
     }
 }

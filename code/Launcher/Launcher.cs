@@ -45,11 +45,13 @@ namespace Launcher
             switch (defaultApp.ToUpper())
             {
                 case "PBC":
-                    this.Hide();     // ✅ Hide first
-                    LaunchPBC();     // ✅ Then start child app
+                    this.WindowState = FormWindowState.Minimized;
+                    this.Hide();
+                    LaunchPBC();
                     break;
 
                 case "POSTLIST":
+                    this.WindowState = FormWindowState.Minimized;
                     this.Hide();
                     LaunchPostList();
                     break;

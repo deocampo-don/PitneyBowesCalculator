@@ -203,6 +203,7 @@ namespace PitneyBowesCalculator
 
         private void DeletePbJob_Click(object sender, EventArgs e)
         {
+            if (!PBCMain.Instance.  EnsureConnected()) return;
             if (_model == null)
                 return;
 
@@ -306,6 +307,7 @@ namespace PitneyBowesCalculator
 
         private async void btnAddPallet_Click_1(object sender, EventArgs e)
         {
+            if (!PBCMain.Instance.EnsureConnected()) return;
             if (_model == null)
                 return;
 
@@ -426,6 +428,7 @@ namespace PitneyBowesCalculator
         }
         private async Task<(Pallet pallet, PbJobModel freshJob)> EnsurePalletIsOpenAsync(Pallet pallet)
         {
+            if (!PBCMain.Instance.EnsureConnected()) return (null, null);
             if (_model == null || pallet == null)
                 return (null, null);
 
@@ -474,6 +477,7 @@ namespace PitneyBowesCalculator
         }
         private async void btnPackPallet_Click(object sender, EventArgs e)
         {
+            if (!PBCMain.Instance.EnsureConnected()) return;
             if (_model == null)
                 return;
 
@@ -593,6 +597,7 @@ namespace PitneyBowesCalculator
 
         private async void btnView_Click_1(object sender, EventArgs e)
         {
+            if (!PBCMain.Instance.EnsureConnected()) return;
             if (_model == null)
                 return;
 
