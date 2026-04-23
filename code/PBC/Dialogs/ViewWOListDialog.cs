@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using PitneyBowesCalculator.Models;
+
 
 namespace PitneyBowesCalculator
 {
@@ -104,7 +104,9 @@ namespace PitneyBowesCalculator
 
                 // ✅ SINGLE atomic call (prevents double refresh)
                 await RqliteClient.DeleteWorkOrdersAndMaybePalletAsync(ids, palletId);
-
+                var savedJob = await RqliteClient.LoadSingleJobGraphAsync(_jobId);
+                if (savedJob?.LastUpdatedRaw != null)
+                    PBCMain.Instance.MarkPendingUpdate(_jobId, savedJob.LastUpdatedRaw);
                 // ✅ Update UI locally (optimistic)
                 foreach (var wo in DeletedItems)
                     _items.Remove(wo);

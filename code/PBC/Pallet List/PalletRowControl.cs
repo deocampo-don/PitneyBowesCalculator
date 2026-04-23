@@ -421,8 +421,10 @@ namespace PitneyBowesCalculator
                 }
                 catch (Exception ex)
                 {
+                    Utils.WriteUnexpectedError($"AddToPallet failed | JobId={_model?.JobId}");
                     Utils.WriteExceptionError(ex);
                     MessageDialogBox.ShowDialog("", "Error saving pallet: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
+
                 }
             }
         }
@@ -550,15 +552,7 @@ namespace PitneyBowesCalculator
              
                 await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
                 // ✅ Ask user if they want to print
-                var result = MessageDialogBox.ShowDialog(
-                    "Print Pallet",
-                    "Do you want to print the packed pallet?",
-                    MessageBoxButtons.YesNo,
-                    MessageType.Info
-                );
-
-                if (result == DialogResult.Yes)
-                {
+        
                     try
                     {
                         // Reload latest data to ensure accuracy
@@ -566,90 +560,105 @@ namespace PitneyBowesCalculator
 
                         if (freshJob != null)
                         {
-                            var palletsToPrint = freshJob.Pallets
-    .Where(p => p.PalletId == activePallet.PalletId && p.PackedAt != null)
-    .ToList();
 
-                            PrintEngine.Print(e =>
+                        int packedBeforeThis = freshJob.Pallets
+       .Count(p => p.ShippedAt == null
+                && p.PackedAt != null
+                && p.PalletId != activePallet.PalletId);
+
+                        int index = packedBeforeThis + 1;
+
+                        var palletToPrint = freshJob.Pallets
+                            .FirstOrDefault(p => p.PalletId == activePallet.PalletId && p.PackedAt != null);
+
+                        if (palletToPrint != null)
+                        {
+                            PrintEngine.Print(ev =>
                             {
-                                PrintLayouts.DrawPallets(e, freshJob, palletsToPrint);
+                                PrintLayouts.DrawPalletLabel(ev, freshJob, palletToPrint, index);
                             });
                         }
                     }
+                    }
                     catch (Exception ex)
                     {
+                        Utils.WriteUnexpectedError($"Print pallet failed | JobId={_model?.JobId}");
                         Utils.WriteExceptionError(ex);
-                        MessageDialogBox.ShowDialog(
-                            "",
-                            "Error printing pallet: " + ex.Message,
-                            MessageBoxButtons.OK,
-                            MessageType.Warning
-                        );
+                        MessageDialogBox.ShowDialog("", "Error printing pallet: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
                     }
-                }
+                
             }
             catch (Exception ex)
             {
+                Utils.WriteUnexpectedError($"PackPallet failed | JobId={_model?.JobId}, PalletId={activePallet?.PalletId}");
                 Utils.WriteExceptionError(ex);
                 MessageDialogBox.ShowDialog("", "Error saving pack data: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
             }
         }
-
         private async void btnView_Click_1(object sender, EventArgs e)
         {
             if (!PBCMain.Instance.EnsureConnected()) return;
             if (_model == null)
                 return;
 
-            var activePallet = _model.Pallets
-                .FirstOrDefault(p => p.PackedAt == null);
-
-            if (activePallet == null)
+            try
             {
-                MessageDialogBox.ShowDialog("", "No active pallet.", MessageBoxButtons.OK, MessageType.Info);
-                return;
-            }
+                var activePallet = _model.Pallets
+                    .FirstOrDefault(p => p.PackedAt == null);
 
-            (activePallet, _) = await EnsurePalletIsOpenAsync(activePallet);
-            if (activePallet == null)
-                return;
-
-            var dbItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
-            activePallet.WorkOrders = dbItems;
-
-            using (var dlg = new ViewWOListDialog())
-            {
-                dlg.SetItems(_model.JobName, _model.JobNumber.ToString(), _model.JobId, dbItems); // ✅ _model.JobId added
-
-                dlg.ShowDialog(this);
-
-                if (dlg.DeletedItems != null && dlg.DeletedItems.Any())
+                if (activePallet == null)
                 {
-                    (activePallet, _) = await EnsurePalletIsOpenAsync(activePallet);
-                    if (activePallet == null)
-                        return;
-
-                    var updatedItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
-
-                    if (!updatedItems.Any())
-                    {
-                        MessageDialogBox.ShowDialog(
-                            "Pallet Updated",
-                            "All work orders have been removed by another workstation.",
-                            MessageBoxButtons.OK,
-                            MessageType.Warning
-                        );
-
-                        var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
-                        if (freshJob?.LastUpdatedRaw != null)
-                            PBCMain.Instance.MarkPendingUpdate(_model.JobId, freshJob.LastUpdatedRaw);
-                        return;
-                    }
-
-                    activePallet.WorkOrders = updatedItems;
-                    UpdateButtonsState();
-                    PalletChanged?.Invoke(this, _model);
+                    MessageDialogBox.ShowDialog("", "No active pallet.", MessageBoxButtons.OK, MessageType.Info);
+                    return;
                 }
+
+                (activePallet, _) = await EnsurePalletIsOpenAsync(activePallet);
+                if (activePallet == null)
+                    return;
+
+                var dbItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
+                activePallet.WorkOrders = dbItems;
+
+                using (var dlg = new ViewWOListDialog())
+                {
+                    dlg.SetItems(_model.JobName, _model.JobNumber.ToString(), _model.JobId, dbItems); // ✅ _model.JobId added
+
+                    dlg.ShowDialog(this);
+
+                    if (dlg.DeletedItems != null && dlg.DeletedItems.Any())
+                    {
+                        (activePallet, _) = await EnsurePalletIsOpenAsync(activePallet);
+                        if (activePallet == null)
+                            return;
+
+                        var updatedItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
+
+                        if (!updatedItems.Any())
+                        {
+                            MessageDialogBox.ShowDialog(
+                                "Pallet Updated",
+                                "All work orders have been removed by another workstation.",
+                                MessageBoxButtons.OK,
+                                MessageType.Warning
+                            );
+
+                            var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+                            if (freshJob?.LastUpdatedRaw != null)
+                                PBCMain.Instance.MarkPendingUpdate(_model.JobId, freshJob.LastUpdatedRaw);
+                            return;
+                        }
+
+                        activePallet.WorkOrders = updatedItems;
+                        UpdateButtonsState();
+                        PalletChanged?.Invoke(this, _model);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.WriteUnexpectedError($"ViewWO failed | JobId={_model?.JobId}");
+                Utils.WriteExceptionError(ex);
+                MessageDialogBox.ShowDialog("", "Error loading work orders: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
             }
         }
     }

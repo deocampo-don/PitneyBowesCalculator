@@ -25,11 +25,6 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
             // ✅ Display Envelope Qty (formatted)
             txtValue.Text = _workorder.Quantity.ToString("N0");
 
-            // Optional: checkbox
-           // chkSelected.Checked = _workorder.IsSelected;
-
-
-
         }
 
 

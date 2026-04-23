@@ -26,11 +26,7 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
          * ------------------------------------------------------------- */
 
         private PbJobModel _job;
-        private List<Pallet> palletsToPrint;
-        private int palletPrintIndex = 0;
-        private int workOrderIndex = 0;
-        private int currentPage = 1;
-        private int totalPages = 1;
+      
         private Panel _staleBanner;
         private bool _isStale = false;
         public bool DataChanged { get; private set; }
@@ -45,7 +41,7 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
         private const int WM_NCLBUTTONDOWN = 0xA1;
         private const int HTCAPTION = 0x2;
 
-        private int _formRadius = 12;
+     
 
         /* -------------------------------------------------------------
          * CONSTRUCTOR
@@ -74,13 +70,8 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
 
             BuildStaleBanner();
 
-
-            //onload select first item
-
         }
 
-
-        // inside lvPallet UserControl
 
 
         /* -------------------------------------------------------------
@@ -204,121 +195,6 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
             this.Close();
         }
 
-        //        private async void btnRemovePallet_Click_1(object sender, EventArgs e)
-        //        {
-
-        //            var selectedIndices = lvPallet.GetSelectedIndices();
-
-        //            if (selectedIndices == null || selectedIndices.Count == 0)
-        //            {
-
-        //                MessageDialogBox.ShowDialog("Error", "Please select at least one pallet.", MessageBoxButtons.OK, MessageType.Info);
-        //                ;                return;
-        //            }
-
-        //            var selectedPallets = selectedIndices
-        //                .Select(i => _job.Pallets[i])
-        //                .ToList();
-
-        //            if (!selectedPallets.All(p => p.State == PalletState.Ready))
-        //            {
-
-        //                MessageDialogBox.ShowDialog(
-        //                    "Invalid Selection",
-        //                    "Only packed pallets (Ready) can be removed.",
-        //                    MessageBoxButtons.OK,
-        //                    MessageType.Warning
-        //);
-        //                return;
-        //            }
-
-        //            var palletIds = selectedPallets
-        //                .Select(p => p.PalletId)
-        //                .Where(id => id > 0)
-        //                .ToList();
-
-        //            ("PalletIds selected: " + string.Join(",", palletIds));
-
-        //            if (!palletIds.Any())
-        //            {
-
-
-        //                MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
-        //                return;
-        //            }
-
-        //            try
-        //            {
-
-        //                var activePalletId = await RqliteClient.GetActivePalletIdAsync(_job.JobId);
-        //                bool hasActivePallet = activePalletId != null;
-
-        //                using (var dlg = new RemovePallets(hasActivePallet))
-        //                {
-        //                    if (dlg.ShowDialog(this) != DialogResult.OK)
-        //                    {
-
-        //                        return;
-        //                    }
-
-        //                    switch (dlg.Action)
-        //                    {
-        //                        case RemovePallets.RemoveAction.Merge:
-        //                            if (activePalletId == null)
-        //                            {  
-        //                                MessageDialogBox.ShowDialog("", "Invalid pallet selection.", MessageBoxButtons.OK, MessageType.Error);
-        //                                return;
-        //                            }
-        //                            await RqliteClient.MergePalletsIntoAsync(
-        //                                palletIds,
-        //                                activePalletId.Value);
-        //                            break;
-
-        //                        case RemovePallets.RemoveAction.Delete:
-        //                            await RqliteClient.DeletePalletsAsync(palletIds);
-
-        //                            break;
-        //                        case RemovePallets.RemoveAction.UndoPack:
-
-        //                            //unpack multiple pallets and there is no ongoing pallet
-        //                            if (!hasActivePallet && palletIds.Count > 1)
-        //                            {
-        //                                int targetPalletId = palletIds.OrderBy(id => id).First();
-
-        //                                // undo only target pallet first
-        //                                await RqliteClient.UndoPackedPalletAsync(
-        //                                    new List<int> { targetPalletId },
-        //                                    _job.JobId);
-        //                                // merge remaining pallets into target
-        //                                await RqliteClient.MergePalletsIntoAsync(
-        //                                    palletIds.Where(id => id != targetPalletId),
-        //                                    targetPalletId);
-        //                            }
-        //                            else
-        //                            {
-        //                                await RqliteClient.UndoPackedPalletAsync(
-        //                                    palletIds,
-        //                                    _job.JobId
-        //                                );
-        //                            }
-
-        //                            break;
-
-        //                        default:
-
-        //                            return;
-        //                    }
-        //                }
-        //                DataChanged = true;
-        //                Close();
-        //            }
-        //            catch (Exception ex)
-        //            {
-
-        //                Utils.WriteExceptionError(ex);
-        //                MessageDialogBox.ShowDialog("", "Error processing pallets:\n\n" + ex.Message, MessageBoxButtons.OK, MessageType.Error);
-        //            }
-        //        }
         private async void btnRemovePallet_Click_1(object sender, EventArgs e)
         {
             try
@@ -399,7 +275,7 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
 
                     if (!palletIds.Any())
                     {
-                        await PBCMain.Instance.RefreshSingleJobAsync(_job.JobId);
+                       
                         return;
                     }
 
@@ -446,15 +322,17 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
                     }
                 }
 
-                // 🔥 FINAL refresh (guarantee UI sync)
-                var ts = await RqliteClient.GetJobsLastUpdatedAsync();
-                PBCMain.Instance.MarkPendingUpdate(_job.JobId, ts);
+             
+                var fresh = await RqliteClient.LoadSingleJobGraphAsync(_job.JobId);
+                if (fresh?.LastUpdatedRaw != null)
+                    PBCMain.Instance.MarkPendingUpdate(_job.JobId, fresh.LastUpdatedRaw);
 
                 DataChanged = true;
                 Close();
             }
             catch (Exception ex)
             {
+                Utils.WriteUnexpectedError($"RemovePallet failed | JobId={_job?.JobId}");
                 Utils.WriteExceptionError(ex);
                 MessageDialogBox.ShowDialog("", "Error processing pallets:\n\n" + ex.Message, MessageBoxButtons.OK, MessageType.Error);
             }
@@ -519,8 +397,8 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
             }
             catch (Exception ex)
             {
+                Utils.WriteUnexpectedError($"PrintPallet failed | JobId={_job?.JobId}");  // ✅ add
                 Utils.WriteExceptionError(ex);
-
                 Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Print failed!");
 
                 MessageDialogBox.ShowDialog(
@@ -586,14 +464,13 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
 
             if (this.InvokeRequired)
             {
-                this.Invoke((Action)NotifyStaleData);
+                try { this.Invoke((Action)NotifyStaleData); }
+                catch (ObjectDisposedException) { }  // ✅ guard the race
                 return;
             }
 
             _isStale = true;
             _staleBanner.Visible = true;
-
-            // ✅ Disable remove while stale to prevent acting on stale data
             btnRemovePallet.Enabled = false;
         }
 
@@ -648,6 +525,7 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
             }
             catch (Exception ex)
             {
+                Utils.WriteUnexpectedError($"RefreshFromDb failed | JobId={_job?.JobId}");  // ✅ add
                 Utils.WriteExceptionError(ex);
                 MessageDialogBox.ShowDialog("", "Refresh failed: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
             }

@@ -37,11 +37,34 @@ namespace PitneyBowesCalculator.Dialogs
             btnOk.Click += BtnOK_Click;
             btnCancel.Click += BtnCancel_Click;
             this.Shown += (_, __) => tbWoBarcode.Focus();
-            PrepareCpsQuery();
-            SettingsDialogAdmin.OnCpsConfigUpdated += async () =>
+            try
+            {
+                PrepareCpsQuery();
+            }
+            catch (Exception ex)
+            {
+                MessageDialogBox.ShowDialog(
+                    "Configuration Error",
+                    "CPS is not configured.\n\n" + ex.Message,
+                    MessageBoxButtons.OK,
+                    MessageType.Error
+                );
+                // Disable scanning since CPS isn't ready
+                tbWoBarcode.Enabled = false;
+                btnOk.Enabled = false;
+            }
+            Action cpsUpdateHandler = null;
+            cpsUpdateHandler = async () =>
             {
                 await PBCMain.LoadCPSConfig();
                 PrepareCpsQuery();
+            };
+
+            SettingsDialogAdmin.OnCpsConfigUpdated += cpsUpdateHandler;
+
+            this.FormClosed += (_, __) =>
+            {
+                SettingsDialogAdmin.OnCpsConfigUpdated -= cpsUpdateHandler;
             };
             _baseEnvelopeQty = envelopeQty;
             _baseScannedWO = scannedWO;
@@ -270,6 +293,7 @@ namespace PitneyBowesCalculator.Dialogs
         private void BtnCancel_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
+
             Close();
         }
 

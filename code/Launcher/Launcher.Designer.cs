@@ -121,7 +121,7 @@
             FormBorderStyle = FormBorderStyle.None;
             Name = "Launcher";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Form1";
+            Text = "Launcher";
             Load += Launcher_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);

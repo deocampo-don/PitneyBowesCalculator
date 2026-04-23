@@ -929,7 +929,7 @@ namespace PitneyBowesCalculator
             Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             Name = "PBCMain";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            Text = "iu8";
+            Text = "Pitney Bowes Calculator";
             Load += Form1_Shown;
             ((System.ComponentModel.ISupportInitialize)pnlHeader).EndInit();
             pnlHeader.ResumeLayout(false);

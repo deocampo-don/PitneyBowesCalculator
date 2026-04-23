@@ -48,6 +48,7 @@ namespace PitneyBowesCalculator.Dialogs
             this.Close();
         }
 
+        // ✅ Consistent version
         private async void btnLogin_Click(object sender, EventArgs e)
         {
             string username = tbUserName.Text.Trim();
@@ -55,43 +56,44 @@ namespace PitneyBowesCalculator.Dialogs
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                
                 MessageDialogBox.ShowDialog("", "Enter username and password.", MessageBoxButtons.OK, MessageType.Error);
-
                 return;
             }
 
-            if (DialogMode == "AddUser")
+            if (DialogMode == "AddUser" && password != tbVerifyPwd.Text.Trim())
             {
-                if (password != tbVerifyPwd.Text.Trim())
-                {
-                   
-                    MessageDialogBox.ShowDialog("", "Passwords do not match.", MessageBoxButtons.OK, MessageType.Error);
-                    return;
-                }
+                MessageDialogBox.ShowDialog("", "Passwords do not match.", MessageBoxButtons.OK, MessageType.Error);
+                return;
             }
 
             btnLogin.Enabled = false;
-            lbstatus.Visible = true;
-
             string hashedPassword = HashPassword(password);
-
             bool result = false;
 
-            if (DialogMode == "Login")
+            try
             {
-                Utils.showStatusAndSpinner(lbstatus, pbSpinner, "Validating...");
-                result = await RqliteClient.ValidateAdminAsync(username, hashedPassword);
+                if (DialogMode == "Login")
+                {
+                    Utils.showStatusAndSpinner(lbstatus, pbSpinner, "Validating...");
+                    result = await RqliteClient.ValidateAdminAsync(username, hashedPassword);
+                }
+                else
+                {
+                    Utils.showStatusAndSpinner(lbstatus, pbSpinner, "Creating user...");
+                    result = await RqliteClient.CreateUserAsync(username, hashedPassword);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                
-                Utils.hideStatusAndSpinner(lbstatus, pbSpinner, "Creating user...");
-                result = await RqliteClient.CreateUserAsync(username, hashedPassword);
+                Utils.WriteExceptionError(ex);
+                MessageDialogBox.ShowDialog("", "An error occurred: " + ex.Message, MessageBoxButtons.OK, MessageType.Error);
+                return;
             }
-
-            btnLogin.Enabled = true;
-            lbstatus.Visible = false;
+            finally
+            {
+                btnLogin.Enabled = true;
+                Utils.hideStatusAndSpinner(lbstatus, pbSpinner, "");
+            }
 
             if (result)
             {
@@ -100,12 +102,11 @@ namespace PitneyBowesCalculator.Dialogs
             }
             else
             {
-        
                 MessageDialogBox.ShowDialog(
-                     "",
-                        DialogMode == "Login"
-                            ? "Invalid admin credentials."
-                            : "Failed to create user.",
+                    "",
+                    DialogMode == "Login"
+                        ? "Invalid admin credentials."
+                        : "Failed to create user.",
                     MessageBoxButtons.OK,
                     MessageType.Error);
             }

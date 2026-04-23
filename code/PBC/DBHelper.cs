@@ -856,10 +856,39 @@ WHERE Id = {jobId};
     }
 
 
-    public static async Task ShipPalletsAsync(IEnumerable<int> jobIds)
+    //    public static async Task ShipPalletsAsync(IEnumerable<int> jobIds)
+    //    {
+    //        if (jobIds == null || !jobIds.Any())
+    //            return;
+
+    //        var idList = string.Join(",", jobIds);
+    //        var now = UtcNowString();
+
+    //        string sql = $@"
+    //UPDATE PALLET
+    //SET 
+    //    ShippedAt = '{now}',
+    //    State = {(int)PalletState.Shipped},
+    //    JobNameSnapshot = (
+    //        SELECT JobName 
+    //        FROM PBJOB 
+    //        WHERE PBJOB.Id = PALLET.PBJobId
+    //    )
+    //WHERE PBJobId IN ({idList})
+    //AND State = {(int)PalletState.Ready}
+    //AND ShippedAt IS NULL;
+
+    //UPDATE PBJOB
+    //SET LastUpdated = '{now}'
+    //WHERE Id IN ({idList});
+    //";
+
+    //        await ExecuteAsync(sql);
+    //    }
+    public static async Task<int> ShipPalletsAsync(IEnumerable<int> jobIds)
     {
         if (jobIds == null || !jobIds.Any())
-            return;
+            return 0;
 
         var idList = string.Join(",", jobIds);
         var now = UtcNowString();
@@ -883,7 +912,8 @@ SET LastUpdated = '{now}'
 WHERE Id IN ({idList});
 ";
 
-        await ExecuteAsync(sql);
+        var result = await ExecuteAsync(sql);
+        return result.RowsAffected;
     }
 
     // =====================================================

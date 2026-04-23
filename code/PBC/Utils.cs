@@ -89,15 +89,6 @@ namespace PitneyBowesCalculator
                 File.AppendAllText(logFullPath, stackTrace + message);
             }
         }
-        internal static string FormattedDateMMDDYYYY()
-        {
-            string formattedDate = string.Empty;
-            formattedDate = DateTime.Now.Month.ToString().PadLeft(2, '0') +
-                                DateTime.Now.Day.ToString().PadLeft(2, '0') +
-                                DateTime.Now.Year.ToString().PadLeft(4, '0');
-
-            return formattedDate;
-        }
 
 
         internal static string CheckAndCreateDirectory(string fileDirectory, string folderName)
@@ -275,83 +266,7 @@ namespace PitneyBowesCalculator
                 return before.TrimEnd() + " WHERE " + clause + " " + after;
         }
 
-        public static void PrintPdf(string pdfPath)
-        {
-            var printerName = Program.AppINI._defaultPrinter;
-            var printerIp = Program.AppINI._printerIP;
-            var printerPort = Program.AppINI._printerPort;
-
-            if (!File.Exists(pdfPath))
-                throw new Exception("PDF file not found.");
-
-            /* -------------------------------------------------------------
-               TRY NETWORK PRINTER FIRST
-            ------------------------------------------------------------- */
-            if (!string.IsNullOrWhiteSpace(printerIp) &&
-                !string.IsNullOrWhiteSpace(printerPort) &&
-                int.TryParse(printerPort, out int port))
-            {
-                try
-                {
-                    PrintPdfToNetworkPrinter(pdfPath, printerIp, port);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                   Utils.WriteExceptionError(ex);
-                }
-            }
-
-            /* -------------------------------------------------------------
-               FALLBACK TO WINDOWS DEFAULT PRINTER
-            ------------------------------------------------------------- */
-            if (!string.IsNullOrWhiteSpace(printerName))
-            {
-                bool printerExists = PrinterSettings.InstalledPrinters
-                    .Cast<string>()
-                    .Any(p => p.Equals(printerName, StringComparison.OrdinalIgnoreCase));
-
-                if (printerExists)
-                {
-                    try
-                    {
-                        var printer = new Jds2.SimpleFreePdfPrinter();
-                        printer.PrintPdfTo(printerName, pdfPath);
-                        return;
-                    }
-                    catch (Exception ex)
-                    {
-                        Utils.WriteExceptionError(ex);
-                    }
-                }
-            }
-
-      
-            MessageDialogBox.ShowDialog("Printing error", "No reachable network printer and no default printer configured.\n" + "Configure printer in settings first!", MessageBoxButtons.OK, MessageType.Error);
-      
-        }
-
-        private static void PrintPdfToNetworkPrinter(string pdfPath, string ip, int port)
-        {
-            byte[] fileBytes = File.ReadAllBytes(pdfPath);
-
-            using (TcpClient client = new TcpClient())
-            {
-                var result = client.BeginConnect(ip, port, null, null);
-                bool success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5));
-
-                if (!success)
-                    throw new Exception("Printer connection timeout.");
-
-                client.EndConnect(result);
-
-                using (NetworkStream stream = client.GetStream())
-                {
-                    stream.Write(fileBytes, 0, fileBytes.Length);
-                    stream.Flush();
-                }
-            }
-        }
+  
         public static void GenerateReport(List<PbJobModel> jobs,DateTimePicker dvFrom, DateTimePicker dvTo)
         {
             if (jobs == null || !jobs.Any())
@@ -507,56 +422,7 @@ namespace PitneyBowesCalculator
             _connectionStatusTimer?.Stop();
         }
 
-        public static string ShowDialog(string text, string caption)
-        {
-            Form prompt = new Form()
-            {
-                Width = 500,
-                Height = 350,
-                FormBorderStyle = FormBorderStyle.FixedDialog,
-                Text = caption,
-                StartPosition = FormStartPosition.CenterScreen
-            };
-            Label textLabel = new Label() { Left = 50, Top = 20, Text = text };
-            TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 400 };
-            Button confirmation = new Button() { Text = "Ok", Left = 350, Width = 100, Top = 100, DialogResult = DialogResult.OK };
-            confirmation.Click += (sender, e) => { prompt.Close(); };
-            prompt.Controls.Add(textBox);
-            prompt.Controls.Add(confirmation);
-            prompt.Controls.Add(textLabel);
-            prompt.AcceptButton = confirmation;
 
-            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
-        }
-
-        public class ListViewItemComparer : IComparer
-        {
-            private int col;
-            private bool reverse;
-
-            public ListViewItemComparer(int column, bool reverseSort)
-            {
-                col = column;
-                reverse = reverseSort;
-            }
-
-            public int Compare(object x, object y)
-            {
-                string itemX = ((ListViewItem)x).SubItems[col].Text;
-                string itemY = ((ListViewItem)y).SubItems[col].Text;
-
-                // Try parsing as numbers
-                if (double.TryParse(itemX, out double dX) && double.TryParse(itemY, out double dY))
-                    return reverse ? dY.CompareTo(dX) : dX.CompareTo(dY);
-
-                // Try parsing as dates
-                if (DateTime.TryParse(itemX, out DateTime dtX) && DateTime.TryParse(itemY, out DateTime dtY))
-                    return reverse ? dtY.CompareTo(dtX) : dtX.CompareTo(dtY);
-
-                // Default string comparison
-                return reverse ? string.Compare(itemY, itemX) : string.Compare(itemX, itemY);
-            }
-        }
     }
 
 
@@ -571,15 +437,7 @@ namespace PitneyBowesCalculator
 
     public class MessageDialogBox : Form
     {
-        public static Bitmap ByteToImage(byte[] blob)
-        {
-            MemoryStream mStream = new MemoryStream();
-            byte[] pData = blob;
-            mStream.Write(pData, 0, Convert.ToInt32(pData.Length));
-            Bitmap bm = new Bitmap(mStream, false);
-            mStream.Dispose();
-            return bm;
-        }
+    
 
         private static bool _dialogOpen = false;
 

@@ -86,10 +86,5 @@ namespace PitneyBowesCalculator.DIalogs
             DialogResult = DialogResult.Cancel;
             Close();
         }
-
-        private void btnOk_Click_1(object sender, EventArgs e)
-        {
-
-        }
     }
 }

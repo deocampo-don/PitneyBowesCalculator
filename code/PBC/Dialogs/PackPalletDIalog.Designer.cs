@@ -127,7 +127,7 @@
             btnOk.TabIndex = 8;
             btnOk.Values.DropDownArrowColor = System.Drawing.Color.Empty;
             btnOk.Values.Text = "OK";
-            btnOk.Click += btnOk_Click_1;
+         
             // 
             // PackPalletDIalog
             // 

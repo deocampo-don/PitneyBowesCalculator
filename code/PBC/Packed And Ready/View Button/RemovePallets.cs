@@ -121,16 +121,6 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
          * ------------------------------------------------------------- */
         private void btnNo1_Click(object sender, EventArgs e)
         {
-            // If user presses NO before merge options appear → cancel
-            if (!_hasActivePallet || !firstYesClicked)
-            {
-                Action = RemoveAction.Delete;
-                DialogResult = DialogResult.OK;
-                Close();
-                
-            }
-
-            // After animation → NO means delete
             Action = RemoveAction.Delete;
             DialogResult = DialogResult.OK;
             Close();

@@ -17,6 +17,7 @@ namespace PitneyBowesCalculator
         public event EventHandler<PbJobModel> PalletChanged;
         public event EventHandler<PbJobModel> EditRequested;
         public event EventHandler<PbJobModel> SoftDeleteRequested;
+        private int _lastResizeWidth = -1;
 
         public PalletListView()
         {
@@ -41,32 +42,11 @@ namespace PitneyBowesCalculator
         }
         public void AddItem(PbJobModel job)
         {
-            var row = new PalletRowControl();
-            row.Bind(job);
-
-            row.DeleteRequested += async (_, j) =>
-            {
-                try
-                {
-                    DeleteRequested?.Invoke(this, j); 
-                }
-                catch (Exception ex)
-                {
-                    Utils.WriteUnexpectedError("DeleteRequested event failed");
-                    Utils.WriteExceptionError(ex);
-                }
-            };
-     
-            row.PalletChanged += (_, j) =>
-                PalletChanged?.Invoke(this, j);
-            row.EditRequested += (_, j) =>
-        EditRequested?.Invoke(this, j);
-            row.SoftDeleteRequested += (_, j) =>
-    SoftDeleteRequested?.Invoke(this, j);
-            row.Dock = DockStyle.Top;
-
+            var row = CreateRow(job);
+            rowsContainer.SuspendLayout();        
             rowsContainer.Controls.Add(row);
-            rowsContainer.Controls.SetChildIndex(row, 0); // newest on top
+            rowsContainer.Controls.SetChildIndex(row, 0);
+            rowsContainer.ResumeLayout();       
         }
 
         public void BeginUpdate()
@@ -80,17 +60,18 @@ namespace PitneyBowesCalculator
         }
         public void SetItems(IEnumerable<PbJobModel> items)
         {
-         
             rowsContainer.SuspendLayout();
+
+            // ✅ Dispose before clearing
+            foreach (Control c in rowsContainer.Controls)
+                c.Dispose();
+
             rowsContainer.Controls.Clear();
 
             foreach (var job in items)
-            {
                 AddItem(job);
-            }
 
             rowsContainer.ResumeLayout();
-        
         }
 
         public int GetItemIndex(int jobId)
@@ -106,24 +87,7 @@ namespace PitneyBowesCalculator
 
         public void InsertItem(PbJobModel job, int index)
         {
-            var row = new PalletRowControl();
-            row.Bind(job);
-
-            row.DeleteRequested += async (_, j) =>
-            {
-                try { DeleteRequested?.Invoke(this, j); }
-                catch (Exception ex)
-                {
-                    Utils.WriteUnexpectedError("DeleteRequested event failed");
-                    Utils.WriteExceptionError(ex);
-                }
-            };
-            row.PalletChanged += (_, j) => PalletChanged?.Invoke(this, j);
-            row.EditRequested += (_, j) => EditRequested?.Invoke(this, j);
-            row.SoftDeleteRequested += (_, j) => SoftDeleteRequested?.Invoke(this, j);
-            row.Dock = DockStyle.Top;
-
-            // ✅ Suspend layout during insert to prevent scroll reset
+            var row = CreateRow(job);
             rowsContainer.SuspendLayout();
             rowsContainer.Controls.Add(row);
             rowsContainer.Controls.SetChildIndex(row, index);
@@ -135,14 +99,40 @@ namespace PitneyBowesCalculator
             ResizeRowsToHost();
         }
 
+        private PalletRowControl CreateRow(PbJobModel job)
+        {
+            var row = new PalletRowControl();
+            row.Bind(job);
+            row.Dock = DockStyle.Top;
+
+            row.DeleteRequested += (_, j) =>
+            {
+                try { DeleteRequested?.Invoke(this, j); }
+                catch (Exception ex)
+                {
+                    Utils.WriteUnexpectedError("DeleteRequested event failed");
+                    Utils.WriteExceptionError(ex);
+                }
+            };
+            row.PalletChanged += (_, j) => PalletChanged?.Invoke(this, j);
+            row.EditRequested += (_, j) => EditRequested?.Invoke(this, j);
+            row.SoftDeleteRequested += (_, j) => SoftDeleteRequested?.Invoke(this, j);
+
+            return row;
+        }
+
+        
+
         public void ResizeRowsToHost()
         {
             int width = rowsContainer.ClientSize.Width;
+            if (width == _lastResizeWidth) return;
+            _lastResizeWidth = width;
 
+            rowsContainer.SuspendLayout();
             foreach (Control c in rowsContainer.Controls)
-            {
-                c.Width = width-5; // small margin
-            }
+                c.Width = width - 5;
+            rowsContainer.ResumeLayout();
         }
 
         public int GetScrollPosition()

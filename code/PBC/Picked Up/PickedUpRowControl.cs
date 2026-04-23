@@ -36,35 +36,31 @@ namespace PitneyBowesCalculator.Picked_Up
 
         private void btnView_Click(object sender, EventArgs e)
         {
-            if (_model == null)
-                return;
+            if (_model == null) return;
 
-            // 🔥 IMPORTANT: Always deep clone before opening dialog
-            var clonedJob = ModelCloner.CloneJob(_model);
-
-            Form parentForm = this.FindForm();
-
-            using (var dlg = new ViewButtonDialog(
-                clonedJob,
-                hideRemove: true,
-                hidePrint: true,
-                hideClose: false))
+            try
             {
-                dlg.ShowDialog(parentForm);
+                var clonedJob = ModelCloner.CloneJob(_model);
+                Form parentForm = this.FindForm();
 
-                if (dlg.DataChanged)
+                using (var dlg = new ViewButtonDialog(clonedJob, hideRemove: true, hidePrint: true, hideClose: false))
                 {
-                    ViewDialogClosed?.Invoke(this, EventArgs.Empty);
+                    dlg.ShowDialog(parentForm);
+                    if (dlg.DataChanged)
+                        ViewDialogClosed?.Invoke(this, EventArgs.Empty);
                 }
+            }
+            catch (Exception ex)
+            {
+                Utils.WriteUnexpectedError($"ViewDialog failed | JobId={_model?.JobId}");
+                Utils.WriteExceptionError(ex);
+                MessageDialogBox.ShowDialog("", "Error opening view: " + ex.Message,
+                    MessageBoxButtons.OK, MessageType.Warning);
             }
         }
 
-    
-        public void SetChecked(bool value)
-        {
 
-            cbItem.Checked = value;
-        }
+
 
         [System.ComponentModel.Browsable(false)]
         [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]

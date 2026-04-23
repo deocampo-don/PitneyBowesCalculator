@@ -46,10 +46,14 @@ namespace PitneyBowesCalculator
             }
             if (e.KeyCode == Keys.Enter)
             {
-                this.DialogResult = DialogResult.OK;
-                this.Close();
+                if (!string.IsNullOrWhiteSpace(tbPBJobName.Text) &&
+                    !string.IsNullOrWhiteSpace(tbJobNumber.Text))
+                {
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
             }
-            
+
         }
 
         private void kryptonButton1_Click(object sender, EventArgs e)

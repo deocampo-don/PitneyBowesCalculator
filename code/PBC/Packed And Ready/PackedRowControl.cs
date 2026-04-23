@@ -29,6 +29,7 @@ namespace PitneyBowesCalculator.Packed_And_Ready
         public event EventHandler ViewDialogClosed;
         private bool _suppressEvents = false;
         private static int _cbSelected = 0;
+        public bool IsChecked => chkbxStatus.Checked;
 
 
         /* -------------------------------------------------------------
@@ -103,27 +104,35 @@ namespace PitneyBowesCalculator.Packed_And_Ready
 
         private void btnView_Click_1(object sender, EventArgs e)
         {
-            ViewClicked?.Invoke(this, EventArgs.Empty);
-
-            Form parentForm = this.FindForm();
-
-            using (var dlg = new ViewButtonDialog(_modelpbjob))
+            if (_modelpbjob == null) return;
+            try
             {
-                // ✅ Register stale callback before showing
-                PBCMain.Instance.RegisterStaleCallback(_modelpbjob.JobId, () =>
+                Form parentForm = this.FindForm();
+                using (var dlg = new ViewButtonDialog(_modelpbjob))
                 {
-                    dlg.NotifyStaleData();
-                });
+                    PBCMain.Instance.RegisterStaleCallback(_modelpbjob.JobId, () =>
+                        dlg.NotifyStaleData());
 
-                dlg.ShowDialog(parentForm);
+                    try
+                    {
+                        dlg.ShowDialog(parentForm);
+                    }
+                    finally
+                    {
+                        // ✅ Always unregister even if ShowDialog throws
+                        PBCMain.Instance.UnregisterStaleCallback(_modelpbjob.JobId);
+                    }
 
-                // ✅ Always unregister when dialog closes
-                PBCMain.Instance.UnregisterStaleCallback(_modelpbjob.JobId);
-
-                if (dlg.DataChanged)
-                {
-                    ViewDialogClosed?.Invoke(this, EventArgs.Empty);
+                    if (dlg.DataChanged)
+                        ViewDialogClosed?.Invoke(this, EventArgs.Empty);
                 }
+            }
+            catch (Exception ex)
+            {
+                Utils.WriteUnexpectedError($"ViewDialog failed | JobId={_modelpbjob?.JobId}");
+                Utils.WriteExceptionError(ex);
+                MessageDialogBox.ShowDialog("", "Error opening view: " + ex.Message,
+                    MessageBoxButtons.OK, MessageType.Warning);
             }
         }
         private async void chkbxStatus_CheckedChanged(object sender, EventArgs e)
@@ -169,12 +178,16 @@ namespace PitneyBowesCalculator.Packed_And_Ready
             }
             catch (Exception ex)
             {
+                Utils.WriteUnexpectedError($"TogglePalletReady failed | JobId={_modelpbjob?.JobId}");
                 Utils.WriteExceptionError(ex);
+                MessageDialogBox.ShowDialog("", "Error updating pallet status: " + ex.Message,
+                    MessageBoxButtons.OK, MessageType.Warning);
             }
             finally
             {
                 this.Enabled = true;
                 _suppressEvents = false;
+                SelectionChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 

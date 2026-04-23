@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using System.Drawing;
+using System.Drawing.Printing;
+using System.Linq;
 
 public static class PrintLayouts
 {
@@ -78,39 +79,51 @@ public static class PrintLayouts
         int colPallets = 560;
         int colShip = 650;
 
-        // Title
         e.Graphics.DrawString("Pitney Bose Summary Sheet", titleFont, Brushes.Black, left, y);
         y += 40;
 
         e.Graphics.DrawString("Timestamp: " + DateTime.Now.ToString("M/d/yy h:mmtt"),
             textFont, Brushes.Black, left, y);
-
         y += 40;
 
-        // Header
         e.Graphics.FillRectangle(Brushes.LightGray, left, y, 750, rowHeight);
-
         e.Graphics.DrawString("Job ID", headerFont, Brushes.Black, colJob, y + 5);
         e.Graphics.DrawString("QTY", headerFont, Brushes.Black, colQty, y + 5);
         e.Graphics.DrawString("TRAYS", headerFont, Brushes.Black, colTrays, y + 5);
         e.Graphics.DrawString("PALLETS", headerFont, Brushes.Black, colPallets, y + 5);
         e.Graphics.DrawString("PACK DATE", headerFont, Brushes.Black, colShip, y + 5);
-
         y += rowHeight;
 
         bool alt = false;
 
         foreach (var job in jobs)
         {
+            // Only count pallets from the most recent ShippedAt for this job
+            var latestShipTime = job.Pallets
+                .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
+                .Max(p => p.ShippedAt);
+
+            var shippedPallets = job.Pallets
+                .Where(p => p.State == PalletState.Shipped && p.ShippedAt == latestShipTime)
+                .ToList();
+
+            int totalEnvelopes = shippedPallets.Sum(p => p.PalletEnvelopeQty);
+            int totalTrays = shippedPallets.Sum(p => p.TrayCount);
+            int palletCount = shippedPallets.Count;
+
+            var packDate = shippedPallets
+                .Where(p => p.PackedAt.HasValue)
+                .Max(p => p.PackedAt);
+
             if (alt)
                 e.Graphics.FillRectangle(Brushes.Gainsboro, left, y, 750, rowHeight);
 
             e.Graphics.DrawString($"{job.JobNumber} {job.JobName}", textFont, Brushes.Black, colJob, y + 5);
-            e.Graphics.DrawString(job.TotalEnvelopeOfJob.ToString(), textFont, Brushes.Black, colQty, y + 5);
-            e.Graphics.DrawString(job.TotalTraysOfJob.ToString(), textFont, Brushes.Black, colTrays, y + 5);
-            e.Graphics.DrawString(job.Pallets.Count.ToString(), textFont, Brushes.Black, colPallets, y + 5);
-            e.Graphics.DrawString(job.LastPackedTime?.ToString("MM/dd/yyyy hh:mm tt") ?? "--",
-    textFont, Brushes.Black, colShip, y + 5);
+            e.Graphics.DrawString(totalEnvelopes.ToString(), textFont, Brushes.Black, colQty, y + 5);
+            e.Graphics.DrawString(totalTrays.ToString(), textFont, Brushes.Black, colTrays, y + 5);
+            e.Graphics.DrawString(palletCount.ToString(), textFont, Brushes.Black, colPallets, y + 5);
+            e.Graphics.DrawString(packDate?.ToString("MM/dd/yyyy hh:mm tt") ?? "--",
+                textFont, Brushes.Black, colShip, y + 5);
 
             y += rowHeight;
             alt = !alt;
@@ -239,6 +252,52 @@ public static class PrintLayouts
             alternate = !alternate;
             index++; // ✅ increment
         }
-    
-}
+    }
+    public static void DrawPalletLabel(PrintPageEventArgs e, PbJobModel job, Pallet pallet, int palletIndex)
+    {
+        int leftMargin = 80;
+        int y = 80;
+
+        int pageWidth = e.PageBounds.Width;
+
+        Font jobFont = new Font("Segoe UI", 24, FontStyle.Regular);
+        Font palletFont = new Font("Segoe UI", 42, FontStyle.Bold);
+        Font labelFont = new Font("Segoe UI", 16, FontStyle.Regular);
+
+        StringFormat centerFormat = new StringFormat
+        {
+            Alignment = StringAlignment.Center,
+            LineAlignment = StringAlignment.Near
+        };
+
+        // --- Job Number + Name (centered) ---
+        string jobTitle = $"{job.JobNumber} {job.JobName}";
+        RectangleF jobRect = new RectangleF(0, y, pageWidth, 50);
+        e.Graphics.DrawString(jobTitle, jobFont, Brushes.Black, jobRect, centerFormat);
+
+        y += 80;
+
+        // --- Pallet # X (big and bold, centered) ---
+        string palletTitle = $"Pallet # {palletIndex}";
+   
+        RectangleF palletRect = new RectangleF(0, y, pageWidth, 80);
+        e.Graphics.DrawString(palletTitle, palletFont, Brushes.Black, palletRect, centerFormat);
+
+        y += 120;
+
+        // --- Details (left aligned, spaced out like label) ---
+        int lineSpacing = 45;
+
+        e.Graphics.DrawString($"Envelope QTY: {pallet.PalletEnvelopeQty:N0}", labelFont, Brushes.Black, leftMargin, y);
+        y += lineSpacing;
+
+        e.Graphics.DrawString($"Tray: {pallet.TrayCount:N0}", labelFont, Brushes.Black, leftMargin, y);
+        y += lineSpacing;
+
+        e.Graphics.DrawString($"Scanned WO: {pallet.PalletScannedWO}", labelFont, Brushes.Black, leftMargin, y);
+        y += lineSpacing;
+
+        string packTime = pallet.PackedAt?.ToString("MM/dd/yyyy hh:mm tt") ?? "--";
+        e.Graphics.DrawString($"PACK TIME: {packTime}", labelFont, Brushes.Black, leftMargin, y);
+    }
 }

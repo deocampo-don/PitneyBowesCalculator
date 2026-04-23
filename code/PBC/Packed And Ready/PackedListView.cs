@@ -9,56 +9,24 @@ namespace PitneyBowesCalculator.Packed_And_Ready
 {
     public partial class PackedListView : UserControl
     {
+
+        public event EventHandler RowSelectionChanged;
         public PackedListView()
         {
             InitializeComponent();
 
         }
         public event EventHandler<PbJobModel> PackedDataChanged;
-
-        //public void SetItems(IEnumerable<PbJobModel> items)
-        //{
-        //    packedFlowRow.SuspendLayout();
-        //    packedFlowRow.Controls.Clear();
-
-        //    var list = items.ToList();
-        //    for (int i = 0; i < list.Count; i++)
-        //    {
-        //        var job = list[i]; // capture properly
-
-        //        var row = new PackedRowControl();
-        //        row.Bind(job);
-        //        AddRow(row);
-
-        //        row.ViewDialogClosed += (_, __) =>
-        //        {
-        //            PackedDataChanged?.Invoke(this, job);
-        //        };
-        //    }
-
-        //    packedFlowRow.ResumeLayout();
-        //}
         public void SetItems(IEnumerable<PbJobModel> items)
         {
-            packedFlowRow.SuspendLayout();
+            packedFlowRow.SuspendLayout();         
+
+            foreach (Control c in packedFlowRow.Controls)
+                c.Dispose();
             packedFlowRow.Controls.Clear();
 
-            var list = items.ToList();
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                var job = list[i]; // capture correctly
-
-                var row = new PackedRowControl();
-                row.Bind(job);
-
-                row.ViewDialogClosed += (_, __) =>
-                {
-                    PackedDataChanged?.Invoke(this, job);
-                };
-
-                AddRow(row);
-            }
+            foreach (var job in items.ToList())
+                AddRow(CreateRow(job));            
 
             packedFlowRow.ResumeLayout();
         }
@@ -111,8 +79,6 @@ namespace PitneyBowesCalculator.Packed_And_Ready
                 if (c is PackedRowControl row)
                 {
                     row.SetChecked(isSelected);
-                 
-                       
                 }
             }
 
@@ -126,6 +92,15 @@ namespace PitneyBowesCalculator.Packed_And_Ready
         {
             packedFlowRow.AutoScrollPosition = new Point(0, y);
         }
+
+        private PackedRowControl CreateRow(PbJobModel job)
+        {
+            var row = new PackedRowControl();
+            row.Bind(job);
+            row.ViewDialogClosed += (_, __) => PackedDataChanged?.Invoke(this, job);
+            row.SelectionChanged += (_, __) => RowSelectionChanged?.Invoke(this, EventArgs.Empty);
+            return row;
+        }
         public void RemoveItem(int jobId)
         {
             var row = packedFlowRow.Controls
@@ -133,20 +108,17 @@ namespace PitneyBowesCalculator.Packed_And_Ready
                 .FirstOrDefault(r => r.BoundJob.JobId == jobId);
 
             if (row != null)
+            {
+                packedFlowRow.SuspendLayout();   // optional but consistent
                 packedFlowRow.Controls.Remove(row);
+                row.Dispose();
+                packedFlowRow.ResumeLayout();
+            }
         }
 
         public void AddItem(PbJobModel job)
         {
-            var row = new PackedRowControl();
-            row.Bind(job);
-
-            row.ViewDialogClosed += (_, __) =>
-            {
-                PackedDataChanged?.Invoke(this, job);
-            };
-
-            packedFlowRow.Controls.Add(row);
+            packedFlowRow.Controls.Add(CreateRow(job)); 
         }
 
         public int GetItemIndex(int jobId)
@@ -160,18 +132,19 @@ namespace PitneyBowesCalculator.Packed_And_Ready
             return -1;
         }
 
+        public bool AllChecked()
+        {
+            var rows = packedFlowRow.Controls.OfType<PackedRowControl>().ToList();
+            return rows.Count > 0 && rows.All(r => r.IsChecked);
+        }
+
         public void InsertItem(PbJobModel job, int index)
         {
-            var row = new PackedRowControl();
-            row.Bind(job);
-
-            row.ViewDialogClosed += (_, __) =>
-            {
-                PackedDataChanged?.Invoke(this, job);
-            };
-
+            var row = CreateRow(job);
+            packedFlowRow.SuspendLayout();       // ✅ add
             packedFlowRow.Controls.Add(row);
             packedFlowRow.Controls.SetChildIndex(row, index);
+            packedFlowRow.ResumeLayout();        // ✅ add
         }
 
     }
