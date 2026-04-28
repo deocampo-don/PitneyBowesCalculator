@@ -91,14 +91,13 @@ public static class PrintLayouts
         e.Graphics.DrawString("QTY", headerFont, Brushes.Black, colQty, y + 5);
         e.Graphics.DrawString("TRAYS", headerFont, Brushes.Black, colTrays, y + 5);
         e.Graphics.DrawString("PALLETS", headerFont, Brushes.Black, colPallets, y + 5);
-        e.Graphics.DrawString("PACK DATE", headerFont, Brushes.Black, colShip, y + 5);
+        e.Graphics.DrawString("SHIP DATE", headerFont, Brushes.Black, colShip, y + 5);
         y += rowHeight;
 
         bool alt = false;
 
         foreach (var job in jobs)
         {
-            // Only count pallets from the most recent ShippedAt for this job
             var latestShipTime = job.Pallets
                 .Where(p => p.State == PalletState.Shipped && p.ShippedAt.HasValue)
                 .Max(p => p.ShippedAt);
@@ -111,9 +110,10 @@ public static class PrintLayouts
             int totalTrays = shippedPallets.Sum(p => p.TrayCount);
             int palletCount = shippedPallets.Count;
 
-            var packDate = shippedPallets
-                .Where(p => p.PackedAt.HasValue)
-                .Max(p => p.PackedAt);
+            // ✅ Fix — fall back to DateTime.Now if ShippedAt not yet committed to DB
+            var shipDate = shippedPallets
+                .Where(p => p.ShippedAt.HasValue)
+                .Max(p => p.ShippedAt) ?? DateTime.Now;
 
             if (alt)
                 e.Graphics.FillRectangle(Brushes.Gainsboro, left, y, 750, rowHeight);
@@ -122,7 +122,7 @@ public static class PrintLayouts
             e.Graphics.DrawString(totalEnvelopes.ToString(), textFont, Brushes.Black, colQty, y + 5);
             e.Graphics.DrawString(totalTrays.ToString(), textFont, Brushes.Black, colTrays, y + 5);
             e.Graphics.DrawString(palletCount.ToString(), textFont, Brushes.Black, colPallets, y + 5);
-            e.Graphics.DrawString(packDate?.ToString("MM/dd/yyyy hh:mm tt") ?? "--",
+            e.Graphics.DrawString(shipDate.ToString("MM/dd/yyyy hh:mm tt"),
                 textFont, Brushes.Black, colShip, y + 5);
 
             y += rowHeight;

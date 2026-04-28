@@ -308,299 +308,269 @@ namespace PitneyBowesCalculator
         private async void btnAddPallet_Click_1(object sender, EventArgs e)
         {
             if (!PBCMain.Instance.EnsureConnected()) return;
-            if (_model == null)
-                return;
+            if (_model == null) return;
 
-            // 1️⃣ Find working pallet
-            var pallet = _model.Pallets
-                .FirstOrDefault(p =>
-                    p.State == PalletState.NotReady &&
-                    p.PackedAt == null &&
-                    p.ShippedAt == null);
-
-            // 2️⃣ Early validation
-            if (pallet != null)
+            // Fix #1 — double-click guard
+            btnAddPallet.Enabled = false;
+            try
             {
-                (pallet, _) = await EnsurePalletIsOpenAsync(pallet);
-                if (pallet == null)
-                    return;
+                // 1️⃣ Find working pallet
+                var pallet = _model.Pallets
+                    .FirstOrDefault(p =>
+                        p.State == PalletState.NotReady &&
+                        p.PackedAt == null &&
+                        p.ShippedAt == null);
 
-                pallet.WorkOrders = await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
-            }
-
-            int baseEnvelope = pallet?.WorkOrders.Sum(w => w.Quantity) ?? 0;
-            int baseScannedWO = pallet?.WorkOrders.Count ?? 0;
-
-            using (var dlg = new PitneyBowesCalculator.Dialogs.AddToPalletDialog(baseEnvelope, baseScannedWO))
-            {
-                if (dlg.ShowDialog(this) != DialogResult.OK)
-                    return;
-
-                if (!dlg.ScannedWorkOrders.Any())
+                // 2️⃣ Early validation
+                if (pallet != null)
                 {
-                    MessageDialogBox.ShowDialog("", "No scanned data.", MessageBoxButtons.OK, MessageType.Error);
-                    return;
-                }
+                    var (earlyChecked, _, earlyStatus) = await EnsurePalletIsOpenAsync(pallet);
 
-                try
-                {
-                    var scannedBarcodes = dlg.ScannedWorkOrders
-                        .Select(x => x.Barcode)
-                        .ToList();
-
-                    // 3️⃣ Check duplicates
-                    var existing = await RqliteClient.GetExistingBarcodesAsync(scannedBarcodes);
-                    var duplicates = existing.ToList();
-
-                    var validWorkOrders = dlg.ScannedWorkOrders
-                        .Where(x => !duplicates.Contains(x.Barcode))
-                        .ToList();
-
-                    if (!validWorkOrders.Any())
+                    if (earlyStatus != PalletCheckResult.Open)
                     {
-                        MessageDialogBox.ShowDialog("", "All scanned barcodes are duplicates.", MessageBoxButtons.OK, MessageType.Error);
+                        await HandlePalletCheckFailure(earlyStatus);
                         return;
                     }
 
-                    // 4️⃣ Create pallet if needed
-                    if (pallet == null)
+                    pallet = earlyChecked;
+                    pallet.WorkOrders = await RqliteClient.LoadWorkOrdersAsync(pallet.PalletId);
+                }
+
+                int baseEnvelope = pallet?.WorkOrders.Sum(w => w.Quantity) ?? 0;
+                int baseScannedWO = pallet?.WorkOrders.Count ?? 0;
+
+                using (var dlg = new PitneyBowesCalculator.Dialogs.AddToPalletDialog(baseEnvelope, baseScannedWO))
+                {
+                    if (dlg.ShowDialog(this) != DialogResult.OK)
+                        return;
+
+                    if (!dlg.ScannedWorkOrders.Any())
                     {
-                        // Guard: ensure job still exists before creating a pallet
-                        var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
-                        if (freshJob == null)
+                        MessageDialogBox.ShowDialog("", "No scanned data.", MessageBoxButtons.OK, MessageType.Error);
+                        return;
+                    }
+
+                    try
+                    {
+                        var scannedBarcodes = dlg.ScannedWorkOrders
+                            .Select(x => x.Barcode)
+                            .ToList();
+
+                        // 3️⃣ Check duplicates
+                        var existing = await RqliteClient.GetExistingBarcodesAsync(scannedBarcodes);
+                        var duplicates = existing.ToList();
+
+                        var validWorkOrders = dlg.ScannedWorkOrders
+                            .Where(x => !duplicates.Contains(x.Barcode))
+                            .ToList();
+
+                        if (!validWorkOrders.Any())
                         {
-                            MessageDialogBox.ShowDialog(
-                                "Job Deleted",
-                                "This job has been deleted by another workstation.",
-                                MessageBoxButtons.OK,
-                                MessageType.Warning
-                            );
+                            MessageDialogBox.ShowDialog("", "All scanned barcodes are duplicates.", MessageBoxButtons.OK, MessageType.Error);
                             return;
                         }
 
-                        int palletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
-
-                        pallet = new Pallet
+                        // 4️⃣ Create pallet if needed
+                        if (pallet == null)
                         {
-                            PalletId = palletId,
-                            PBJobId = _model.JobId,
-                            WorkOrders = new List<WorkOrder>(),
-                            State = PalletState.NotReady
-                        };
+                            var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+                            if (freshJob == null)
+                            {
+                                MessageDialogBox.ShowDialog(
+                                    "Job Deleted",
+                                    "This job has been deleted by another workstation.",
+                                    MessageBoxButtons.OK,
+                                    MessageType.Warning
+                                );
+                                return;
+                            }
 
-                        _model.Pallets.Add(pallet);
+                            int palletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
+
+                            pallet = new Pallet
+                            {
+                                PalletId = palletId,
+                                PBJobId = _model.JobId,
+                                WorkOrders = new List<WorkOrder>(),
+                                State = PalletState.NotReady
+                            };
+
+                            _model.Pallets.Add(pallet);
+                        }
+
+                        // 5️⃣ Late validation — pallet may have been packed mid-scan
+                        var (checkedPallet, _, palletStatus) = await EnsurePalletIsOpenAsync(pallet);
+
+                        if (palletStatus != PalletCheckResult.Open)
+                        {
+                            if (palletStatus == PalletCheckResult.PalletPacked)
+                            {
+                                var result = MessageDialogBox.ShowDialog(
+                                    "Pallet Already Packed",
+                                    "This pallet was already packed by another workstation.\n\n" +
+                                    "Would you like to add your scanned work orders to a new pallet instead?",
+                                    MessageBoxButtons.YesNo,
+                                    MessageType.Warning
+                                );
+
+                                if (result != DialogResult.Yes)
+                                {
+                                    // Fix #4
+                                    SetButtonsEnabled(false);
+                                    try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
+                                    finally { SetButtonsEnabled(true); }
+                                    return;
+                                }
+
+                                int newPalletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
+
+                                var recheck = await RqliteClient.GetExistingBarcodesAsync(
+                                    validWorkOrders.Select(x => x.Barcode).ToList()
+                                );
+
+                                var safeWorkOrders = validWorkOrders
+                                    .Where(x => !recheck.Contains(x.Barcode))
+                                    .ToList();
+
+                                if (!safeWorkOrders.Any())
+                                {
+                                    MessageDialogBox.ShowDialog(
+                                        "",
+                                        "All scanned work orders were already added by another workstation.",
+                                        MessageBoxButtons.OK,
+                                        MessageType.Warning
+                                    );
+                                    // Fix #4
+                                    SetButtonsEnabled(false);
+                                    try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
+                                    finally { SetButtonsEnabled(true); }
+                                    return;
+                                }
+
+                                // Fix #2 — SaveWorkOrdersAsync should guard with WHERE barcode NOT EXISTS on DB side
+                                await RqliteClient.SaveWorkOrdersAsync(newPalletId, safeWorkOrders);
+                                // Fix #4
+                                SetButtonsEnabled(false);
+                                try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
+                                finally { SetButtonsEnabled(true); }
+                                return;
+                            }
+
+                            await HandlePalletCheckFailure(palletStatus);
+                            return;
+                        }
+
+                        pallet = checkedPallet;
+
+                        // 6️⃣ Save to DB — Fix #2: DB side should guard with WHERE barcode NOT EXISTS
+                        await RqliteClient.SaveWorkOrdersAsync(pallet.PalletId, validWorkOrders);
+
+                        // 7️⃣ Show duplicates if any
+                        if (duplicates.Any())
+                        {
+                            var duplicateNames = dlg.ScannedWorkOrders
+                                .Where(x => duplicates.Contains(x.Barcode))
+                                .Select(x => x.WorkOrderCode)
+                                .ToList();
+
+                            var message =
+                                $"Inserted: {validWorkOrders.Count}\n" +
+                                $"Duplicates skipped: {duplicates.Count}\n\n" +
+                                $"{string.Join("\n", duplicateNames)}\n\n" +
+                                "Duplicate workorder/s";
+
+                            MessageDialogBox.ShowDialog(
+                                "",
+                                message,
+                                MessageBoxButtons.OK,
+                                MessageType.Warning
+                            );
+                        }
+
+                        // 8️⃣ Refresh — Fix #4
+                        SetButtonsEnabled(false);
+                        try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
+                        finally { SetButtonsEnabled(true); }
                     }
-
-                    // 5️⃣ Late validation — just check pallet is still open
-                    (pallet, _) = await EnsurePalletIsOpenAsync(pallet);
-                    if (pallet == null)
-                        return;
-
-                    // 6️⃣ Save to DB
-                    await RqliteClient.SaveWorkOrdersAsync(pallet.PalletId, validWorkOrders);
-
-                    // 7️⃣ Show duplicates if any
-                    if (duplicates.Any())
+                    catch (Exception ex)
                     {
-                        var message =
-                            $"Inserted: {validWorkOrders.Count}\n" +
-                            $"Duplicates skipped: {duplicates.Count}\n\n" +
-                            $"{string.Join("\n", duplicates)}\n\n" +
-                            "Duplicate Barcodes";
-
-                        MessageDialogBox.ShowDialog(
-                            "",
-                            message,
-                            MessageBoxButtons.OK,
-                            MessageType.Warning
-                        );
+                        Utils.WriteUnexpectedError($"AddToPallet failed | JobId={_model?.JobId}");
+                        Utils.WriteExceptionError(ex);
+                        MessageDialogBox.ShowDialog("", "Error saving pallet: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
                     }
-
-                    // 8️⃣ Refresh from DB — picks up ALL workstations' changes
-                    await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
                 }
-                catch (Exception ex)
-                {
-                    Utils.WriteUnexpectedError($"AddToPallet failed | JobId={_model?.JobId}");
-                    Utils.WriteExceptionError(ex);
-                    MessageDialogBox.ShowDialog("", "Error saving pallet: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
-
-                }
+            }
+            finally
+            {
+                // Fix #1 — always re-enable
+                btnAddPallet.Enabled = true;
             }
         }
-        private async Task<(Pallet pallet, PbJobModel freshJob)> EnsurePalletIsOpenAsync(Pallet pallet)
+        private async Task<(Pallet pallet, PbJobModel freshJob, PalletCheckResult status)>
+     EnsurePalletIsOpenAsync(Pallet pallet)
         {
-            if (!PBCMain.Instance.EnsureConnected()) return (null, null);
-            if (_model == null || pallet == null)
-                return (null, null);
+            var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
 
-            var fresh = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+            if (freshJob == null)
+                return (null, null, PalletCheckResult.JobDeleted);
 
-            if (fresh == null)
-            {
-                MessageDialogBox.ShowDialog(
-                    "Job Deleted",
-                    "This job has been deleted by another workstation.",
-                    MessageBoxButtons.OK,
-                    MessageType.Warning
-                );
-                return (null, null);
-            }
-
-            var dbPallet = fresh.Pallets
+            var dbPallet = freshJob.Pallets
                 .FirstOrDefault(p => p.PalletId == pallet.PalletId);
 
             if (dbPallet == null)
-            {
-                MessageDialogBox.ShowDialog(
-                    "Pallet Deleted",
-                    "This pallet has been deleted by another workstation.",
-                    MessageBoxButtons.OK,
-                    MessageType.Warning
-                );
-                return (null, null);
-            }
+                return (null, freshJob, PalletCheckResult.PalletDeleted);
 
             if (dbPallet.PackedAt != null)
-            {
-                MessageDialogBox.ShowDialog(
-                    "Pallet Already Packed",
-                    "This pallet was already packed by another workstation.",
-                    MessageBoxButtons.OK,
-                    MessageType.Warning
-                );
-                return (null, null);
-            }
+                return (null, freshJob, PalletCheckResult.PalletPacked);
 
             pallet.PackedAt = dbPallet.PackedAt;
             pallet.State = dbPallet.State;
-
-            return (pallet, fresh);
+            return (pallet, freshJob, PalletCheckResult.Open);
         }
-        private async void btnPackPallet_Click(object sender, EventArgs e)
+
+        private async Task HandlePalletCheckFailure(PalletCheckResult status)
         {
-            if (!PBCMain.Instance.EnsureConnected()) return;
-            if (_model == null)
-                return;
-
-            var activePallet = _model.Pallets
-                .FirstOrDefault(p => p.PackedAt == null);
-
-            if (activePallet == null)
+            switch (status)
             {
-                MessageDialogBox.ShowDialog("", "No active pallet to pack.", MessageBoxButtons.OK, MessageType.Info);
-                return;
-            }
+                case PalletCheckResult.JobDeleted:
+                    MessageDialogBox.ShowDialog(
+                        "Job Deleted",
+                        "This job has been deleted by another workstation.",
+                        MessageBoxButtons.OK,
+                        MessageType.Warning
+                    );
+                    break;
 
-            if (activePallet.PalletEnvelopeQty == 0 &&
-                activePallet.PalletScannedWO == 0)
-            {
-                MessageDialogBox.ShowDialog("", "Cannot pack an empty pallet.", MessageBoxButtons.OK, MessageType.Info);
-                return;
-            }
+                case PalletCheckResult.PalletDeleted:
+                    MessageDialogBox.ShowDialog(
+                        "Pallet Deleted",
+                        "This pallet has been deleted or emptied by another workstation.",
+                        MessageBoxButtons.OK,
+                        MessageType.Warning
+                    );
+                    break;
 
-            int trayCount;
-
-            (activePallet, _) = await EnsurePalletIsOpenAsync(activePallet);
-            if (activePallet == null)
-                return;
-
-            using (var dlg = new PackPalletDIalog())
-            {
-                if (dlg.ShowDialog(this) != DialogResult.OK)
-                    return;
-
-                if (dlg.TrayCount <= 0)
-                {
-                    MessageDialogBox.ShowDialog("", "Tray count must be greater than 0.", MessageBoxButtons.OK, MessageType.Info);
-                    return;
-                }
-
-                trayCount = dlg.TrayCount;
-            }
-
-            try
-            {
-                var rows = await RqliteClient.UpdatePalletPackingAsync(
-                    activePallet.PalletId,
-                    trayCount
-                );
-
-                if (rows == 0)
-                {
+                case PalletCheckResult.PalletPacked:
                     MessageDialogBox.ShowDialog(
                         "Pallet Already Packed",
                         "This pallet was already packed by another workstation.",
                         MessageBoxButtons.OK,
-                        MessageType.Info
+                        MessageType.Warning
                     );
-
-                    await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
-                    return;
-                }
-
-                // ✅ Update model state
-                activePallet.TrayCount = trayCount;
-                activePallet.PackedAt = DateTime.Now;
-                activePallet.State = PalletState.Ready;
-
-                // ✅ Get timestamp AFTER save
-                var savedJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
-                if (savedJob?.LastUpdatedRaw != null)
-                    PBCMain.Instance.MarkPendingUpdate(_model.JobId, savedJob.LastUpdatedRaw);
-
-             
-                await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId);
-                // ✅ Ask user if they want to print
-        
-                    try
-                    {
-                        // Reload latest data to ensure accuracy
-                        var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
-
-                        if (freshJob != null)
-                        {
-
-                        int packedBeforeThis = freshJob.Pallets
-       .Count(p => p.ShippedAt == null
-                && p.PackedAt != null
-                && p.PalletId != activePallet.PalletId);
-
-                        int index = packedBeforeThis + 1;
-
-                        var palletToPrint = freshJob.Pallets
-                            .FirstOrDefault(p => p.PalletId == activePallet.PalletId && p.PackedAt != null);
-
-                        if (palletToPrint != null)
-                        {
-                            PrintEngine.Print(ev =>
-                            {
-                                PrintLayouts.DrawPalletLabel(ev, freshJob, palletToPrint, index);
-                            });
-                        }
-                    }
-                    }
-                    catch (Exception ex)
-                    {
-                        Utils.WriteUnexpectedError($"Print pallet failed | JobId={_model?.JobId}");
-                        Utils.WriteExceptionError(ex);
-                        MessageDialogBox.ShowDialog("", "Error printing pallet: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
-                    }
-                
+                    break;
             }
-            catch (Exception ex)
-            {
-                Utils.WriteUnexpectedError($"PackPallet failed | JobId={_model?.JobId}, PalletId={activePallet?.PalletId}");
-                Utils.WriteExceptionError(ex);
-                MessageDialogBox.ShowDialog("", "Error saving pack data: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
-            }
+
+            SetButtonsEnabled(false);
+            try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
+            finally { SetButtonsEnabled(true); }
         }
-        private async void btnView_Click_1(object sender, EventArgs e)
+        private async void btnPackPallet_Click(object sender, EventArgs e)
         {
             if (!PBCMain.Instance.EnsureConnected()) return;
-            if (_model == null)
-                return;
+            if (_model == null) return;
 
+            // Fix #1 — double-click guard
+            btnPackPallet.Enabled = false;
             try
             {
                 var activePallet = _model.Pallets
@@ -608,50 +578,273 @@ namespace PitneyBowesCalculator
 
                 if (activePallet == null)
                 {
+                    MessageDialogBox.ShowDialog("", "No active pallet to pack.", MessageBoxButtons.OK, MessageType.Info);
+                    return;
+                }
+
+                if (activePallet.PalletEnvelopeQty == 0 && activePallet.PalletScannedWO == 0)
+                {
+                    MessageDialogBox.ShowDialog("", "Cannot pack an empty pallet.", MessageBoxButtons.OK, MessageType.Info);
+                    return;
+                }
+
+                var (checkedPallet, _, palletStatus) = await EnsurePalletIsOpenAsync(activePallet);
+
+                if (palletStatus != PalletCheckResult.Open)
+                {
+                    await HandlePalletCheckFailure(palletStatus);
+                    return;
+                }
+
+                activePallet = checkedPallet;
+
+                using (var dlg = new PackPalletDIalog())
+                {
+                    if (dlg.ShowDialog(this) != DialogResult.OK)
+                        return;
+
+                    if (dlg.TrayCount <= 0)
+                    {
+                        MessageDialogBox.ShowDialog("", "Tray count must be greater than 0.", MessageBoxButtons.OK, MessageType.Info);
+                        return;
+                    }
+
+                    int trayCount = dlg.TrayCount;
+
+                    try
+                    {
+                        // Fix #2 — optimistic lock on DB side
+                        var rows = await RqliteClient.UpdatePalletPackingAsync(activePallet.PalletId, trayCount);
+
+                        if (rows == 0)
+                        {
+                            // ✅ FIX — distinguish deleted vs packed
+                            var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+                            bool palletStillExists = freshJob?.Pallets.Any(p => p.PalletId == activePallet.PalletId) ?? false;
+
+                            if (!palletStillExists)
+                            {
+                                MessageDialogBox.ShowDialog(
+                                    "Pallet Deleted",
+                                    "This pallet was deleted by another workstation.",
+                                    MessageBoxButtons.OK,
+                                    MessageType.Warning
+                                );
+                            }
+                            else
+                            {
+                                MessageDialogBox.ShowDialog(
+                                    "Pallet Already Packed",
+                                    "This pallet was already packed by another workstation.",
+                                    MessageBoxButtons.OK,
+                                    MessageType.Warning
+                                );
+                            }
+
+                            // Fix #4 — refresh either way
+                            SetButtonsEnabled(false);
+                            try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
+                            finally { SetButtonsEnabled(true); }
+                            return;
+                        }
+
+                        activePallet.TrayCount = trayCount;
+                        activePallet.PackedAt = DateTime.Now;
+                        activePallet.State = PalletState.Ready;
+
+                        var savedJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+                        if (savedJob?.LastUpdatedRaw != null)
+                            PBCMain.Instance.MarkPendingUpdate(_model.JobId, savedJob.LastUpdatedRaw);
+
+                        // Fix #4
+                        SetButtonsEnabled(false);
+                        try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
+                        finally { SetButtonsEnabled(true); }
+
+                        try
+                        {
+                            var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+
+                            if (freshJob != null)
+                            {
+                                int packedBeforeThis = freshJob.Pallets
+                                    .Count(p => p.ShippedAt == null
+                                             && p.PackedAt != null
+                                             && p.PalletId != activePallet.PalletId);
+
+                                int index = packedBeforeThis + 1;
+
+                                var palletToPrint = freshJob.Pallets
+                                    .FirstOrDefault(p => p.PalletId == activePallet.PalletId && p.PackedAt != null);
+
+                                if (palletToPrint != null)
+                                {
+                                    PrintEngine.Print(ev =>
+                                    {
+                                        PrintLayouts.DrawPalletLabel(ev, freshJob, palletToPrint, index);
+                                    });
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Utils.WriteUnexpectedError($"Print pallet failed | JobId={_model?.JobId}");
+                            Utils.WriteExceptionError(ex);
+                            MessageDialogBox.ShowDialog("", "Error printing pallet: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Utils.WriteUnexpectedError($"PackPallet failed | JobId={_model?.JobId}, PalletId={activePallet?.PalletId}");
+                        Utils.WriteExceptionError(ex);
+                        MessageDialogBox.ShowDialog("", "Error saving pack data: " + ex.Message, MessageBoxButtons.OK, MessageType.Info);
+                    }
+                }
+            }
+            finally
+            {
+                // Fix #1 — always re-enable
+                btnPackPallet.Enabled = true;
+            }
+        }
+        private async void btnView_Click_1(object sender, EventArgs e)
+        {
+            if (!PBCMain.Instance.EnsureConnected()) return;
+            if (_model == null) return;
+
+            btnView.Enabled = false;
+            try
+            {
+                var activePallet = _model.Pallets.FirstOrDefault(p => p.PackedAt == null);
+
+                if (activePallet == null)
+                {
                     MessageDialogBox.ShowDialog("", "No active pallet.", MessageBoxButtons.OK, MessageType.Info);
                     return;
                 }
 
-                (activePallet, _) = await EnsurePalletIsOpenAsync(activePallet);
-                if (activePallet == null)
+                var (checkedPallet, _, palletStatus) = await EnsurePalletIsOpenAsync(activePallet);
+
+                if (palletStatus != PalletCheckResult.Open)
+                {
+                    await HandlePalletCheckFailure(palletStatus);
                     return;
+                }
+
+                activePallet = checkedPallet;
 
                 var dbItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
                 activePallet.WorkOrders = dbItems;
 
                 using (var dlg = new ViewWOListDialog())
+                using (var cts = new System.Threading.CancellationTokenSource())
                 {
-                    dlg.SetItems(_model.JobName, _model.JobNumber.ToString(), _model.JobId, dbItems); // ✅ _model.JobId added
+                    // ✅ Fix — pass cts so dialog can cancel the timer before deleting
+                    dlg.SetCancellationSource(cts);
 
-                    dlg.ShowDialog(this);
+                    var refreshTimer = new System.Windows.Forms.Timer { Interval = 5000 };
 
-                    if (dlg.DeletedItems != null && dlg.DeletedItems.Any())
+                    refreshTimer.Tick += async (s, args) =>
                     {
-                        (activePallet, _) = await EnsurePalletIsOpenAsync(activePallet);
-                        if (activePallet == null)
+                        if (cts.Token.IsCancellationRequested)
                             return;
 
-                        var updatedItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
+                        var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
 
-                        if (!updatedItems.Any())
+                        if (cts.Token.IsCancellationRequested)
+                            return;
+
+                        if (freshJob == null)
                         {
-                            MessageDialogBox.ShowDialog(
-                                "Pallet Updated",
-                                "All work orders have been removed by another workstation.",
-                                MessageBoxButtons.OK,
-                                MessageType.Warning
-                            );
-
-                            var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
-                            if (freshJob?.LastUpdatedRaw != null)
-                                PBCMain.Instance.MarkPendingUpdate(_model.JobId, freshJob.LastUpdatedRaw);
+                            refreshTimer.Stop();
+                            cts.Cancel();
+                            dlg.DialogResult = DialogResult.Abort;
+                            dlg.Close();
                             return;
                         }
 
-                        activePallet.WorkOrders = updatedItems;
-                        UpdateButtonsState();
-                        PalletChanged?.Invoke(this, _model);
+                        var freshPallet = freshJob.Pallets
+                            .FirstOrDefault(p => p.PalletId == activePallet.PalletId);
+
+                        if (freshPallet == null)
+                        {
+                            refreshTimer.Stop();
+                            cts.Cancel();
+                            dlg.DialogResult = DialogResult.Abort;
+                            dlg.Close();
+                            return;
+                        }
+
+                        if (freshPallet.PackedAt != null)
+                        {
+                            refreshTimer.Stop();
+                            cts.Cancel();
+                            dlg.DialogResult = DialogResult.Abort;
+                            dlg.Close();
+                            return;
+                        }
+
+                        var latest = freshJob.Pallets
+                            .FirstOrDefault(p => p.PalletId == activePallet.PalletId)?
+                            .WorkOrders ?? new List<WorkOrder>();
+
+                        dlg.RefreshItems(latest);
+                    };
+
+                    refreshTimer.Start();
+                    dlg.SetItems(_model.JobName, _model.JobNumber.ToString(), _model.JobId, dbItems);
+                    dlg.ShowDialog(this);
+
+                    cts.Cancel();
+                    refreshTimer.Stop();
+                    refreshTimer.Dispose();
+
+                    // ✅ Fix — unregister stale callback so poll goes through RefreshSingleJobAsync directly
+                    PBCMain.Instance.UnregisterStaleCallback(_model.JobId);
+
+                    var freshJobAfter = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
+
+                    if (freshJobAfter == null)
+                    {
+                        await HandlePalletCheckFailure(PalletCheckResult.JobDeleted);
+                        return;
                     }
+
+                    var freshPalletAfter = freshJobAfter.Pallets
+                        .FirstOrDefault(p => p.PalletId == activePallet.PalletId);
+
+                    if (freshPalletAfter == null)
+                    {
+                        if (dlg.DeletedItems == null || !dlg.DeletedItems.Any())
+                            await HandlePalletCheckFailure(PalletCheckResult.PalletDeleted);
+                        else
+                        {
+                            SetButtonsEnabled(false);
+                            try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
+                            finally { SetButtonsEnabled(true); }
+                        }
+                        return;
+                    }
+
+                    if (freshPalletAfter.PackedAt != null && (dlg.DeletedItems == null || !dlg.DeletedItems.Any()))
+                    {
+                        MessageDialogBox.ShowDialog(
+                            "Pallet Packed",
+                            "This pallet was packed by another workstation while you had it open.",
+                            MessageBoxButtons.OK,
+                            MessageType.Info
+                        );
+                    }
+
+                    var updatedItems = await RqliteClient.LoadWorkOrdersAsync(activePallet.PalletId);
+                    activePallet.WorkOrders = updatedItems;
+
+                    UpdateButtonsState();
+                    PalletChanged?.Invoke(this, _model);
+
+                    SetButtonsEnabled(false);
+                    try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
+                    finally { SetButtonsEnabled(true); }
                 }
             }
             catch (Exception ex)
@@ -660,6 +853,25 @@ namespace PitneyBowesCalculator
                 Utils.WriteExceptionError(ex);
                 MessageDialogBox.ShowDialog("", "Error loading work orders: " + ex.Message, MessageBoxButtons.OK, MessageType.Warning);
             }
+            finally
+            {
+                btnView.Enabled = true;
+            }
+        }
+
+        public enum PalletCheckResult
+        {
+            Open,
+            JobDeleted,
+            PalletDeleted,
+            PalletPacked
+        }
+
+        private void SetButtonsEnabled(bool enabled)
+        {
+            btnAddPallet.Enabled = enabled;
+            btnPackPallet.Enabled = enabled;
+            btnView.Enabled = enabled;
         }
     }
 }

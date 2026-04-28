@@ -1155,45 +1155,43 @@ ORDER BY j.Id, p.PalletNumber
 
     public static async Task<int> GetOrCreateWorkingPalletAsync(int jobId)
     {
-        var existing = await QueryAsync($@"
-SELECT Id
-FROM {TablePallets}
-WHERE PBJobId = {jobId}
-AND PackedAt IS NULL
-ORDER BY Id DESC
-LIMIT 1
-");
-
-        if (existing.Records.Count > 0)
-            return Convert.ToInt32(existing.Records[0]["Id"]);
-
+        // Fix #3 — INSERT OR IGNORE prevents duplicate active pallets
+        // Requires: CREATE UNIQUE INDEX uq_one_active_pallet ON PALLET(PBJobId)
+        // WHERE PackedAt IS NULL AND ShippedAt IS NULL
         await ExecuteAsync($@"
-INSERT INTO {TablePallets}
+INSERT OR IGNORE INTO {TablePallets}
 (PBJobId, PalletNumber, State, TrayCount)
-VALUES ({jobId}, 0, {(int)PalletState.NotReady}, 0);
+SELECT {jobId}, 0, {(int)PalletState.NotReady}, 0
+WHERE NOT EXISTS (
+    SELECT 1 FROM {TablePallets}
+    WHERE PBJobId = {jobId}
+    AND PackedAt IS NULL
+);
 
 UPDATE {TablePallets}
-SET PalletNumber = last_insert_rowid()
-WHERE Id = last_insert_rowid();
+SET PalletNumber = Id
+WHERE PBJobId = {jobId}
+AND PackedAt IS NULL
+AND PalletNumber = 0;
 
 UPDATE {TableJobs}
 SET LastUpdated = '{UtcNowString()}'
 WHERE Id = {jobId};
 ");
 
-        var inserted = await QueryAsync($@"
+        var result = await QueryAsync($@"
 SELECT Id
 FROM {TablePallets}
 WHERE PBJobId = {jobId}
 AND PackedAt IS NULL
-ORDER BY Id DESC
+ORDER BY Id ASC
 LIMIT 1
 ");
 
-        if (inserted.Records.Count == 0)
-            throw new Exception("Failed to retrieve inserted pallet.");
+        if (result.Records.Count == 0)
+            throw new Exception("Failed to retrieve or create active pallet.");
 
-        return Convert.ToInt32(inserted.Records[0]["Id"]);
+        return Convert.ToInt32(result.Records[0]["Id"]);
     }
 
     public static async Task<PbJobModel> LoadSingleJobGraphAsync(int jobId)

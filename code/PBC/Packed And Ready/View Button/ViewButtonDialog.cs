@@ -223,17 +223,17 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
                 }
 
                 // 🔒 Validate states again
-                if (!selectedPallets.All(p => p.State == PalletState.Ready))
+                // 🔒 Validate states again
+                if (!selectedPallets.All(p => p.State == PalletState.Ready || p.State == PalletState.Packed_NotReady))
                 {
                     MessageDialogBox.ShowDialog(
                         "Invalid Selection",
-                        "Only packed pallets (Ready) can be removed.",
+                        "Only packed pallets (Ready or Packed Not Ready) can be removed.",
                         MessageBoxButtons.OK,
                         MessageType.Warning
                     );
                     return;
                 }
-
                 var palletIds = selectedPallets
                     .Select(p => p.PalletId)
                     .Where(id => id > 0)
@@ -341,24 +341,17 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
         private async void btnPrintPallet_Click_1(object sender, EventArgs e)
         {
             btnPrintPallet.Enabled = false;
-
             Utils.showStatusAndSpinner(lbStatus, pbSpinner, "Attempting to print...");
 
             try
             {
                 var selectedIndices = lvPallet.GetSelectedIndices();
 
-                // ✅ Validate selection early
                 if (selectedIndices == null || selectedIndices.Count == 0)
                 {
                     Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "");
-
-                    MessageDialogBox.ShowDialog(
-                        "No Selection",
-                        "Select pallet(s) to print.",
-                        MessageBoxButtons.OK,
-                        MessageType.Info
-                    );
+                    MessageDialogBox.ShowDialog("No Selection", "Select pallet(s) to print.",
+                        MessageBoxButtons.OK, MessageType.Info);
                     return;
                 }
 
@@ -366,47 +359,70 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
                     .Select(i => _job.Pallets[i])
                     .ToList();
 
-                // ✅ Optional: ensure pallets are packed
-                var invalid = selectedPallets
-                    .Where(p => p.PackedAt == null)
-                    .ToList();
+                var invalid = selectedPallets.Where(p => p.PackedAt == null).ToList();
 
                 if (invalid.Any())
                 {
                     Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "");
-
-                    MessageDialogBox.ShowDialog(
-                        "Invalid Selection",
-                        "Only packed pallets can be printed.",
-                        MessageBoxButtons.OK,
-                        MessageType.Warning
-                    );
+                    MessageDialogBox.ShowDialog("Invalid Selection", "Only packed pallets can be printed.",
+                        MessageBoxButtons.OK, MessageType.Warning);
                     return;
                 }
 
-                // ✅ Run print safely
+                var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_job.JobId);
+                if (freshJob == null)
+                {
+                    Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "");
+                    MessageDialogBox.ShowDialog("", "Job not found.", MessageBoxButtons.OK, MessageType.Warning);
+                    return;
+                }
+
+                // Build the ordered list of pallets to print with their indices
+                var palletsToPrint = selectedPallets
+                    .Select(selected => freshJob.Pallets
+                        .FirstOrDefault(p => p.PalletId == selected.PalletId && p.PackedAt != null))
+                    .Where(p => p != null)
+                    .Select(p => new
+                    {
+                        Pallet = p,
+                        Index = freshJob.Pallets
+                            .Where(x => x.ShippedAt == null && x.PackedAt != null)
+                            .ToList()
+                            .IndexOf(p) + 1
+                    })
+                    .ToList();
+
+                if (!palletsToPrint.Any())
+                {
+                    Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "");
+                    MessageDialogBox.ShowDialog("", "No valid pallets to print.", MessageBoxButtons.OK, MessageType.Warning);
+                    return;
+                }
+
+                // Single PDF, one page per pallet
                 await Task.Run(() =>
                 {
-                    PrintEngine.Print(e =>
-                        PrintLayouts.DrawPallets(e, _job, selectedPallets)
-                    );
+                    int currentPage = 0;
+
+                    PrintEngine.PrintMultiPage(ev =>
+                    {
+                        var entry = palletsToPrint[currentPage];
+                        PrintLayouts.DrawPalletLabel(ev, freshJob, entry.Pallet, entry.Index);
+
+                        currentPage++;
+                        ev.HasMorePages = currentPage < palletsToPrint.Count;
+                    });
                 });
 
-                // ✅ Only reached if NO exception
                 Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Printed successfully!");
             }
             catch (Exception ex)
             {
-                Utils.WriteUnexpectedError($"PrintPallet failed | JobId={_job?.JobId}");  // ✅ add
+                Utils.WriteUnexpectedError($"PrintPallet failed | JobId={_job?.JobId}");
                 Utils.WriteExceptionError(ex);
                 Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Print failed!");
-
-                MessageDialogBox.ShowDialog(
-                    "Printing Error",
-                    "Failed to print pallet.\n\n" + ex.Message,
-                    MessageBoxButtons.OK,
-                    MessageType.Warning
-                );
+                MessageDialogBox.ShowDialog("Printing Error", "Failed to print pallet.\n\n" + ex.Message,
+                    MessageBoxButtons.OK, MessageType.Warning);
             }
             finally
             {

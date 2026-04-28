@@ -16,7 +16,7 @@ namespace PitneyBowesCalculator.Dialogs
 {
     public partial class LoginDialog : Form
     {
-        public bool IsAuthenticated { get; private set; }
+        
         private string DialogMode;
 
         public LoginDialog(string frm)
