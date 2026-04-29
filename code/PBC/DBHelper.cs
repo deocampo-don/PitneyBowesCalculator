@@ -41,7 +41,7 @@ public static class RqliteClient
     public const string TablePallets = "PALLET";
     public const string TablePalletWorkOrders = "WORKORDERS";
     public const string TableAppSettings = "SETTINGS";
-
+    public static bool AllowDuplicateBarcodes { get; set; } = false;
     // ======================
     // RESULT MODELS
     // ======================
@@ -374,7 +374,9 @@ VALUES ('{username}', '{password}', 1, 1)";
         };
     }
 
-    public static async Task<HashSet<string>> GetExistingBarcodesAsync(IEnumerable<string> barcodes)
+    public static async Task<HashSet<string>> GetExistingBarcodesAsync(
+    IEnumerable<string> barcodes,
+    int? scopeJobId = null)
     {
         var barcodeList = barcodes
             .Where(b => !string.IsNullOrWhiteSpace(b))
@@ -384,18 +386,25 @@ VALUES ('{username}', '{password}', 1, 1)";
         if (!barcodeList.Any())
             return new HashSet<string>();
 
-        string sql =
-            $"SELECT Barcode FROM workorders WHERE Barcode IN ({string.Join(",", barcodeList)})";
+        string jobFilter = scopeJobId.HasValue
+            ? $@"AND w.PalletId IN (
+                SELECT Id FROM {TablePallets} WHERE PBJobId = {scopeJobId.Value}
+             )"
+            : "";
+
+        string sql = $@"
+SELECT w.Barcode 
+FROM {TablePalletWorkOrders} w
+WHERE w.Barcode IN ({string.Join(",", barcodeList)})
+{jobFilter}";
 
         var result = await QueryAsync(sql);
 
         var existing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         if (result?.Records != null)
-        {
             foreach (var r in result.Records)
                 existing.Add(r["Barcode"]?.ToString());
-        }
 
         return existing;
     }
@@ -617,7 +626,7 @@ UPDATE {TablePallets}
 SET State = {(int)PalletState.NotReady},
     PackedAt = NULL
 WHERE PalletNumber IN ({ids})
-AND State = {(int)PalletState.Ready};
+AND State IN ({(int)PalletState.Ready}, {(int)PalletState.Packed_NotReady});
 
 UPDATE {TableJobs}
 SET LastUpdated = '{now}'
@@ -1389,49 +1398,78 @@ ORDER BY p.PalletNumber
         return 0;
     }
 
+    //    public static async Task<RqliteWriteResult> SaveWorkOrdersAsync(
+    //    int palletId,
+    //    List<WorkOrder> workOrders)
+
+
+    //    {
+    //        if (workOrders == null || !workOrders.Any())
+    //            return new RqliteWriteResult { Success = true, RowsAffected = 0 };
+
+    //        var sql = new StringBuilder();
+
+    //        sql.AppendLine($@"
+    //INSERT OR IGNORE INTO {TablePalletWorkOrders}
+    //(PalletId, Barcode, WorkOrder, Quantity)
+    //VALUES");
+
+    //        for (int i = 0; i < workOrders.Count; i++)
+    //        {
+    //            var wo = workOrders[i];
+
+    //            sql.Append($@"(
+    //{palletId},
+    //{FormatValue(wo.Barcode)},
+    //{FormatValue(wo.WorkOrderCode)},
+    //{wo.Quantity}
+    //)");
+
+    //            if (i < workOrders.Count - 1)
+    //                sql.AppendLine(",");
+    //            else
+    //                sql.AppendLine(";");
+    //        }
+
+    //        sql.AppendLine($@"
+    //UPDATE {TableJobs}
+    //SET LastUpdated = '{UtcNowString()}'
+    //WHERE Id = (
+    //    SELECT PBJobId
+    //    FROM {TablePallets}
+    //    WHERE Id = {palletId}
+    //);");
+
+    //        return await ExecuteAsync(sql.ToString());
+    //    }
     public static async Task<RqliteWriteResult> SaveWorkOrdersAsync(
-    int palletId,
-    List<WorkOrder> workOrders)
-
-
+        int palletId,
+        List<WorkOrder> workOrders,
+        bool allowDuplicates = false)  // ← add this
     {
         if (workOrders == null || !workOrders.Any())
             return new RqliteWriteResult { Success = true, RowsAffected = 0 };
 
-        var sql = new StringBuilder();
+        var valueRows = workOrders.Select(wo =>
+            $"({palletId}, {FormatValue(wo.Barcode)}, {FormatValue(wo.WorkOrderCode)}, {wo.Quantity})"
+        );
 
-        sql.AppendLine($@"
-INSERT OR IGNORE INTO {TablePalletWorkOrders}
-(PalletId, Barcode, WorkOrder, Quantity)
-VALUES");
+        // ← switch between INSERT OR IGNORE and INSERT OR REPLACE
+        string insertMode = allowDuplicates ? "INSERT OR REPLACE" : "INSERT OR IGNORE";
 
-        for (int i = 0; i < workOrders.Count; i++)
-        {
-            var wo = workOrders[i];
+        string sql = $@"
+{insertMode} INTO {TablePalletWorkOrders}
+    (PalletId, Barcode, WorkOrder, Quantity)
+VALUES
+    {string.Join(",\n    ", valueRows)};
 
-            sql.Append($@"(
-{palletId},
-{FormatValue(wo.Barcode)},
-{FormatValue(wo.WorkOrderCode)},
-{wo.Quantity}
-)");
-
-            if (i < workOrders.Count - 1)
-                sql.AppendLine(",");
-            else
-                sql.AppendLine(";");
-        }
-
-        sql.AppendLine($@"
 UPDATE {TableJobs}
 SET LastUpdated = '{UtcNowString()}'
 WHERE Id = (
-    SELECT PBJobId
-    FROM {TablePallets}
-    WHERE Id = {palletId}
-);");
+    SELECT PBJobId FROM {TablePallets} WHERE Id = {palletId}
+);";
 
-        return await ExecuteAsync(sql.ToString());
+        return await ExecuteAsync(sql);
     }
     public static async Task<bool> IsDatabaseAvailableAsync()
     {

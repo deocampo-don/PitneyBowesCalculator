@@ -47,6 +47,9 @@
             tbConnTimeOut = new Krypton.Toolkit.KryptonNumericUpDown();
             lbSqlUser = new Krypton.Toolkit.KryptonLabel();
             tbSqlUser = new Krypton.Toolkit.KryptonTextBox();
+            tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            tglAllowDupli = new Krypton.Toolkit.KryptonToggleSwitch();
+            kryptonLabel8 = new Krypton.Toolkit.KryptonLabel();
             kryptonPanel1 = new Krypton.Toolkit.KryptonPanel();
             pbSpinner = new System.Windows.Forms.PictureBox();
             lbStatus = new Krypton.Toolkit.KryptonLabel();
@@ -55,6 +58,7 @@
             btnSettingsSave = new Krypton.Toolkit.KryptonButton();
             kryptonTableLayoutPanel1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
+            tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)kryptonPanel1).BeginInit();
             kryptonPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbSpinner).BeginInit();
@@ -80,6 +84,7 @@
             kryptonTableLayoutPanel1.Controls.Add(tbConnTimeOut, 2, 2);
             kryptonTableLayoutPanel1.Controls.Add(lbSqlUser, 0, 9);
             kryptonTableLayoutPanel1.Controls.Add(tbSqlUser, 0, 10);
+            kryptonTableLayoutPanel1.Controls.Add(tableLayoutPanel2, 2, 7);
             kryptonTableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             kryptonTableLayoutPanel1.Location = new System.Drawing.Point(18, 19);
             kryptonTableLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -105,7 +110,7 @@
             // 
             // tbSqlPwd
             // 
-            tbSqlPwd.Location = new System.Drawing.Point(371, 328);
+            tbSqlPwd.Location = new System.Drawing.Point(371, 329);
             tbSqlPwd.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             tbSqlPwd.Name = "tbSqlPwd";
             tbSqlPwd.PasswordChar = '●';
@@ -118,7 +123,7 @@
             // 
             // lbSqlPwd
             // 
-            lbSqlPwd.Location = new System.Drawing.Point(368, 300);
+            lbSqlPwd.Location = new System.Drawing.Point(368, 301);
             lbSqlPwd.Margin = new System.Windows.Forms.Padding(0, 2, 3, 2);
             lbSqlPwd.Name = "lbSqlPwd";
             lbSqlPwd.Size = new System.Drawing.Size(137, 24);
@@ -274,7 +279,7 @@
             // 
             kryptonTableLayoutPanel1.SetColumnSpan(tbCpsQuery, 3);
             tbCpsQuery.Dock = System.Windows.Forms.DockStyle.Fill;
-            tbCpsQuery.Location = new System.Drawing.Point(3, 255);
+            tbCpsQuery.Location = new System.Drawing.Point(3, 256);
             tbCpsQuery.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             tbCpsQuery.Multiline = true;
             tbCpsQuery.Name = "tbCpsQuery";
@@ -289,7 +294,7 @@
             tbConnTimeOut.Anchor = System.Windows.Forms.AnchorStyles.None;
             tbConnTimeOut.Increment = new decimal(new int[] { 1, 0, 0, 0 });
             tbConnTimeOut.Location = new System.Drawing.Point(372, 89);
-            tbConnTimeOut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            tbConnTimeOut.Margin = new System.Windows.Forms.Padding(4);
             tbConnTimeOut.Maximum = new decimal(new int[] { 100, 0, 0, 0 });
             tbConnTimeOut.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
             tbConnTimeOut.Name = "tbConnTimeOut";
@@ -300,7 +305,7 @@
             // 
             // lbSqlUser
             // 
-            lbSqlUser.Location = new System.Drawing.Point(0, 300);
+            lbSqlUser.Location = new System.Drawing.Point(0, 301);
             lbSqlUser.Margin = new System.Windows.Forms.Padding(0, 2, 3, 2);
             lbSqlUser.Name = "lbSqlUser";
             lbSqlUser.Size = new System.Drawing.Size(141, 24);
@@ -311,7 +316,7 @@
             // 
             // tbSqlUser
             // 
-            tbSqlUser.Location = new System.Drawing.Point(3, 328);
+            tbSqlUser.Location = new System.Drawing.Point(3, 329);
             tbSqlUser.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             tbSqlUser.Name = "tbSqlUser";
             tbSqlUser.Size = new System.Drawing.Size(353, 36);
@@ -319,6 +324,42 @@
             tbSqlUser.StateCommon.Content.Font = new System.Drawing.Font("Segoe UI", 13.8F);
             tbSqlUser.StateCommon.Content.TextH = Krypton.Toolkit.PaletteRelativeAlign.Center;
             tbSqlUser.TabIndex = 14;
+            // 
+            // tableLayoutPanel2
+            // 
+            tableLayoutPanel2.ColumnCount = 2;
+            tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 76.1194F));
+            tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 23.8805962F));
+            tableLayoutPanel2.Controls.Add(tglAllowDupli, 1, 0);
+            tableLayoutPanel2.Controls.Add(kryptonLabel8, 0, 0);
+            tableLayoutPanel2.Location = new System.Drawing.Point(371, 228);
+            tableLayoutPanel2.Name = "tableLayoutPanel2";
+            tableLayoutPanel2.RowCount = 1;
+            tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            tableLayoutPanel2.Size = new System.Drawing.Size(268, 23);
+            tableLayoutPanel2.TabIndex = 16;
+            tableLayoutPanel2.Paint += tableLayoutPanel2_Paint;
+            // 
+            // tglAllowDupli
+            // 
+            tglAllowDupli.Anchor = System.Windows.Forms.AnchorStyles.None;
+            tglAllowDupli.Location = new System.Drawing.Point(207, 2);
+            tglAllowDupli.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            tglAllowDupli.Name = "tglAllowDupli";
+            tglAllowDupli.Size = new System.Drawing.Size(58, 20);
+            tglAllowDupli.StateCommon.Back.Color1 = System.Drawing.Color.White;
+            tglAllowDupli.TabIndex = 5;
+            tglAllowDupli.CheckedChanged += tglAllowDupli_CheckedChanged;
+            // 
+            // kryptonLabel8
+            // 
+            kryptonLabel8.Location = new System.Drawing.Point(3, 3);
+            kryptonLabel8.Name = "kryptonLabel8";
+            kryptonLabel8.Size = new System.Drawing.Size(198, 17);
+            kryptonLabel8.StateCommon.ShortText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            kryptonLabel8.TabIndex = 0;
+            kryptonLabel8.Values.Text = "Allow Duplicate Barcodes";
             // 
             // kryptonPanel1
             // 
@@ -340,7 +381,7 @@
             // 
             pbSpinner.Anchor = System.Windows.Forms.AnchorStyles.None;
             pbSpinner.Location = new System.Drawing.Point(4, 8);
-            pbSpinner.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            pbSpinner.Margin = new System.Windows.Forms.Padding(4);
             pbSpinner.Name = "pbSpinner";
             pbSpinner.Size = new System.Drawing.Size(50, 37);
             pbSpinner.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -352,7 +393,7 @@
             // 
             lbStatus.Anchor = System.Windows.Forms.AnchorStyles.None;
             lbStatus.Location = new System.Drawing.Point(56, 13);
-            lbStatus.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            lbStatus.Margin = new System.Windows.Forms.Padding(4);
             lbStatus.Name = "lbStatus";
             lbStatus.Size = new System.Drawing.Size(88, 20);
             lbStatus.TabIndex = 3;
@@ -435,12 +476,13 @@
             Padding = new System.Windows.Forms.Padding(18, 19, 18, 19);
             ShowInTaskbar = false;
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            Text = "tyggggggg6";
             Load += SettingsDialog_Load;
             kryptonTableLayoutPanel1.ResumeLayout(false);
             kryptonTableLayoutPanel1.PerformLayout();
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
+            tableLayoutPanel2.ResumeLayout(false);
+            tableLayoutPanel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)kryptonPanel1).EndInit();
             kryptonPanel1.ResumeLayout(false);
             kryptonPanel1.PerformLayout();
@@ -476,5 +518,8 @@
         private Krypton.Toolkit.KryptonButton btnAddUser;
         private Krypton.Toolkit.KryptonLabel lbStatus;
         private System.Windows.Forms.PictureBox pbSpinner;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private Krypton.Toolkit.KryptonLabel kryptonLabel8;
+        private Krypton.Toolkit.KryptonToggleSwitch tglAllowDupli;
     }
 }

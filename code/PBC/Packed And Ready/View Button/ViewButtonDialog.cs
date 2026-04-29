@@ -377,6 +377,8 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
                     return;
                 }
 
+                string jobName = freshJob.JobName;
+
                 // Build the ordered list of pallets to print with their indices
                 var palletsToPrint = selectedPallets
                     .Select(selected => freshJob.Pallets
@@ -411,8 +413,9 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
 
                         currentPage++;
                         ev.HasMorePages = currentPage < palletsToPrint.Count;
-                    });
+                    }, jobName);  // Pass the jobName here
                 });
+
 
                 Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Printed successfully!");
             }

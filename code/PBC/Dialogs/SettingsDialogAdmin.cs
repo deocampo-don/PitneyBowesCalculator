@@ -25,7 +25,7 @@ namespace PitneyBowesCalculator
             InitializeComponent();
             FormHelper.ApplyRoundedCorners(this);
             ShadowHelper.ApplyShadow(this);
-          
+
         }
 
         private async void SettingsDialog_Load(object sender, EventArgs e)
@@ -45,11 +45,11 @@ namespace PitneyBowesCalculator
                 tglTrustedServerCert.Checked = cps.TrustedServerCertificate;
                 tbSqlUser.Text = cps.SqlUser;
                 tbSqlPwd.Text = Utils.Decrypt(cps.SqlPassword);
-               
+
             }
-            
+            tglAllowDupli.Checked = RqliteClient.AllowDuplicateBarcodes;
         }
-     
+
         private void btnSettingsCancel_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -93,13 +93,13 @@ namespace PitneyBowesCalculator
                 sqlUser = tbSqlUser.Text.Trim();
 
                 // 🔐 Encrypt password before saving
-                
+
             }
             sqlPassword = Utils.Encrypt(tbSqlPwd.Text.Trim());
-            
+
             if (missingFields.Count > 0)
             {
-          
+
 
                 MessageDialogBox.ShowDialog(
                     "Validation",
@@ -111,7 +111,7 @@ namespace PitneyBowesCalculator
             }
 
             Utils.showStatusAndSpinner(lbStatus, pbSpinner, "Testing SQL connection...");
-          
+
 
             var test = await RqliteClient.TestSqlConnectionAsync(
                 tbCpsServer.Text.Trim(),
@@ -127,7 +127,7 @@ namespace PitneyBowesCalculator
 
             if (!test.Success)
             {
-     
+
                 MessageDialogBox.ShowDialog(
                     "Connection Error",
                     "SQL connection failed:\n\n" + test.Error,
@@ -135,7 +135,7 @@ namespace PitneyBowesCalculator
                     MessageType.Error);
 
                 lbStatus.Visible = false;
-                pbSpinner.Visible= false;
+                pbSpinner.Visible = false;
 
 
 
@@ -145,7 +145,7 @@ namespace PitneyBowesCalculator
 
             Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "Connected");
 
-           
+
             var result = await RqliteClient.SaveSettingsAsync(
                 tbCpsServer.Text.Trim(),
                 tbCpsDb.Text.Trim(),
@@ -159,14 +159,14 @@ namespace PitneyBowesCalculator
 
             if (result.Success)
             {
-            
+
                 MessageDialogBox.ShowDialog("", "Settings saved.", MessageBoxButtons.OK, MessageType.Info);
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             else
             {
-               
+
                 MessageDialogBox.ShowDialog("", result.ErrorMessage, MessageBoxButtons.OK, MessageType.Error);
             }
         }
@@ -210,7 +210,7 @@ namespace PitneyBowesCalculator
             {
                 if (login.ShowDialog() == DialogResult.OK)
                 {
-                    
+
                     MessageDialogBox.ShowDialog("", "User Added.", MessageBoxButtons.OK, MessageType.Info);
 
                     using (var frm = new SettingsDialogAdmin())
@@ -221,6 +221,16 @@ namespace PitneyBowesCalculator
             }
         }
 
+        private void tableLayoutPanel2_Paint(object sender, PaintEventArgs e)
+        {
 
+        }
+
+        private void tglAllowDupli_CheckedChanged(object sender, EventArgs e)
+        {
+            
+                RqliteClient.AllowDuplicateBarcodes =tglAllowDupli.Checked;
+         
+        }
     }
 }

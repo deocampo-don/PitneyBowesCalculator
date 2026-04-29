@@ -305,6 +305,7 @@ namespace PitneyBowesCalculator
         // -----------------------------
 
 
+
         private async void btnAddPallet_Click_1(object sender, EventArgs e)
         {
             if (!PBCMain.Instance.EnsureConnected()) return;
@@ -314,18 +315,17 @@ namespace PitneyBowesCalculator
             btnAddPallet.Enabled = false;
             try
             {
-                // 1️⃣ Find working pallet
+                // 1️⃣ Find working pallet (state = NotReady, not packed)
                 var pallet = _model.Pallets
                     .FirstOrDefault(p =>
                         p.State == PalletState.NotReady &&
                         p.PackedAt == null &&
                         p.ShippedAt == null);
 
-                // 2️⃣ Early validation
+                // 2️⃣ Early validation: Ensure pallet is open and not packed
                 if (pallet != null)
                 {
                     var (earlyChecked, _, earlyStatus) = await EnsurePalletIsOpenAsync(pallet);
-
                     if (earlyStatus != PalletCheckResult.Open)
                     {
                         await HandlePalletCheckFailure(earlyStatus);
@@ -339,11 +339,13 @@ namespace PitneyBowesCalculator
                 int baseEnvelope = pallet?.WorkOrders.Sum(w => w.Quantity) ?? 0;
                 int baseScannedWO = pallet?.WorkOrders.Count ?? 0;
 
+                // 3️⃣ Open the dialog to scan work orders
                 using (var dlg = new PitneyBowesCalculator.Dialogs.AddToPalletDialog(baseEnvelope, baseScannedWO))
                 {
                     if (dlg.ShowDialog(this) != DialogResult.OK)
                         return;
 
+                    // If no scanned work orders, show an error and exit
                     if (!dlg.ScannedWorkOrders.Any())
                     {
                         MessageDialogBox.ShowDialog("", "No scanned data.", MessageBoxButtons.OK, MessageType.Error);
@@ -352,25 +354,40 @@ namespace PitneyBowesCalculator
 
                     try
                     {
-                        var scannedBarcodes = dlg.ScannedWorkOrders
-                            .Select(x => x.Barcode)
-                            .ToList();
+                        // 4️⃣ Check for duplicate work orders based on the setting
+                        List<string> duplicates = new List<string>();
+                        List<WorkOrder> validWorkOrders;
 
-                        // 3️⃣ Check duplicates
-                        var existing = await RqliteClient.GetExistingBarcodesAsync(scannedBarcodes);
-                        var duplicates = existing.ToList();
-
-                        var validWorkOrders = dlg.ScannedWorkOrders
-                            .Where(x => !duplicates.Contains(x.Barcode))
-                            .ToList();
-
-                        if (!validWorkOrders.Any())
+                        if (RqliteClient.AllowDuplicateBarcodes)
                         {
-                            MessageDialogBox.ShowDialog("", "All scanned barcodes are duplicates.", MessageBoxButtons.OK, MessageType.Error);
-                            return;
+                            // If duplicates are allowed, just take all scanned work orders
+                            validWorkOrders = dlg.ScannedWorkOrders.ToList();
+                        }
+                        else
+                        {
+                            // If duplicates are NOT allowed, query the database for existing barcodes
+                            var scannedBarcodes = dlg.ScannedWorkOrders
+                                .Select(x => x.Barcode)
+                                .ToList();
+
+                            // Query the database to get existing barcodes
+                            var existing = await RqliteClient.GetExistingBarcodesAsync(scannedBarcodes);
+                            duplicates = existing.ToList();
+
+                            // Filter out the work orders that are not duplicates
+                            validWorkOrders = dlg.ScannedWorkOrders
+                                .Where(x => !duplicates.Contains(x.Barcode))
+                                .ToList();
+
+                            // If there are no valid work orders after filtering, show a message
+                            if (!validWorkOrders.Any())
+                            {
+                                MessageDialogBox.ShowDialog("", "All scanned barcodes are duplicates.", MessageBoxButtons.OK, MessageType.Error);
+                                return;
+                            }
                         }
 
-                        // 4️⃣ Create pallet if needed
+                        // 5️⃣ Create pallet if needed (if no pallet exists)
                         if (pallet == null)
                         {
                             var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
@@ -398,9 +415,8 @@ namespace PitneyBowesCalculator
                             _model.Pallets.Add(pallet);
                         }
 
-                        // 5️⃣ Late validation — pallet may have been packed mid-scan
+                        // 6️⃣ Late validation: Ensure the pallet is still open (not packed)
                         var (checkedPallet, _, palletStatus) = await EnsurePalletIsOpenAsync(pallet);
-
                         if (palletStatus != PalletCheckResult.Open)
                         {
                             if (palletStatus == PalletCheckResult.PalletPacked)
@@ -415,13 +431,14 @@ namespace PitneyBowesCalculator
 
                                 if (result != DialogResult.Yes)
                                 {
-                                    // Fix #4
+                                    // Refresh job and exit if user doesn't want to migrate work orders
                                     SetButtonsEnabled(false);
                                     try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
                                     finally { SetButtonsEnabled(true); }
                                     return;
                                 }
 
+                                // Create new pallet and save work orders
                                 int newPalletId = await RqliteClient.GetOrCreateWorkingPalletAsync(_model.JobId);
 
                                 var recheck = await RqliteClient.GetExistingBarcodesAsync(
@@ -440,32 +457,34 @@ namespace PitneyBowesCalculator
                                         MessageBoxButtons.OK,
                                         MessageType.Warning
                                     );
-                                    // Fix #4
+                                    // Fix #4: Refresh job and exit
                                     SetButtonsEnabled(false);
                                     try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
                                     finally { SetButtonsEnabled(true); }
                                     return;
                                 }
 
-                                // Fix #2 — SaveWorkOrdersAsync should guard with WHERE barcode NOT EXISTS on DB side
+                                // Save work orders to the new pallet
                                 await RqliteClient.SaveWorkOrdersAsync(newPalletId, safeWorkOrders);
-                                // Fix #4
+                                // Refresh UI after saving
                                 SetButtonsEnabled(false);
                                 try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
                                 finally { SetButtonsEnabled(true); }
                                 return;
                             }
 
+                            // Handle other pallet statuses (e.g., pallet deleted, etc.)
                             await HandlePalletCheckFailure(palletStatus);
                             return;
                         }
 
+                        // Update the pallet and save work orders to the current pallet
                         pallet = checkedPallet;
 
-                        // 6️⃣ Save to DB — Fix #2: DB side should guard with WHERE barcode NOT EXISTS
+                        // 7️⃣ Save work orders to the pallet
                         await RqliteClient.SaveWorkOrdersAsync(pallet.PalletId, validWorkOrders);
 
-                        // 7️⃣ Show duplicates if any
+                        // 8️⃣ Show duplicates if any
                         if (duplicates.Any())
                         {
                             var duplicateNames = dlg.ScannedWorkOrders
@@ -487,7 +506,7 @@ namespace PitneyBowesCalculator
                             );
                         }
 
-                        // 8️⃣ Refresh — Fix #4
+                        // 9️⃣ Refresh the job after saving
                         SetButtonsEnabled(false);
                         try { await PBCMain.Instance.RefreshSingleJobAsync(_model.JobId); }
                         finally { SetButtonsEnabled(true); }
@@ -502,10 +521,15 @@ namespace PitneyBowesCalculator
             }
             finally
             {
-                // Fix #1 — always re-enable
+                // Always re-enable the button at the end
                 btnAddPallet.Enabled = true;
             }
         }
+
+
+
+
+
         private async Task<(Pallet pallet, PbJobModel freshJob, PalletCheckResult status)>
      EnsurePalletIsOpenAsync(Pallet pallet)
         {
@@ -664,9 +688,9 @@ namespace PitneyBowesCalculator
                         try
                         {
                             var freshJob = await RqliteClient.LoadSingleJobGraphAsync(_model.JobId);
-
                             if (freshJob != null)
                             {
+                                
                                 int packedBeforeThis = freshJob.Pallets
                                     .Count(p => p.ShippedAt == null
                                              && p.PackedAt != null
@@ -676,13 +700,14 @@ namespace PitneyBowesCalculator
 
                                 var palletToPrint = freshJob.Pallets
                                     .FirstOrDefault(p => p.PalletId == activePallet.PalletId && p.PackedAt != null);
+                                string printJobName = !string.IsNullOrEmpty(palletToPrint.JobNameSnapshot) ? palletToPrint.JobNameSnapshot : freshJob.JobName;
 
                                 if (palletToPrint != null)
                                 {
-                                    PrintEngine.Print(ev =>
+                                    await Task.Run(() => PrintEngine.Print(ev =>
                                     {
                                         PrintLayouts.DrawPalletLabel(ev, freshJob, palletToPrint, index);
-                                    });
+                                    }, printJobName));
                                 }
                             }
                         }

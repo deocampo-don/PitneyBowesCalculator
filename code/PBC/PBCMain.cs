@@ -1117,7 +1117,7 @@ namespace PitneyBowesCalculator
 
             try
             {
-                PrintEngine.Print(e => PrintLayouts.DrawSummary(e, selectedJobs));
+                PrintEngine.Print(e => PrintLayouts.DrawSummary(e, selectedJobs),"Summary");
             }
             catch (Exception ex)
             {
@@ -1330,7 +1330,7 @@ namespace PitneyBowesCalculator
 
                 await Task.Run(() =>
                 {
-                    PrintEngine.Print(e => PrintLayouts.SummaryShip(e, freshJobs));
+                    PrintEngine.Print(e => PrintLayouts.SummaryShip(e, freshJobs),"Shipped_Pallets");
                 });
 
                 // Final UI sync
@@ -1354,7 +1354,8 @@ namespace PitneyBowesCalculator
                     }
                 }
 
-                // ✅ Fix — switch to Reports tab so user sees the shipped rows
+
+                pickedUpListView.ResizeRowsToHost();
                 kryptonCheckSet1.CheckedButton = kcbPickedUp;
             }
             catch (Exception ex)

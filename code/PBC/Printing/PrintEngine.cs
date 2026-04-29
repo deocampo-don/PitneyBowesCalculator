@@ -5,11 +5,12 @@ using System.IO;
 
 public static class PrintEngine
 {
-    public static void Print(Action<PrintPageEventArgs> drawAction)
+    public static void Print(Action<PrintPageEventArgs> drawAction, string jobName)
     {
+        // Use the provided jobName in the file name
         string pdfPath = Path.Combine(
             Path.GetTempPath(),
-            $"Print_{DateTime.Now:yyyyMMddHHmmss}.pdf"
+            $"{jobName}_{DateTime.Now:yyyyMMddHHmmss}.pdf"
         );
 
         PrintDocument doc = new PrintDocument();
@@ -35,6 +36,36 @@ public static class PrintEngine
         PrintHelper.PrintPdf(pdfPath); // your existing logic
     }
 
+    public static void PrintMultiPage(Action<PrintPageEventArgs> drawAction, string jobName)
+    {
+        // Use the provided jobName in the file name
+        string pdfPath = Path.Combine(
+            Path.GetTempPath(),
+            $"{jobName}_{DateTime.Now:yyyyMMddHHmmss}.pdf"
+        );
+
+        PrintDocument doc = new PrintDocument();
+
+        doc.PrintPage += (s, e) =>
+        {
+            drawAction(e); // caller controls e.HasMorePages
+        };
+
+        doc.PrinterSettings.PrinterName = "Microsoft Print to PDF";
+        doc.PrinterSettings.PrintToFile = true;
+        doc.PrinterSettings.PrintFileName = pdfPath;
+
+        doc.Print();
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = pdfPath,
+            UseShellExecute = true
+        });
+
+        PrintHelper.PrintPdf(pdfPath);
+    }
+
     public static void PrintMultiPage(Action<PrintPageEventArgs> drawAction)
     {
         string pdfPath = Path.Combine(
@@ -52,6 +83,7 @@ public static class PrintEngine
         doc.PrinterSettings.PrinterName = "Microsoft Print to PDF";
         doc.PrinterSettings.PrintToFile = true;
         doc.PrinterSettings.PrintFileName = pdfPath;
+       // Set the print job name
 
         doc.Print();
 

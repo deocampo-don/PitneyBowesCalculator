@@ -27,35 +27,16 @@ namespace PitneyBowesCalculator.Picked_Up
 		public void BeginUpdate()
         {
             this.SuspendLayout();
+            
         }
 
         public void EndUpdate()
         {
+           
             this.ResumeLayout();
+           
         }
-		public void AddItem(PbJobModel job)
-		{
-			if (!_rowsByJobId.TryGetValue(job.JobId, out var list))
-			{
-				list = new List<PickedUpRowControl>();
-				_rowsByJobId[job.JobId] = list;
-			}
 
-            // 🔥 Prevent duplicates (same shipment)
-            bool exists = list.Any(r =>
-    r.BoundJob?.ShippedDate == job.ShippedDate);
-
-            if (exists)
-				return;
-
-			var row = new PickedUpRowControl();
-			row.Bind(job);
-
-			pickflowRows.Controls.Add(row);
-			list.Add(row);
-
-			BeginInvoke(new Action(ResizeRowsToHost));
-		}
 
 		public void SetAllSelected(bool isSelected)
         {
@@ -110,13 +91,13 @@ namespace PitneyBowesCalculator.Picked_Up
         public void ResizeRowsToHost()
         {
             int width = pickflowRows.ClientSize.Width;
-            if (width == _lastResizeWidth) return;   // ✅ add
-            _lastResizeWidth = width;                 // ✅ add
+            if (width == _lastResizeWidth) return;   
+            _lastResizeWidth = width;                 
 
-            pickflowRows.SuspendLayout();             // ✅ add
+            pickflowRows.SuspendLayout();            
             foreach (Control c in pickflowRows.Controls)
                 c.Width = width;
-            pickflowRows.ResumeLayout();              // ✅ add
+            pickflowRows.ResumeLayout();             
         }
         public void SortByShippedDateDescending()
         {
