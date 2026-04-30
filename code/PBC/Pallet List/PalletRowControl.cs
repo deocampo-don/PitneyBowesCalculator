@@ -232,7 +232,7 @@ namespace PitneyBowesCalculator
             {
                 MessageDialogBox.ShowDialog(
                     "Cannot Delete",
-                    "This job has ongoing or packed pallets.",
+                    "Can't delete — Ongoing Pallet exists under this PB Job.",
                     MessageBoxButtons.OK,
                     MessageType.Warning
                 );

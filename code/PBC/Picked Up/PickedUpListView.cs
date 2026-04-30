@@ -19,8 +19,8 @@ namespace PitneyBowesCalculator.Picked_Up
         public PickedUpListView()
         {
             InitializeComponent();
-			pickflowRows.Resize += (_, __) => ResizeRowsToHost();
-		}
+            pickflowRows.Resize += (_, __) => ResizeRowsToHost(force: true);
+        }
        
         public event EventHandler<PbJobModel> PalletChanged;
 
@@ -58,14 +58,16 @@ namespace PitneyBowesCalculator.Picked_Up
             foreach (Control c in pickflowRows.Controls)
                 c.Dispose();
 
-           
             pickflowRows.Controls.Clear();
-            _rowsByJobId.Clear(); // 🔥 reset index
+            _rowsByJobId.Clear();
 
             foreach (var item in items)
             {
                 var row = new PickedUpRowControl();
                 row.Bind(item);
+
+                // ✅ Set width immediately before adding to panel
+                row.Width = pickflowRows.ClientSize.Width;
 
                 pickflowRows.Controls.Add(row);
 
@@ -78,7 +80,9 @@ namespace PitneyBowesCalculator.Picked_Up
             }
 
             pickflowRows.ResumeLayout();
-            BeginInvoke(new Action(ResizeRowsToHost));
+
+            // ✅ Force resize after layout is done — no BeginInvoke race
+            ResizeRowsToHost(force: true);
         }
 
         protected override void OnResize(EventArgs e)
@@ -88,16 +92,16 @@ namespace PitneyBowesCalculator.Picked_Up
         }
 
 
-        public void ResizeRowsToHost()
+        public void ResizeRowsToHost(bool force = false)
         {
             int width = pickflowRows.ClientSize.Width;
-            if (width == _lastResizeWidth) return;   
-            _lastResizeWidth = width;                 
+            if (!force && width == _lastResizeWidth) return;
+            _lastResizeWidth = width;
 
-            pickflowRows.SuspendLayout();            
+            pickflowRows.SuspendLayout();
             foreach (Control c in pickflowRows.Controls)
                 c.Width = width;
-            pickflowRows.ResumeLayout();             
+            pickflowRows.ResumeLayout();
         }
         public void SortByShippedDateDescending()
         {

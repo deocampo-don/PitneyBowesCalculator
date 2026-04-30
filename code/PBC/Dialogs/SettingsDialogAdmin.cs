@@ -30,24 +30,40 @@ namespace PitneyBowesCalculator
 
         private async void SettingsDialog_Load(object sender, EventArgs e)
         {
-            //tbDefPrinter.Text = appINI._defaultPrinter;
-            //tbDirectory.Text = appINI._outputDir;
-
-            // CPS (DATABASE)
-            var cps = await RqliteClient.LoadCpsSettingsAsync();
-            if (cps != null)
+            try
             {
-                tbCpsServer.Text = cps.CPSServer;
-                tbCpsDb.Text = cps.CPSDatabase;
-                tbCpsQuery.Text = cps.CPSQuery;
-                tbConnTimeOut.Text = cps.ConnectionTimeout.ToString();
-                tglTrustedConnection.Checked = cps.TrustedConnection;
-                tglTrustedServerCert.Checked = cps.TrustedServerCertificate;
-                tbSqlUser.Text = cps.SqlUser;
-                tbSqlPwd.Text = Utils.Decrypt(cps.SqlPassword);
+                var cps = await RqliteClient.LoadCpsSettingsAsync();
 
+                if (cps != null)
+                {
+                    tbCpsServer.Text = cps.CPSServer;
+                    tbCpsDb.Text = cps.CPSDatabase;
+                    tbCpsQuery.Text = cps.CPSQuery;
+                    tbConnTimeOut.Text = cps.ConnectionTimeout.ToString();
+                    tglTrustedConnection.Checked = cps.TrustedConnection;
+                    tglTrustedServerCert.Checked = cps.TrustedServerCertificate;
+                    tbSqlUser.Text = cps.SqlUser;
+                    tbSqlPwd.Text = Utils.Decrypt(cps.SqlPassword);
+                }
+                else
+                {
+                    MessageDialogBox.ShowDialog(
+                        "Database Offline",
+                        "Could not load settings — database is unreachable.\n\nYou can still update the connection settings and save.",
+                        MessageBoxButtons.OK,
+                        MessageType.Warning);
+                }
+
+                tglAllowDupli.Checked = RqliteClient.AllowDuplicateBarcodes;
             }
-            tglAllowDupli.Checked = RqliteClient.AllowDuplicateBarcodes;
+            catch (Exception ex)
+            {
+                MessageDialogBox.ShowDialog(
+                    "Load Error",
+                    "An error occurred while loading settings:\n\n" + ex.Message,
+                    MessageBoxButtons.OK,
+                    MessageType.Error);
+            }
         }
 
         private void btnSettingsCancel_Click(object sender, EventArgs e)

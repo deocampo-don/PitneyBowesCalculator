@@ -102,7 +102,7 @@ namespace PitneyBowesCalculator.Dialogs
               
                 MessageDialogBox.ShowDialog(
                     "",
-                    "You've already scanned this barcode!",
+                    "Scanned job already exists in a pallet!",
                     MessageBoxButtons.OK,
                     MessageType.Info
                  );
@@ -153,17 +153,20 @@ namespace PitneyBowesCalculator.Dialogs
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {
-                            if (reader.HasRows && await reader.ReadAsync())
+                            if (!reader.HasRows)
                             {
-                                workOrderCode = reader["WOName"]?.ToString() ?? "";
-                                envQty = Convert.ToInt32(reader["items"]);
-                            }
-                            else
-                            {
-                                
                                 MessageDialogBox.ShowDialog("", "Scanned Work Order not found.", MessageBoxButtons.OK, MessageType.Info);
                                 Utils.errorStatusAndSpinner(lbStatus, pbSpinner, "Not found!");
                                 return;
+                            }
+
+                            while (await reader.ReadAsync())
+                            {
+                                // WOName should be the same across all rows — take it from the first
+                                if (string.IsNullOrEmpty(workOrderCode))
+                                    workOrderCode = reader["WOName"]?.ToString() ?? "";
+
+                                envQty += Convert.ToInt32(reader["items"]);  // ← sum all rows
                             }
                         }
                     }

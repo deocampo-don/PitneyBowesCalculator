@@ -59,9 +59,6 @@ namespace PitneyBowesCalculator.Picked_Up
             }
         }
 
-
-
-
         [System.ComponentModel.Browsable(false)]
         [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public bool IsChecked

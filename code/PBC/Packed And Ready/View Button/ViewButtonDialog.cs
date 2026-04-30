@@ -350,7 +350,7 @@ namespace PitneyBowesCalculator.Packed_And_Ready.View_Button
                 if (selectedIndices == null || selectedIndices.Count == 0)
                 {
                     Utils.hideStatusAndSpinner(lbStatus, pbSpinner, "");
-                    MessageDialogBox.ShowDialog("No Selection", "Select pallet(s) to print.",
+                    MessageDialogBox.ShowDialog("No Selection", "No pallet selected.",
                         MessageBoxButtons.OK, MessageType.Info);
                     return;
                 }
